@@ -15,7 +15,7 @@ interface FileStore {
   setProcessing: (isProcessing: boolean, tool: ToolType | null) => void;
   setProgress: (progress: number) => void;
   setError: (error: string | null) => void;
-  setResult: (result: Blob | null) => void;
+  setResult: (result: Blob | null, filename?: string | null) => void;
   resetProcessing: () => void;
 }
 
@@ -25,6 +25,7 @@ const initialProcessingState: ProcessingState = {
   currentTool: null,
   error: null,
   result: null,
+  resultFilename: null,
 };
 
 export const useFileStore = create<FileStore>((set) => ({
@@ -80,7 +81,7 @@ export const useFileStore = create<FileStore>((set) => ({
         isProcessing,
         currentTool: tool,
         // Reset error and result when starting new processing
-        ...(isProcessing && { error: null, result: null, progress: 0 }),
+        ...(isProcessing && { error: null, result: null, resultFilename: null, progress: 0 }),
       },
     }));
   },
@@ -107,11 +108,12 @@ export const useFileStore = create<FileStore>((set) => ({
   },
 
   // Set processing result
-  setResult: (result: Blob | null) => {
+  setResult: (result: Blob | null, filename: string | null = null) => {
     set((state) => ({
       processing: {
         ...state.processing,
         result,
+        resultFilename: filename,
         isProcessing: false, // Stop processing when result is set
         progress: 100,
       },

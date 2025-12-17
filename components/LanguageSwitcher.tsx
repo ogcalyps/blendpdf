@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -9,40 +9,9 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   const switchLanguage = (newLocale: 'en' | 'ar') => {
-    // Get pathname without locale prefix
-    let pathnameWithoutLocale = pathname;
-    
-    // Remove locale prefix if present (/en or /ar)
-    if (pathname.startsWith('/en/') || pathname.startsWith('/ar/')) {
-      pathnameWithoutLocale = pathname.replace(/^\/(en|ar)/, '') || '/';
-    } else if (pathname === '/en' || pathname === '/ar') {
-      // Handle root paths with locale
-      pathnameWithoutLocale = '/';
-    } else if (pathname === '/') {
-      // Already at root
-      pathnameWithoutLocale = '/';
-    }
-    
-    // Ensure pathnameWithoutLocale starts with /
-    if (!pathnameWithoutLocale.startsWith('/')) {
-      pathnameWithoutLocale = '/' + pathnameWithoutLocale;
-    }
-    
-    // Construct new pathname
-    // For default locale (en), use 'as-needed' - don't add locale prefix
-    // For other locales (ar), add locale prefix
-    let newPathname: string;
-    if (newLocale === 'en') {
-      // Default locale: no prefix
-      newPathname = pathnameWithoutLocale;
-    } else {
-      // Other locales: add prefix
-      newPathname = pathnameWithoutLocale === '/' 
-        ? `/${newLocale}` 
-        : `/${newLocale}${pathnameWithoutLocale}`;
-    }
-    
-    router.push(newPathname);
+    // Use the locale-aware router which handles 'as-needed' strategy correctly
+    // pathname from next-intl already excludes the locale prefix
+    router.push(pathname, { locale: newLocale });
   };
 
   return (

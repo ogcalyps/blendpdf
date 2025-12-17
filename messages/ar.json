@@ -1,38 +1,42 @@
 {
-  "nav": { "logo": "Blend PDF" },
+  "nav": { "logo": "BlendPDF" },
   "hero": {
-    "title": "أدوات PDF مجانية. بدون تسجيل.",
-    "subtitle": "دمج، ضغط، تحويل. يعمل بأي لغة.",
-    "uploadTitle": "اسحب ملف PDF هنا",
-    "uploadSubtitle": "أو انقر للتصفح",
+    "title": "أدوات PDF مجانية بدون تسجيل",
+    "subtitle": "دمج، ضغط، وتحويل ملفاتك بسهولة",
+    "uploadTitle": "اسحب ملفات PDF هنا",
+    "uploadSubtitle": "أو اضغط للتصفح",
     "chooseFile": "اختر ملف",
-    "fileInfo": "الحد الأقصى 50 ميجابايت • الملفات تُحذف تلقائياً بعد ساعة"
+    "fileInfo": "الحد الأقصى 50 ميجابايت | ملفات متعددة | لا حاجة للتسجيل"
   },
   "tools": {
     "title": "ماذا تريد أن تفعل؟",
     "merge": { "title": "دمج ملفات PDF", "description": "دمج عدة ملفات في ملف واحد", "badge": "الأكثر استخداماً" },
-    "compress": { "title": "ضغط PDF", "description": "تقليل حجم الملف بشكل كبير", "badge": "توفير 90%" },
-    "convert": { "title": "PDF إلى صور", "description": "تحويل إلى JPG، PNG", "badge": "" },
+    "compress": { "title": "ضغط PDF", "description": "تقليل حجم الملف بشكل ذكي", "badge": "توفير 90%" },
+    "convert": { "title": "PDF إلى صور", "description": "تحويل إلى JPG، PNG، وغيرها", "badge": "قريباً" },
     "split": { "title": "تقسيم PDF", "description": "استخراج صفحات محددة", "badge": "" }
   },
   "technical": {
     "title": "يتعامل مع النصوص المعقدة بشكل صحيح",
-    "subtitle": "معظم أدوات PDF تفشل عند معالجة اللغات من اليمين لليسار والنصوص المعقدة. نحن لا نفعل ذلك.",
+    "subtitle": "معظم أدوات PDF تفشل في معالجة اللغات من اليمين لليسار. نحن لا نفشل.",
     "mostTools": "معظم الأدوات",
-    "fluxpdf": "Blend PDF",
-    "brokenRTL": "عرض RTL معطل",
-    "perfectRTL": "دعم RTL مثالي",
-    "languages": "يدعم اللغات من اليمين لليسار: العربية، العبرية، الفارسية، الأردية • بالإضافة إلى: الإنجليزية، الإسبانية، الفرنسية، الألمانية، الصينية، اليابانية، والمزيد"
+    "fluxpdf": "BlendPDF",
+    "brokenRTL": "✗ لا يعمل بشكل صحيح",
+    "perfectRTL": "✓ يعمل بشكل صحيح",
+    "brokenTitle": "???????",
+    "brokenDescription": "النص مكسور، الترتيب معكوس",
+    "perfectTitle": "مرحباً بك في ملف PDF",
+    "perfectDescription": "النص مقروء، الترتيب صحيح",
+    "languages": "ندعم العربية، العبرية، الفارسية، الأردية، بالإضافة إلى الإنجليزية، الإسبانية، الفرنسية، الألمانية، وأكثر من 20 لغة أخرى"
   },
   "why": {
-    "title": "لماذا Blend PDF؟",
-    "noSignup": { "title": "لا يتطلب تسجيل", "description": "رفع، معالجة، تنزيل. لا حاجة لحساب أو بريد إلكتروني أو بطاقة ائتمان." },
-    "autoDelete": { "title": "حذف الملفات تلقائياً", "description": "يتم حذف ملفاتك بعد ساعة واحدة. لا نصل إلى بياناتك أو نخزنها أبداً." }
+    "title": "لماذا BlendPDF؟",
+    "noSignup": { "title": "لا يتطلب تسجيل", "description": "بدون حسابات، بدون تعقيدات. ارفع ملفك، احصل على النتيجة، وانتهى الأمر." },
+    "autoDelete": { "title": "حذف الملفات تلقائياً", "description": "نحذف ملفاتك بعد ساعة واحدة. لا نحتفظ بأي شيء، ولا نسجل أي شيء." }
   },
-  "footer": { "builtBy": "صُنع بواسطة", "contact": "اتصل بنا", "madeIn": "صُنع في برشلونة" },
-  "processing": { "uploading": "جاري الرفع...", "processing": "جاري المعالجة...", "downloading": "جاري تحضير التنزيل...", "success": "نجح!", "error": "خطأ", "download": "تنزيل", "fileDownloaded": "تم تنزيل الملف", "close": "إغلاق" },
+  "footer": { "builtBy": "صُنع بواسطة", "contact": "اتصل بنا:", "madeIn": "صنع في برشلونة" },
+  "processing": { "uploading": "جاري الرفع...", "processing": "جاري المعالجة...", "downloading": "جاري تحضير التنزيل...", "success": "نجح!", "error": "خطأ", "download": "تنزيل", "fileDownloaded": "تم تنزيل الملف", "readyToDownload": "ملفك جاهز! انقر على تنزيل لحفظه.", "close": "إغلاق" },
   "fileList": { "title": "الملفات المرفوعة", "file": "ملف", "files": "ملفات", "empty": "لم يتم رفع أي ملفات بعد" },
-  "compressDialog": { "title": "اختر مستوى الضغط", "low": "جودة منخفضة", "lowDesc": "90% أصغر، أدنى جودة", "medium": "جودة متوسطة", "mediumDesc": "70% أصغر، متوازن", "high": "جودة عالية", "highDesc": "50% أصغر، أفضل جودة", "cancel": "إلغاء", "compress": "ضغط" },
+  "compressDialog": { "title": "اختر مستوى الضغط", "low": "أفضل جودة", "lowDesc": "أعلى جودة، حجم ملف أكبر", "medium": "متوازن", "mediumDesc": "توازن جيد بين الجودة وحجم الملف", "high": "أصغر حجم", "highDesc": "أقصى ضغط، أصغر حجم ملف", "recommended": "موصى به", "cancel": "إلغاء", "compress": "ضغط" },
   "splitDialog": { "title": "استخراج الصفحات", "totalPages": "إجمالي الصفحات", "pageRanges": "نطاقات الصفحات", "placeholder": "مثلاً: 1-5، 8، 12-15", "helper": "أدخل أرقام الصفحات أو النطاقات مفصولة بفواصل", "cancel": "إلغاء", "split": "تقسيم" }
 }
 

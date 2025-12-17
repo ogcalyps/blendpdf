@@ -1,4 +1,5 @@
 import { PDFDocument, degrees } from 'pdf-lib';
+import { createCanvas } from 'canvas';
 import type { CompressionLevel } from '@/types';
 
 /**
@@ -33,8 +34,50 @@ export async function mergePDFs(pdfBuffers: ArrayBuffer[]): Promise<Uint8Array> 
   }
 }
 
+// Try to use pdf.js, but if it fails, we'll use fallback compression
+let pdfjsLib: any = null;
+let pdfjsAvailable = true;
+
+async function getPdfJs() {
+  if (pdfjsLib !== null) {
+    return pdfjsLib;
+  }
+  
+  if (!pdfjsAvailable) {
+    throw new Error('pdf.js is not available');
+  }
+  
+  try {
+    // Use older version (3.11.174) which has better Next.js compatibility
+    // Use require for CommonJS module (server-side only)
+    const { createRequire } = await import('module');
+    const require = createRequire(import.meta.url);
+    // Use require for older version (CommonJS) - add type assertion
+    pdfjsLib = require('pdfjs-dist/build/pdf.js') as any;
+    
+    // Set worker path (server-side only)
+    if (typeof window === 'undefined') {
+      try {
+        const workerPath = require.resolve('pdfjs-dist/build/pdf.worker.js');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerPath;
+      } catch (workerError) {
+        // If worker resolution fails, disable it
+        console.warn('Could not resolve worker, using synchronous mode');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      }
+    }
+    
+    return pdfjsLib;
+  } catch (importError) {
+    console.warn('pdf.js not available, will use fallback compression:', importError);
+    pdfjsAvailable = false;
+    pdfjsLib = null;
+    throw importError;
+  }
+}
+
 /**
- * Compress a PDF based on compression level
+ * Compress a PDF based on compression level using pdf.js and canvas for image optimization
  * @param pdfBuffer - PDF file buffer to compress
  * @param level - Compression level (low, medium, high)
  * @returns Compressed PDF as Uint8Array
@@ -45,82 +88,182 @@ export async function compressPDF(
   level: CompressionLevel
 ): Promise<Uint8Array> {
   try {
-    const sourcePdf = await PDFDocument.load(pdfBuffer);
+    console.log(`[compressPDF] Starting compression with level: ${level}`);
+    
+    // Compression settings based on level
+    const compressionSettings = {
+      low: {
+        scale: 1.5, // Higher resolution for quality
+        imageQuality: 0.85,
+        useObjectStreams: true,
+        removeMetadata: false,
+      },
+      medium: {
+        scale: 1.2,
+        imageQuality: 0.65,
+        useObjectStreams: true,
+        removeMetadata: false,
+      },
+      high: {
+        scale: 1.0,
+        imageQuality: 0.45,
+        useObjectStreams: true,
+        removeMetadata: false,
+      },
+    };
 
-    switch (level) {
-      case 'low': {
-        // Low compression: Save without object streams (faster, larger file)
-        // This is useful when you want minimal processing time
-        return await sourcePdf.save({
-          useObjectStreams: false,
-          addDefaultPage: false,
-        });
+    const settings = compressionSettings[level];
+    
+    // Validate compression level
+    if (!settings) {
+      throw new Error(`Invalid compression level: ${level}. Valid levels are: low, medium, high`);
+    }
+    
+    // Try to get pdf.js library
+    let pdfjs: any;
+    let pdf: any;
+    let numPages: number;
+    
+    try {
+      pdfjs = await getPdfJs();
+      
+      // Load PDF with pdf.js - catch worker errors
+      const loadingTask = pdfjs.getDocument({ 
+        data: pdfBuffer,
+        verbosity: 0,
+        // Disable worker completely
+        useWorkerFetch: false,
+        isEvalSupported: false,
+      });
+      
+      pdf = await loadingTask.promise;
+      numPages = pdf.numPages;
+    } catch (pdfjsError) {
+      // If pdf.js fails (worker issue), throw to trigger fallback
+      throw new Error(`pdf.js failed: ${pdfjsError instanceof Error ? pdfjsError.message : 'Unknown error'}`);
+    }
+
+    // Create new PDF with pdf-lib
+    const compressedPdf = await PDFDocument.create();
+    
+    // Process each page: render to canvas, compress, and re-embed
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: settings.scale });
+      
+      // Create canvas to render the page
+      const canvas = createCanvas(viewport.width, viewport.height);
+      const context = canvas.getContext('2d');
+      
+      // Render PDF page to canvas (synchronous mode, no worker needed)
+      const renderContext = {
+        canvasContext: context as any,
+        viewport: viewport,
+      };
+      
+      await page.render(renderContext).promise;
+      
+      // Convert canvas to JPEG buffer with compression
+      const imageBuffer = canvas.toBuffer('image/jpeg', {
+        quality: Math.round(settings.imageQuality * 100), // Convert 0-1 to 0-100
+      });
+      
+      // Embed compressed image as a page in the new PDF
+      const image = await compressedPdf.embedJpg(imageBuffer);
+      const newPage = compressedPdf.addPage([viewport.width, viewport.height]);
+      
+      // Scale image to fit page
+      const imageDims = image.scale(1);
+      newPage.drawImage(image, {
+        x: 0,
+        y: 0,
+        width: imageDims.width,
+        height: imageDims.height,
+      });
+    }
+    
+    // Handle metadata
+    if (!settings.removeMetadata) {
+      try {
+        const sourcePdf = await PDFDocument.load(pdfBuffer);
+        const title = sourcePdf.getTitle();
+        const author = sourcePdf.getAuthor();
+        const subject = sourcePdf.getSubject();
+        const keywords = sourcePdf.getKeywords();
+        const creator = sourcePdf.getCreator();
+        const producer = sourcePdf.getProducer();
+        const creationDate = sourcePdf.getCreationDate();
+        const modificationDate = sourcePdf.getModificationDate();
+        
+        if (title) compressedPdf.setTitle(title);
+        if (author) compressedPdf.setAuthor(author);
+        if (subject) compressedPdf.setSubject(subject);
+        if (keywords) compressedPdf.setKeywords(Array.isArray(keywords) ? keywords : [keywords]);
+        if (creator) compressedPdf.setCreator(creator);
+        if (producer) compressedPdf.setProducer(producer);
+        if (creationDate) compressedPdf.setCreationDate(creationDate);
+        if (modificationDate) compressedPdf.setModificationDate(modificationDate);
+      } catch (metaError) {
+        console.warn('Failed to copy some metadata:', metaError);
       }
-
-      case 'medium': {
-        // Medium compression: Use object streams (balanced compression)
-        // This provides good compression while maintaining quality
-        return await sourcePdf.save({
-          useObjectStreams: true,
-          addDefaultPage: false,
-        });
-      }
-
-      case 'high': {
-        // High compression: Recreate PDF structure to remove unused objects
-        // Copy only pages and essential resources, then save with object streams
-        const compressedPdf = await PDFDocument.create();
-        const pageCount = sourcePdf.getPageCount();
-        const pageIndices = Array.from({ length: pageCount }, (_, i) => i);
-
-        // Copy all pages (this automatically removes unused objects)
-        const pages = await compressedPdf.copyPages(sourcePdf, pageIndices);
-        pages.forEach((page) => {
-          compressedPdf.addPage(page);
-        });
-
-        // Copy document metadata (optional, but preserves info)
+    }
+    
+    // Save with compression settings
+    const compressed = await compressedPdf.save({
+      useObjectStreams: settings.useObjectStreams,
+      addDefaultPage: false,
+    });
+    
+    const originalSize = pdfBuffer.byteLength;
+    const compressedSize = compressed.length;
+    const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+    
+    console.log(`Compression complete: ${level} - Original: ${originalSize} bytes, Compressed: ${compressedSize} bytes, Reduction: ${reduction}%`);
+    
+    return compressed;
+  } catch (error) {
+    // pdf.js compression failed (likely worker issue), use enhanced pdf-lib compression
+    console.warn('Advanced compression unavailable, using enhanced pdf-lib compression');
+    
+    // Enhanced pdf-lib compression with level-based optimization
+    try {
+      const sourcePdf = await PDFDocument.load(pdfBuffer);
+      const compressedPdf = await PDFDocument.create();
+      const pageCount = sourcePdf.getPageCount();
+      const pageIndices = Array.from({ length: pageCount }, (_, i) => i);
+      
+      const pages = await compressedPdf.copyPages(sourcePdf, pageIndices);
+      pages.forEach((page) => {
+        compressedPdf.addPage(page);
+      });
+      
+      const compressionSettings = {
+        low: { useObjectStreams: true, removeMetadata: false },
+        medium: { useObjectStreams: true, removeMetadata: false },
+        high: { useObjectStreams: true, removeMetadata: true },
+      };
+      
+      const settings = compressionSettings[level] || compressionSettings.medium;
+      
+      if (!settings.removeMetadata) {
         try {
           const title = sourcePdf.getTitle();
-          const author = sourcePdf.getAuthor();
-          const subject = sourcePdf.getSubject();
-          const keywords = sourcePdf.getKeywords();
-          const creator = sourcePdf.getCreator();
-          const producer = sourcePdf.getProducer();
-          const creationDate = sourcePdf.getCreationDate();
-          const modificationDate = sourcePdf.getModificationDate();
-
           if (title) compressedPdf.setTitle(title);
-          if (author) compressedPdf.setAuthor(author);
-          if (subject) compressedPdf.setSubject(subject);
-          if (keywords) compressedPdf.setKeywords(keywords);
-          if (creator) compressedPdf.setCreator(creator);
-          if (producer) compressedPdf.setProducer(producer);
-          if (creationDate) compressedPdf.setCreationDate(creationDate);
-          if (modificationDate) compressedPdf.setModificationDate(modificationDate);
         } catch {
-          // Ignore metadata errors, compression is more important
+          // Ignore metadata errors
         }
-
-        // Save with object streams for maximum compression
-        return await compressedPdf.save({
-          useObjectStreams: true,
-          addDefaultPage: false,
-        });
       }
-
-      default:
-        // Fallback to medium compression
-        return await sourcePdf.save({
-          useObjectStreams: true,
-          addDefaultPage: false,
-        });
+      
+      return await compressedPdf.save({
+        useObjectStreams: settings.useObjectStreams,
+        addDefaultPage: false,
+      });
+    } catch (fallbackError) {
+      if (fallbackError instanceof Error) {
+        throw new Error(`Failed to compress PDF: ${fallbackError.message}`);
+      }
+      throw new Error('Failed to compress PDF: Unknown error');
     }
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Failed to compress PDF: ${error.message}`);
-    }
-    throw new Error('Failed to compress PDF: Unknown error');
   }
 }
 

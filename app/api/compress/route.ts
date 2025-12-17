@@ -13,7 +13,11 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = await file.arrayBuffer();
+    const originalSize = buffer.byteLength;
     const compressed = await compressPDF(buffer, level);
+    const compressedSize = compressed.length;
+
+    console.log(`Compression: ${level} - Original: ${originalSize} bytes, Compressed: ${compressedSize} bytes, Reduction: ${((1 - compressedSize / originalSize) * 100).toFixed(1)}%`);
 
     return new NextResponse(Buffer.from(compressed), {
       headers: {

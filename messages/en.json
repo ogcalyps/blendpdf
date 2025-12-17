@@ -1,5 +1,5 @@
 {
-  "nav": { "logo": "Blend PDF" },
+  "nav": { "logo": "BlendPDF" },
   "hero": {
     "title": "Free PDF Tools. No Sign-up.",
     "subtitle": "Merge, compress, convert. Works in any language.",
@@ -19,20 +19,24 @@
     "title": "Handles complex scripts correctly",
     "subtitle": "Most PDF tools break when processing RTL languages and complex scripts. We don't.",
     "mostTools": "Most Tools",
-    "fluxpdf": "Blend PDF",
+    "fluxpdf": "BlendPDF",
     "brokenRTL": "Broken RTL rendering",
     "perfectRTL": "Perfect RTL support",
+    "brokenTitle": "???????",
+    "brokenDescription": "Text is broken, order is reversed",
+    "perfectTitle": "Welcome to PDF file",
+    "perfectDescription": "Text is readable, order is correct",
     "languages": "Supports RTL languages: Arabic, Hebrew, Persian, Urdu • Plus: English, Spanish, French, German, Chinese, Japanese, and more"
   },
   "why": {
-    "title": "Why Blend PDF?",
+    "title": "Why BlendPDF?",
     "noSignup": { "title": "No sign-up required", "description": "Upload, process, download. No account, no email, no credit card needed." },
     "autoDelete": { "title": "Files auto-delete", "description": "Your files are deleted after 1 hour. We never access or store your data." }
   },
   "footer": { "builtBy": "Built by", "contact": "Contact", "madeIn": "Made in Barcelona" },
-  "processing": { "uploading": "Uploading...", "processing": "Processing...", "downloading": "Preparing download...", "success": "Success!", "error": "Error", "download": "Download", "fileDownloaded": "File downloaded", "close": "Close" },
+  "processing": { "uploading": "Uploading...", "processing": "Processing...", "downloading": "Preparing download...", "success": "Success!", "error": "Error", "download": "Download", "fileDownloaded": "File downloaded", "readyToDownload": "Your file is ready! Click download to save it.", "close": "Close" },
   "fileList": { "title": "Uploaded Files", "file": "file", "files": "files", "empty": "No files uploaded yet" },
-  "compressDialog": { "title": "Choose Compression Level", "low": "Low Quality", "lowDesc": "90% smaller, lowest quality", "medium": "Medium Quality", "mediumDesc": "70% smaller, balanced", "high": "High Quality", "highDesc": "50% smaller, best quality", "cancel": "Cancel", "compress": "Compress" },
+  "compressDialog": { "title": "Choose Compression Level", "low": "Best Quality", "lowDesc": "Highest quality, larger file size", "medium": "Balanced", "mediumDesc": "Good balance between quality and file size", "high": "Smallest Size", "highDesc": "Maximum compression, smaller file size", "recommended": "Recommended", "cancel": "Cancel", "compress": "Compress" },
   "splitDialog": { "title": "Extract Pages", "totalPages": "Total pages", "pageRanges": "Page ranges", "placeholder": "e.g., 1-5, 8, 12-15", "helper": "Enter page numbers or ranges separated by commas", "cancel": "Cancel", "split": "Split" }
 }
 

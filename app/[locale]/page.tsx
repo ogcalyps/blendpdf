@@ -14,14 +14,13 @@ import { SplitDialog } from '@/components/SplitDialog';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
 import { useFileStore } from '@/store/use-file-store';
 import { mergePDFs, compressPDF, splitPDF } from '@/lib/api-client';
-import { downloadBlob } from '@/lib/utils';
 import { PDFDocument } from 'pdf-lib';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import type { CompressionLevel } from '@/types';
 
 export default function Home() {
   const t = useTranslations();
-  const { files, processing, setProcessing, setProgress, setError, resetProcessing } = useFileStore();
+  const { files, processing, setProcessing, setProgress, setError, setResult, resetProcessing } = useFileStore();
 
   const [showCompressDialog, setShowCompressDialog] = useState(false);
   const [showSplitDialog, setShowSplitDialog] = useState(false);
@@ -43,8 +42,7 @@ export default function Home() {
       setProgress(30);
       const result = await mergePDFs(files.map(f => f.file));
       setProgress(100);
-      downloadBlob(result, 'merged.pdf');
-      setTimeout(() => resetProcessing(), 1000);
+      setResult(result, 'merged.pdf');
     } catch (error: any) {
       setError(error.message);
     }
@@ -64,8 +62,7 @@ export default function Home() {
       setProgress(30);
       const result = await compressPDF(files[0].file, level);
       setProgress(100);
-      downloadBlob(result, 'compressed.pdf');
-      setTimeout(() => resetProcessing(), 1000);
+      setResult(result, 'compressed.pdf');
     } catch (error: any) {
       setError(error.message);
     }
@@ -92,8 +89,7 @@ export default function Home() {
       setProgress(30);
       const result = await splitPDF(files[0].file, ranges);
       setProgress(100);
-      downloadBlob(result, 'split.pdf');
-      setTimeout(() => resetProcessing(), 1000);
+      setResult(result, 'split.pdf');
     } catch (error: any) {
       setError(error.message);
     }
@@ -237,7 +233,7 @@ export default function Home() {
               {t('footer.builtBy')} <a href="https://twitter.com/adil" className="font-medium text-ocean-600 hover:text-ocean-700">@adil</a>
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+              <a href="mailto:contact@blendpdf.com" className="text-sm text-gray-600 hover:text-gray-900">
                 {t('footer.contact')}
               </a>
               <p className="text-sm text-gray-600">
@@ -260,7 +256,7 @@ export default function Home() {
         pageCount={pdfPageCount}
       />
       <ProcessingModal
-        isOpen={processing.isProcessing}
+        isOpen={processing.isProcessing || (processing.progress === 100 && processing.result !== null && !processing.error)}
         progress={processing.progress}
         currentTool={processing.currentTool}
         error={processing.error}

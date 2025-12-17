@@ -21,6 +21,7 @@ export interface ProcessingState {
   currentTool: ToolType | null;
   error: string | null;
   result: Blob | null;
+  resultFilename: string | null;
 }
 
 // PDF metadata interface

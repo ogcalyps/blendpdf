@@ -7,8 +7,24 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Blend PDF - Free PDF Tools",
-  description: "Merge, compress, convert, and split PDFs. No sign-up required.",
+  title: "BlendPDF - Free PDF Tools | No Sign-up Required",
+  description: "Free online PDF tools. Merge, compress, split PDFs. Works in any language. No sign-up required.",
+  applicationName: "BlendPDF",
+  keywords: ["PDF tools", "merge PDF", "compress PDF", "split PDF", "PDF converter", "free PDF tools"],
+  authors: [{ name: "BlendPDF" }],
+  creator: "BlendPDF",
+  publisher: "BlendPDF",
+  openGraph: {
+    title: "BlendPDF - Free PDF Tools",
+    description: "Free online PDF tools. Merge, compress, split PDFs. No sign-up required.",
+    siteName: "BlendPDF",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BlendPDF - Free PDF Tools",
+    description: "Free online PDF tools. Merge, compress, split PDFs. No sign-up required.",
+  },
 };
 
 export default async function LocaleLayout({
