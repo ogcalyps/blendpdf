@@ -1,0 +1,38 @@
+{
+  "nav": { "logo": "Blend PDF" },
+  "hero": {
+    "title": "Free PDF Tools. No Sign-up.",
+    "subtitle": "Merge, compress, convert. Works in any language.",
+    "uploadTitle": "Drop PDF here",
+    "uploadSubtitle": "or click to browse",
+    "chooseFile": "Choose File",
+    "fileInfo": "Max 50MB • Files auto-delete after 1 hour"
+  },
+  "tools": {
+    "title": "What do you want to do?",
+    "merge": { "title": "Merge PDFs", "description": "Combine multiple files into one", "badge": "Most used" },
+    "compress": { "title": "Compress PDF", "description": "Reduce file size dramatically", "badge": "Save 90%" },
+    "convert": { "title": "PDF to Images", "description": "Convert to JPG, PNG", "badge": "" },
+    "split": { "title": "Split PDF", "description": "Extract specific pages", "badge": "" }
+  },
+  "technical": {
+    "title": "Handles complex scripts correctly",
+    "subtitle": "Most PDF tools break when processing RTL languages and complex scripts. We don't.",
+    "mostTools": "Most Tools",
+    "fluxpdf": "Blend PDF",
+    "brokenRTL": "Broken RTL rendering",
+    "perfectRTL": "Perfect RTL support",
+    "languages": "Supports RTL languages: Arabic, Hebrew, Persian, Urdu • Plus: English, Spanish, French, German, Chinese, Japanese, and more"
+  },
+  "why": {
+    "title": "Why Blend PDF?",
+    "noSignup": { "title": "No sign-up required", "description": "Upload, process, download. No account, no email, no credit card needed." },
+    "autoDelete": { "title": "Files auto-delete", "description": "Your files are deleted after 1 hour. We never access or store your data." }
+  },
+  "footer": { "builtBy": "Built by", "contact": "Contact", "madeIn": "Made in Barcelona" },
+  "processing": { "uploading": "Uploading...", "processing": "Processing...", "downloading": "Preparing download...", "success": "Success!", "error": "Error", "download": "Download", "fileDownloaded": "File downloaded", "close": "Close" },
+  "fileList": { "title": "Uploaded Files", "file": "file", "files": "files", "empty": "No files uploaded yet" },
+  "compressDialog": { "title": "Choose Compression Level", "low": "Low Quality", "lowDesc": "90% smaller, lowest quality", "medium": "Medium Quality", "mediumDesc": "70% smaller, balanced", "high": "High Quality", "highDesc": "50% smaller, best quality", "cancel": "Cancel", "compress": "Compress" },
+  "splitDialog": { "title": "Extract Pages", "totalPages": "Total pages", "pageRanges": "Page ranges", "placeholder": "e.g., 1-5, 8, 12-15", "helper": "Enter page numbers or ranges separated by commas", "cancel": "Cancel", "split": "Split" }
+}
+
