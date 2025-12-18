@@ -1,0 +1,17 @@
+# Custom headers for AWS Amplify
+# This file should be placed in amplify.yml or configured in Amplify console
+# 
+# To configure in Amplify Console:
+# 1. Go to App settings → Custom headers and cache
+# 2. Add custom headers for API routes
+#
+# Note: This is a reference file - actual configuration is done in Amplify console
+
+customHeaders:
+  - pattern: '/api/*'
+    headers:
+      - key: 'X-Content-Type-Options'
+        value: 'nosniff'
+      - key: 'Access-Control-Max-Age'
+        value: '86400'
+

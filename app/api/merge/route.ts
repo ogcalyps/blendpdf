@@ -7,8 +7,17 @@ const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB total
 const MAX_FILES = 20; // Maximum number of files
 const FUNCTION_TIMEOUT = 25000; // 25 seconds (AWS Amplify default is 10s, max 30s)
 
-export const maxDuration = 30; // Next.js API route max duration (seconds)
+// AWS Amplify timeout configuration
+// Note: Amplify has a default 10-second timeout that may override this
+// You MUST increase the timeout in AWS Amplify Console → App settings → Build settings
+export const maxDuration = 30; // Next.js API route max duration (seconds) - max is 30
 export const runtime = 'nodejs'; // Use Node.js runtime
+
+// Force immediate logging to help debug timeout issues
+if (typeof process !== 'undefined') {
+  process.stdout.write('MERGE_ROUTE_LOADED\n');
+  process.stderr.write('MERGE_ROUTE_LOADED\n');
+}
 
 // Enhanced logging for AWS Amplify visibility
 // Logs to both stdout and stderr to ensure visibility in AWS logs
