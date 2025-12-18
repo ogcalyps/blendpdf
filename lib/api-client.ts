@@ -12,8 +12,24 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
   
   console.log(`[Client] Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB, Max for Base64: ${(MAX_BASE64_SIZE / 1024 / 1024).toFixed(2)}MB`);
   
+  // First, test if POST requests work at all with a small payload
   if (totalSize < MAX_BASE64_SIZE) {
     console.log(`[Client] Files are small enough for Base64 encoding, using alternative endpoint`);
+    
+    // Test endpoint first to see if POST works
+    try {
+      console.log(`[Client] Testing POST endpoint with small payload...`);
+      const testResponse = await fetch('/api/merge-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ test: true, fileCount: files.length }),
+      });
+      const testResult = await testResponse.json();
+      console.log(`[Client] Test endpoint result:`, testResult);
+    } catch (testError) {
+      console.error(`[Client] Test endpoint failed:`, testError);
+    }
+    
     return mergePDFsBase64(files);
   }
   
