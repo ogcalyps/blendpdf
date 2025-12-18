@@ -1,41 +1,36 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { getAWSCredentials, getS3BucketName } from './amplify-secrets';
 
 // Initialize S3 client
-// Use IAM role credentials (default) or explicit credentials if provided
+// Use IAM role credentials (default) or explicit credentials from Secrets/env vars
 // Amplify Lambda functions use the execution role by default
+const awsConfig = getAWSCredentials();
 const s3Client = new S3Client({
-  region: process.env._AWS_REGION || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-north-1',
-  // Only set credentials if explicitly provided (for local dev)
-  // In Amplify, the Lambda execution role will be used automatically
-  ...(process.env._AWS_ACCESS_KEY_ID && process.env._AWS_SECRET_ACCESS_KEY
+  region: awsConfig.region,
+  // Only set credentials if explicitly provided (for local dev or if Secrets are set)
+  // In Amplify, the Lambda execution role will be used automatically if no credentials
+  ...(awsConfig.accessKeyId && awsConfig.secretAccessKey
     ? {
         credentials: {
-          accessKeyId: process.env._AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID || '',
-          secretAccessKey: process.env._AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY || '',
+          accessKeyId: awsConfig.accessKeyId,
+          secretAccessKey: awsConfig.secretAccessKey,
         },
       }
     : {}),
 });
 
-// Initialize bucket name
-// Since Amplify env vars don't work in Lambda, we'll try multiple approaches
+// Get bucket name from Amplify Secrets or fallback
 function getBucketName(): string {
-  // Try environment variables first
-  let bucketName = process.env._AWS_S3_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME || '';
-  
-  // If not set, use hardcoded value (you can change this)
-  // TODO: Once Amplify Secrets work, remove this hardcode
-  if (!bucketName) {
-    bucketName = 'blendpdf-uploads'; // Your bucket name
-    console.warn('S3 Bucket Name: Using hardcoded value because environment variable not available');
-  }
+  const bucketName = getS3BucketName();
   
   // Debug logging
   console.log('S3 Bucket Name Check:', {
     'bucketName': bucketName,
+    'source': bucketName === 'blendpdf-uploads' ? 'hardcoded fallback' : 'Secrets/env var',
     '_AWS_S3_BUCKET_NAME': process.env._AWS_S3_BUCKET_NAME || 'NOT SET',
     'AWS_S3_BUCKET_NAME': process.env.AWS_S3_BUCKET_NAME || 'NOT SET',
+    'AMPLIFY_SECRET_AWS_S3_BUCKET_NAME': process.env.AMPLIFY_SECRET_AWS_S3_BUCKET_NAME || 'NOT SET',
   });
   
   return bucketName;
