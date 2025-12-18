@@ -4,9 +4,9 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
-  // Disabled standalone output - it can cause API route timeout issues in Amplify
-  // API routes need to be deployed as separate Lambda functions
-  // output: 'standalone',
+  // Enable standalone output for AWS Amplify
+  // This ensures API routes are properly deployed as serverless functions
+  output: 'standalone',
   
   experimental: {
     serverActions: {
