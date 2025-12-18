@@ -11,7 +11,23 @@ const s3Client = new S3Client({
   },
 });
 
-const BUCKET_NAME = process.env._AWS_S3_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME || '';
+// Initialize bucket name - check at runtime, not module load time
+// This ensures environment variables are available after Amplify redeploy
+function getBucketName(): string {
+  const bucketName = process.env._AWS_S3_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME || '';
+  
+  // Debug logging
+  if (!bucketName) {
+    console.error('S3 Bucket Name Check:', {
+      '_AWS_S3_BUCKET_NAME': process.env._AWS_S3_BUCKET_NAME || 'NOT SET',
+      'AWS_S3_BUCKET_NAME': process.env.AWS_S3_BUCKET_NAME || 'NOT SET',
+      'All env vars with AWS': Object.keys(process.env).filter(k => k.includes('AWS') || k.includes('S3')).map(k => `${k}=${process.env[k]?.substring(0, 10)}...`),
+    });
+  }
+  
+  return bucketName;
+}
+
 const UPLOAD_PREFIX = 'uploads/';
 const EXPIRES_IN = 3600; // 1 hour
 
@@ -19,8 +35,10 @@ const EXPIRES_IN = 3600; // 1 hour
  * Generate a presigned URL for uploading a file to S3
  */
 export async function generateUploadUrl(fileName: string, contentType: string = 'application/pdf'): Promise<string> {
+  const BUCKET_NAME = getBucketName();
+  
   if (!BUCKET_NAME) {
-    throw new Error('_AWS_S3_BUCKET_NAME or AWS_S3_BUCKET_NAME environment variable is not set');
+    throw new Error('_AWS_S3_BUCKET_NAME or AWS_S3_BUCKET_NAME environment variable is not set. Please check Amplify environment variables and redeploy.');
   }
 
   const key = `${UPLOAD_PREFIX}${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${fileName}`;
@@ -30,6 +48,8 @@ export async function generateUploadUrl(fileName: string, contentType: string = 
     Key: key,
     ContentType: contentType,
   });
+  
+  console.log(`[generateUploadUrl] Using bucket: ${BUCKET_NAME}, key: ${key}`);
 
   const url = await getSignedUrl(s3Client, command, { expiresIn: EXPIRES_IN });
   
@@ -40,6 +60,8 @@ export async function generateUploadUrl(fileName: string, contentType: string = 
  * Download a file from S3
  */
 export async function downloadFromS3(key: string): Promise<ArrayBuffer> {
+  const BUCKET_NAME = getBucketName();
+  
   if (!BUCKET_NAME) {
     throw new Error('_AWS_S3_BUCKET_NAME or AWS_S3_BUCKET_NAME environment variable is not set');
   }
@@ -48,6 +70,8 @@ export async function downloadFromS3(key: string): Promise<ArrayBuffer> {
     Bucket: BUCKET_NAME,
     Key: key,
   });
+  
+  console.log(`[downloadFromS3] Using bucket: ${BUCKET_NAME}, key: ${key}`);
 
   const response = await s3Client.send(command);
   
@@ -73,6 +97,8 @@ export async function downloadFromS3(key: string): Promise<ArrayBuffer> {
  * Delete a file from S3
  */
 export async function deleteFromS3(key: string): Promise<void> {
+  const BUCKET_NAME = getBucketName();
+  
   if (!BUCKET_NAME) {
     return; // Silently fail if bucket not configured
   }
