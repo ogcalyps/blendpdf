@@ -2,28 +2,41 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 // Initialize S3 client
-// Note: Amplify doesn't allow AWS_ prefix, so we use _AWS_ prefix
+// Use IAM role credentials (default) or explicit credentials if provided
+// Amplify Lambda functions use the execution role by default
 const s3Client = new S3Client({
-  region: process.env._AWS_REGION || process.env.AWS_REGION || 'eu-north-1',
-  credentials: {
-    accessKeyId: process.env._AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env._AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY || '',
-  },
+  region: process.env._AWS_REGION || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-north-1',
+  // Only set credentials if explicitly provided (for local dev)
+  // In Amplify, the Lambda execution role will be used automatically
+  ...(process.env._AWS_ACCESS_KEY_ID && process.env._AWS_SECRET_ACCESS_KEY
+    ? {
+        credentials: {
+          accessKeyId: process.env._AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env._AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY || '',
+        },
+      }
+    : {}),
 });
 
-// Initialize bucket name - check at runtime, not module load time
-// This ensures environment variables are available after Amplify redeploy
+// Initialize bucket name
+// Since Amplify env vars don't work in Lambda, we'll try multiple approaches
 function getBucketName(): string {
-  const bucketName = process.env._AWS_S3_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME || '';
+  // Try environment variables first
+  let bucketName = process.env._AWS_S3_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME || '';
+  
+  // If not set, use hardcoded value (you can change this)
+  // TODO: Once Amplify Secrets work, remove this hardcode
+  if (!bucketName) {
+    bucketName = 'blendpdf-uploads'; // Your bucket name
+    console.warn('S3 Bucket Name: Using hardcoded value because environment variable not available');
+  }
   
   // Debug logging
-  if (!bucketName) {
-    console.error('S3 Bucket Name Check:', {
-      '_AWS_S3_BUCKET_NAME': process.env._AWS_S3_BUCKET_NAME || 'NOT SET',
-      'AWS_S3_BUCKET_NAME': process.env.AWS_S3_BUCKET_NAME || 'NOT SET',
-      'All env vars with AWS': Object.keys(process.env).filter(k => k.includes('AWS') || k.includes('S3')).map(k => `${k}=${process.env[k]?.substring(0, 10)}...`),
-    });
-  }
+  console.log('S3 Bucket Name Check:', {
+    'bucketName': bucketName,
+    '_AWS_S3_BUCKET_NAME': process.env._AWS_S3_BUCKET_NAME || 'NOT SET',
+    'AWS_S3_BUCKET_NAME': process.env.AWS_S3_BUCKET_NAME || 'NOT SET',
+  });
   
   return bucketName;
 }
