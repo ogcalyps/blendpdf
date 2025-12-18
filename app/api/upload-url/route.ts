@@ -14,6 +14,15 @@ export async function POST(request: NextRequest) {
   
   console.log(`[${requestId}] Upload URL request initiated`);
   
+  // Debug: Log environment variables (without exposing secrets)
+  console.log(`[${requestId}] Environment check:`, {
+    hasRegion: !!process.env._AWS_REGION,
+    hasAccessKey: !!process.env._AWS_ACCESS_KEY_ID,
+    hasSecretKey: !!process.env._AWS_SECRET_ACCESS_KEY,
+    hasBucketName: !!process.env._AWS_S3_BUCKET_NAME,
+    bucketName: process.env._AWS_S3_BUCKET_NAME || 'NOT SET',
+  });
+  
   try {
     const body = await request.json();
     const { files } = body;
