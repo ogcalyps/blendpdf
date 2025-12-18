@@ -1,38 +1,137 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mergePDFs } from '@/lib/pdf-processor';
 
+// AWS Amplify serverless function limits
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB per file
+const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB total
+const MAX_FILES = 20; // Maximum number of files
+const FUNCTION_TIMEOUT = 25000; // 25 seconds (AWS Amplify default is 10s, max 30s)
+
+export const maxDuration = 30; // Next.js API route max duration (seconds)
+export const runtime = 'nodejs'; // Use Node.js runtime
+
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = `merge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
   try {
+    console.log(`[${requestId}] Merge request started`);
+    
     // Get form data from request
+    const formDataStart = Date.now();
     const formData = await request.formData();
+    console.log(`[${requestId}] FormData parsed in ${Date.now() - formDataStart}ms`);
     
     // Get all files from form data
     const files = formData.getAll('files') as File[];
+    console.log(`[${requestId}] Received ${files.length} files`);
     
     // Validate: need at least 2 files to merge
     if (files.length < 2) {
+      console.log(`[${requestId}] Validation failed: Need at least 2 files, got ${files.length}`);
       return NextResponse.json(
         { error: 'At least 2 PDF files are required to merge' },
         { status: 400 }
       );
     }
     
-    // Validate all files are PDFs
-    const invalidFiles = files.filter(file => file.type !== 'application/pdf');
-    if (invalidFiles.length > 0) {
+    // Validate file count
+    if (files.length > MAX_FILES) {
+      console.log(`[${requestId}] Validation failed: Too many files (${files.length} > ${MAX_FILES})`);
       return NextResponse.json(
-        { error: 'All files must be PDFs' },
+        { error: `Maximum ${MAX_FILES} files allowed for merging` },
         { status: 400 }
       );
     }
     
-    // Convert files to ArrayBuffers
+    // Validate all files are PDFs and check sizes
+    const fileInfo: Array<{ name: string; size: number; type: string }> = [];
+    let totalSize = 0;
+    const invalidFiles: string[] = [];
+    
+    for (const file of files) {
+      fileInfo.push({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      });
+      
+      if (file.type !== 'application/pdf') {
+        invalidFiles.push(`${file.name} (type: ${file.type})`);
+      }
+      
+      if (file.size > MAX_FILE_SIZE) {
+        invalidFiles.push(`${file.name} (size: ${(file.size / 1024 / 1024).toFixed(2)}MB > ${MAX_FILE_SIZE / 1024 / 1024}MB)`);
+      }
+      
+      totalSize += file.size;
+    }
+    
+    console.log(`[${requestId}] File info:`, JSON.stringify(fileInfo, null, 2));
+    console.log(`[${requestId}] Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
+    
+    if (invalidFiles.length > 0) {
+      console.log(`[${requestId}] Validation failed: Invalid files`, invalidFiles);
+      return NextResponse.json(
+        { 
+          error: 'Invalid files detected',
+          details: invalidFiles 
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (totalSize > MAX_TOTAL_SIZE) {
+      console.log(`[${requestId}] Validation failed: Total size too large (${(totalSize / 1024 / 1024).toFixed(2)}MB > ${MAX_TOTAL_SIZE / 1024 / 1024}MB)`);
+      return NextResponse.json(
+        { error: `Total file size exceeds maximum allowed size of ${MAX_TOTAL_SIZE / 1024 / 1024}MB` },
+        { status: 400 }
+      );
+    }
+    
+    // Convert files to ArrayBuffers with timeout
+    const bufferStart = Date.now();
+    console.log(`[${requestId}] Starting to convert ${files.length} files to ArrayBuffers...`);
+    
     const buffers = await Promise.all(
-      files.map(file => file.arrayBuffer())
+      files.map(async (file, index) => {
+        const fileStart = Date.now();
+        const buffer = await file.arrayBuffer();
+        console.log(`[${requestId}] File ${index + 1}/${files.length} (${file.name}, ${(file.size / 1024 / 1024).toFixed(2)}MB) converted in ${Date.now() - fileStart}ms`);
+        return buffer;
+      })
     );
     
-    // Merge PDFs
-    const mergedPdf = await mergePDFs(buffers);
+    console.log(`[${requestId}] All files converted to ArrayBuffers in ${Date.now() - bufferStart}ms`);
+    console.log(`[${requestId}] Total buffer size: ${(buffers.reduce((sum, b) => sum + b.byteLength, 0) / 1024 / 1024).toFixed(2)}MB`);
+    
+    // Check if we're approaching timeout
+    const elapsed = Date.now() - startTime;
+    if (elapsed > FUNCTION_TIMEOUT) {
+      console.log(`[${requestId}] Timeout warning: ${elapsed}ms elapsed, approaching ${FUNCTION_TIMEOUT}ms limit`);
+      return NextResponse.json(
+        { error: 'Request is taking too long. Please try with smaller files or fewer files.' },
+        { status: 408 }
+      );
+    }
+    
+    // Merge PDFs with timeout
+    const mergeStart = Date.now();
+    console.log(`[${requestId}] Starting PDF merge...`);
+    
+    const mergedPdf = await Promise.race([
+      mergePDFs(buffers),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Merge operation timed out')), FUNCTION_TIMEOUT - elapsed)
+      ),
+    ]);
+    
+    const mergeTime = Date.now() - mergeStart;
+    console.log(`[${requestId}] PDF merge completed in ${mergeTime}ms`);
+    console.log(`[${requestId}] Merged PDF size: ${(mergedPdf.length / 1024 / 1024).toFixed(2)}MB`);
+    
+    const totalTime = Date.now() - startTime;
+    console.log(`[${requestId}] Total request time: ${totalTime}ms`);
     
     // Return merged PDF as response (convert Uint8Array to Buffer)
     return new NextResponse(Buffer.from(mergedPdf), {
@@ -40,19 +139,33 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'attachment; filename="merged.pdf"',
+        'X-Request-ID': requestId,
+        'X-Processing-Time': `${totalTime}ms`,
       },
     });
   } catch (error) {
-    // Log error for debugging
-    console.error('Error merging PDFs:', error);
+    const totalTime = Date.now() - startTime;
     
-    // Return error response
+    // Log detailed error for debugging
+    console.error(`[${requestId}] Error merging PDFs after ${totalTime}ms:`, error);
+    
+    if (error instanceof Error) {
+      console.error(`[${requestId}] Error name: ${error.name}`);
+      console.error(`[${requestId}] Error message: ${error.message}`);
+      console.error(`[${requestId}] Error stack:`, error.stack);
+    }
+    
+    // Return error response with request ID for debugging
     const errorMessage = error instanceof Error 
       ? error.message 
       : 'An unknown error occurred while merging PDFs';
     
     return NextResponse.json(
-      { error: errorMessage },
+      { 
+        error: errorMessage,
+        requestId,
+        processingTime: `${totalTime}ms`,
+      },
       { status: 500 }
     );
   }

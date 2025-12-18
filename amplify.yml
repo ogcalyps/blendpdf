@@ -15,4 +15,7 @@ frontend:
     paths:
       - node_modules/**/*
       - .next/cache/**/*
+# Note: For AWS Amplify, API route timeouts are configured in Next.js
+# The maxDuration export in route.ts sets the timeout (max 30 seconds)
+# Check AWS Amplify console → App settings → Build settings for function timeout configuration
 

@@ -9,24 +9,71 @@ import type { CompressionLevel } from '@/types';
  * @throws Error if PDF loading or merging fails
  */
 export async function mergePDFs(pdfBuffers: ArrayBuffer[]): Promise<Uint8Array> {
+  const mergeStart = Date.now();
+  const totalInputSize = pdfBuffers.reduce((sum, b) => sum + b.byteLength, 0);
+  
   try {
     if (pdfBuffers.length === 0) {
       throw new Error('No PDFs provided to merge');
     }
 
+    console.log(`[mergePDFs] Starting merge of ${pdfBuffers.length} PDFs (${(totalInputSize / 1024 / 1024).toFixed(2)}MB total)`);
+    
     const mergedPdf = await PDFDocument.create();
+    let totalPages = 0;
 
-    for (const buffer of pdfBuffers) {
-      const pdf = await PDFDocument.load(buffer);
-      const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+    for (let i = 0; i < pdfBuffers.length; i++) {
+      const buffer = pdfBuffers[i];
+      const fileStart = Date.now();
+      const fileSize = buffer.byteLength;
       
-      pages.forEach((page) => {
-        mergedPdf.addPage(page);
-      });
+      console.log(`[mergePDFs] Processing file ${i + 1}/${pdfBuffers.length} (${(fileSize / 1024 / 1024).toFixed(2)}MB)...`);
+      
+      try {
+        const pdf = await PDFDocument.load(buffer);
+        const pageCount = pdf.getPageCount();
+        totalPages += pageCount;
+        
+        console.log(`[mergePDFs] File ${i + 1} loaded: ${pageCount} pages`);
+        
+        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        
+        pages.forEach((page) => {
+          mergedPdf.addPage(page);
+        });
+        
+        const fileTime = Date.now() - fileStart;
+        console.log(`[mergePDFs] File ${i + 1} processed in ${fileTime}ms`);
+      } catch (fileError) {
+        console.error(`[mergePDFs] Error processing file ${i + 1}:`, fileError);
+        if (fileError instanceof Error) {
+          throw new Error(`Failed to process file ${i + 1}: ${fileError.message}`);
+        }
+        throw new Error(`Failed to process file ${i + 1}: Unknown error`);
+      }
     }
 
-    return await mergedPdf.save();
+    console.log(`[mergePDFs] All files processed. Total pages: ${totalPages}. Saving merged PDF...`);
+    const saveStart = Date.now();
+    
+    const result = await mergedPdf.save();
+    
+    const saveTime = Date.now() - saveStart;
+    const totalTime = Date.now() - mergeStart;
+    const resultSize = result.length;
+    
+    console.log(`[mergePDFs] Merge completed!`);
+    console.log(`[mergePDFs] - Total pages: ${totalPages}`);
+    console.log(`[mergePDFs] - Input size: ${(totalInputSize / 1024 / 1024).toFixed(2)}MB`);
+    console.log(`[mergePDFs] - Output size: ${(resultSize / 1024 / 1024).toFixed(2)}MB`);
+    console.log(`[mergePDFs] - Save time: ${saveTime}ms`);
+    console.log(`[mergePDFs] - Total time: ${totalTime}ms`);
+    
+    return result;
   } catch (error) {
+    const totalTime = Date.now() - mergeStart;
+    console.error(`[mergePDFs] Merge failed after ${totalTime}ms:`, error);
+    
     if (error instanceof Error) {
       throw new Error(`Failed to merge PDFs: ${error.message}`);
     }

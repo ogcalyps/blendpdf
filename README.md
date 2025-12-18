@@ -2,6 +2,8 @@
 
 Free online PDF tools. Merge, compress, split, and convert PDFs. Works in any language. No sign-up required.
 
+> **SEO-First Development**: This project prioritizes SEO optimization. See [.seo-guidelines.md](.seo-guidelines.md) for SEO standards that must be followed for all features and content.
+
 ## Features
 
 - **Merge PDFs**: Combine multiple PDF files into one
@@ -81,3 +83,23 @@ The project is configured for AWS Amplify deployment. Make sure to set the envir
 1. Go to your Amplify app settings
 2. Navigate to Environment variables
 3. Add `NEXT_PUBLIC_GTM_ID` and `NEXT_PUBLIC_GA_ID` if needed
+
+### Verify Deployment
+
+To verify Google Analytics is working:
+
+1. **Check AWS Amplify Console:**
+   - Go to Deployments tab → Latest deployment should show "Success"
+   - Check App settings → Environment variables → Verify `NEXT_PUBLIC_GA_ID` is set
+
+2. **Test in Browser:**
+   - Open your deployed site
+   - Open DevTools (F12) → Network tab
+   - Filter by "gtag" → Should see requests to `googletagmanager.com/gtag/js?id=G-0Y9R0VV31X`
+   - In Console, run `window.gtag` → Should return a function (not undefined)
+
+3. **Check Google Analytics:**
+   - Go to Google Analytics → Reports → Realtime
+   - Visit your deployed site → Your visit should appear within 10-30 seconds
+
+See `scripts/verify-analytics.md` for detailed verification steps.
