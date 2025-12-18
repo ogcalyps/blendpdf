@@ -40,8 +40,11 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
 
 async function mergePDFsBase64(files: File[]): Promise<Blob> {
   const startTime = Date.now();
+  const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+  
   console.log(`[Client] Converting ${files.length} files to Base64...`);
   console.log(`[Client] File sizes:`, files.map(f => `${f.name}: ${(f.size / 1024 / 1024).toFixed(2)}MB`));
+  console.log(`[Client] Total original size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
   
   // Convert files to Base64 (more efficient method for large files)
   const base64Files = await Promise.all(
