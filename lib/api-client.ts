@@ -28,11 +28,13 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
     
     let response: Response;
     try {
+      // DO NOT set Content-Type header - browser will set it automatically with boundary
+      // Amplify might be stripping/transforming headers, so let the browser handle it
       response = await fetch('/api/merge', {
         method: 'POST',
         body: formData,
         signal: controller.signal,
-        // Add headers to help with debugging
+        // Only set custom headers, NOT Content-Type
         headers: {
           'X-Request-Type': 'merge',
           'X-File-Count': String(files.length),

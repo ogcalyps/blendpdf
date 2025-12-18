@@ -54,15 +54,39 @@ export async function POST(request: NextRequest) {
     // Log before attempting to parse form data
     log(`[${requestId}] About to parse FormData...`);
     
-    // Check request headers first
+    // Check request headers first - log ALL headers for debugging
     const contentType = request.headers.get('content-type');
     const contentLength = request.headers.get('content-length');
+    const allHeaders: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      allHeaders[key] = value;
+    });
     log(`[${requestId}] Content-Type: ${contentType}, Content-Length: ${contentLength}`);
+    log(`[${requestId}] All headers:`, allHeaders);
+    
+    // If Content-Type is missing or wrong, try to handle it
+    if (!contentType || (!contentType.includes('multipart/form-data') && !contentType.includes('application/x-www-form-urlencoded'))) {
+      log(`[${requestId}] WARNING: Invalid Content-Type: ${contentType}`);
+      log(`[${requestId}] Attempting to parse anyway...`);
+    }
     
     // Get form data from request
     const formDataStart = Date.now();
-    const formData = await request.formData();
-    log(`[${requestId}] FormData parsed in ${Date.now() - formDataStart}ms`);
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+      log(`[${requestId}] FormData parsed successfully in ${Date.now() - formDataStart}ms`);
+    } catch (formDataError) {
+      log(`[${requestId}] FormData parsing failed:`, formDataError);
+      // Try to read as stream and log what we get
+      try {
+        const text = await request.text();
+        log(`[${requestId}] Request body (first 500 chars):`, text.substring(0, 500));
+      } catch (textError) {
+        log(`[${requestId}] Could not read request body as text:`, textError);
+      }
+      throw formDataError;
+    }
     
     // Get all files from form data
     const files = formData.getAll('files') as File[];
