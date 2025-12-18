@@ -50,8 +50,34 @@ npm run build
 npm start
 ```
 
+## Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```bash
+# Google Tag Manager ID (required for analytics)
+# Get this from https://tagmanager.google.com
+# Format: GTM-XXXXXXX
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
+
+# Google Analytics ID (optional - can also be configured via GTM)
+# Get this from https://analytics.google.com
+# Format: G-XXXXXXXXXX or UA-XXXXXXXXX-X
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+
+**Note:** Both GTM and GA are optional. If you don't provide IDs, the components won't render.
+
 ## Deploy on Vercel
 
 The easiest way to deploy BlendPDF is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Deploy on AWS Amplify
+
+The project is configured for AWS Amplify deployment. Make sure to set the environment variables in your Amplify console:
+
+1. Go to your Amplify app settings
+2. Navigate to Environment variables
+3. Add `NEXT_PUBLIC_GTM_ID` and `NEXT_PUBLIC_GA_ID` if needed
