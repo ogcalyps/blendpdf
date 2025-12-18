@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     
     // Merge PDFs
     console.log(`[${requestId}] Starting PDF merge...`);
-    const mergedPdf = await mergePDFs(buffers, requestId);
+    const mergedPdf = await mergePDFs(buffers);
     console.log(`[${requestId}] PDF merge completed. Size: ${(mergedPdf.length / 1024 / 1024).toFixed(2)}MB`);
     
     const totalTime = Date.now() - startTime;
