@@ -69,9 +69,22 @@ async function mergePDFsBase64(files: File[]): Promise<Blob> {
   );
   
   const totalBase64Size = base64Files.reduce((sum, f) => sum + f.data.length, 0);
+  const jsonPayload = JSON.stringify({ files: base64Files });
+  const payloadSize = new Blob([jsonPayload]).size;
+  
   console.log(`[Client] All files converted to Base64. Total Base64 size: ${(totalBase64Size / 1024 / 1024).toFixed(2)}MB`);
+  console.log(`[Client] JSON payload size: ${(payloadSize / 1024 / 1024).toFixed(2)}MB`);
   console.log(`[Client] Sending to /api/merge-base64...`);
   console.log(`[Client] Request URL: ${window.location.origin}/api/merge-base64`);
+  
+  // Amplify likely has a ~1-2MB body size limit
+  // If payload is too large, we need a different approach
+  const MAX_PAYLOAD_SIZE = 1.5 * 1024 * 1024; // 1.5MB (conservative estimate)
+  
+  if (payloadSize > MAX_PAYLOAD_SIZE) {
+    console.error(`[Client] Payload too large (${(payloadSize / 1024 / 1024).toFixed(2)}MB > ${(MAX_PAYLOAD_SIZE / 1024 / 1024).toFixed(2)}MB)`);
+    throw new Error(`Files are too large to upload via Base64. Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB. Please try with smaller files or use a different upload method.`);
+  }
   
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
@@ -81,13 +94,13 @@ async function mergePDFsBase64(files: File[]): Promise<Blob> {
   
   try {
     const requestStart = Date.now();
-    console.log(`[Client] Starting fetch to /api/merge-base64...`);
+    console.log(`[Client] Starting fetch to /api/merge-base64 with ${(payloadSize / 1024 / 1024).toFixed(2)}MB payload...`);
     const response = await fetch('/api/merge-base64', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ files: base64Files }),
+      body: jsonPayload,
       signal: controller.signal,
     });
     console.log(`[Client] Fetch completed in ${Date.now() - requestStart}ms, status: ${response.status}`);
