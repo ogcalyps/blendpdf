@@ -80,14 +80,16 @@ async function mergePDFsBase64(files: File[]): Promise<Blob> {
   console.log(`[Client] Sending to /api/merge-base64...`);
   console.log(`[Client] Request URL: ${window.location.origin}/api/merge-base64`);
   
-  // Amplify likely has a ~1-2MB body size limit
-  // If payload is too large, we need a different approach
-  const MAX_PAYLOAD_SIZE = 1.5 * 1024 * 1024; // 1.5MB (conservative estimate)
+  // Amplify seems to have a very strict body size limit (possibly < 500KB)
+  // Test with smaller payload first
+  const MAX_PAYLOAD_SIZE = 400 * 1024; // 400KB (very conservative - seems like even 420KB fails)
   
   if (payloadSize > MAX_PAYLOAD_SIZE) {
-    console.error(`[Client] Payload too large (${(payloadSize / 1024 / 1024).toFixed(2)}MB > ${(MAX_PAYLOAD_SIZE / 1024 / 1024).toFixed(2)}MB)`);
-    throw new Error(`Files are too large to upload via Base64. Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB. Please try with smaller files or use a different upload method.`);
+    console.error(`[Client] Payload too large (${(payloadSize / 1024).toFixed(2)}KB > ${(MAX_PAYLOAD_SIZE / 1024).toFixed(2)}KB)`);
+    throw new Error(`Files are too large to upload via Base64. Payload size: ${(payloadSize / 1024).toFixed(2)}KB. Amplify appears to have a very strict body size limit. Please try with smaller files (< 200KB each) or we need to use S3/Lambda functions.`);
   }
+  
+  console.log(`[Client] Payload size ${(payloadSize / 1024).toFixed(2)}KB is within limit, proceeding...`);
   
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
