@@ -6,36 +6,102 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
   
   console.log(`[Client] Starting merge: ${files.length} files, ${(totalSize / 1024 / 1024).toFixed(2)}MB total`);
   
-  // Check if total size is small enough for Base64 encoding (< 5MB total)
-  // Base64 increases size by ~33%, so 5MB files = ~6.7MB encoded
-  const MAX_BASE64_SIZE = 5 * 1024 * 1024; // 5MB
+  // Use S3 for all file uploads (most reliable)
+  console.log(`[Client] Using S3 upload method for reliable file handling`);
+  return mergePDFsS3(files);
+}
+
+async function mergePDFsS3(files: File[]): Promise<Blob> {
+  const startTime = Date.now();
+  console.log(`[Client] Using S3 upload method for ${files.length} files`);
   
-  console.log(`[Client] Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB, Max for Base64: ${(MAX_BASE64_SIZE / 1024 / 1024).toFixed(2)}MB`);
-  
-  // First, test if POST requests work at all with a small payload
-  if (totalSize < MAX_BASE64_SIZE) {
-    console.log(`[Client] Files are small enough for Base64 encoding, using alternative endpoint`);
-    
-    // Test endpoint first to see if POST works
-    try {
-      console.log(`[Client] Testing POST endpoint with small payload...`);
-      const testResponse = await fetch('/api/merge-test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ test: true, fileCount: files.length }),
-      });
-      const testResult = await testResponse.json();
-      console.log(`[Client] Test endpoint result:`, testResult);
-    } catch (testError) {
-      console.error(`[Client] Test endpoint failed:`, testError);
+  try {
+    // Step 1: Get presigned URLs
+    console.log(`[Client] Step 1: Requesting presigned URLs...`);
+    const urlResponse = await fetch('/api/upload-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        files: files.map(f => ({
+          name: f.name,
+          type: f.type,
+          size: f.size,
+        })),
+      }),
+    });
+
+    if (!urlResponse.ok) {
+      const errorData = await urlResponse.json();
+      throw new Error(errorData.error || 'Failed to get upload URLs');
     }
+
+    const { urls } = await urlResponse.json() as { urls: Array<{ url: string; key: string; fileName: string }> };
+    console.log(`[Client] Received ${urls.length} presigned URLs`);
+
+    // Step 2: Upload files directly to S3
+    console.log(`[Client] Step 2: Uploading files to S3...`);
+    const uploadStart = Date.now();
     
-    return mergePDFsBase64(files);
+    await Promise.all(
+      files.map(async (file, index) => {
+        const { url, key } = urls[index];
+        const fileStart = Date.now();
+        
+        console.log(`[Client] Uploading file ${index + 1}/${files.length} (${file.name}) to S3...`);
+        
+        const uploadResponse = await fetch(url, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type || 'application/pdf',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Failed to upload ${file.name} to S3: ${uploadResponse.statusText}`);
+        }
+
+        console.log(`[Client] File ${index + 1} uploaded in ${Date.now() - fileStart}ms`);
+        return key;
+      })
+    );
+    
+    console.log(`[Client] All files uploaded to S3 in ${Date.now() - uploadStart}ms`);
+
+    // Step 3: Request merge from S3
+    console.log(`[Client] Step 3: Requesting merge from S3...`);
+    const mergeStart = Date.now();
+    
+    const mergeResponse = await fetch('/api/merge-s3', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        keys: urls.map((u: { url: string; key: string; fileName: string }) => u.key),
+      }),
+    });
+
+    if (!mergeResponse.ok) {
+      const errorData = await mergeResponse.json();
+      throw new Error(errorData.error || 'Failed to merge PDFs');
+    }
+
+    const result = await mergeResponse.json();
+    console.log(`[Client] Merge completed in ${Date.now() - mergeStart}ms`);
+
+    // Step 4: Convert Base64 result to Blob
+    const base64Data = result.data.replace(/^data:application\/pdf;base64,/, '');
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    console.log(`[Client] S3 merge successful! Total time: ${Date.now() - startTime}ms`);
+    return new Blob([bytes], { type: 'application/pdf' });
+  } catch (error) {
+    console.error(`[Client] S3 merge error after ${Date.now() - startTime}ms:`, error);
+    throw error;
   }
-  
-  // For larger files, try FormData (might still fail on Amplify)
-  console.log(`[Client] Files too large for Base64 (${(totalSize / 1024 / 1024).toFixed(2)}MB > ${(MAX_BASE64_SIZE / 1024 / 1024).toFixed(2)}MB), trying FormData (may fail on Amplify)`);
-  return mergePDFsFormData(files);
 }
 
 async function mergePDFsBase64(files: File[]): Promise<Blob> {
