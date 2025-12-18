@@ -10,29 +10,55 @@
 
 ## IMMEDIATE FIX (Do This Now)
 
-### Step 1: Increase Lambda Function Timeout
+### Step 1: Navigate to Lambda Functions
 
-**Option A: Through AWS Lambda Console (Recommended)**
+1. **From the Lambda page you're on:**
+   - Look at the **left sidebar** → Click **"Functions"**
+   - **OR** click the **AWS logo** (top left) → Search "Lambda" → Click "Functions"
 
-1. Go to [AWS Lambda Console](https://console.aws.amazon.com/lambda)
-2. **Functions** → Search for functions containing: `amplify-blendpdf` or `blendpdf`
-3. Look for functions with names like:
+2. **Make sure you're in the correct region:**
+   - Check top right: Should be **"Europe (Stockholm)"** (eu-north-1)
+   - This matches your Amplify app region
+
+### Step 2: Find Your Amplify Functions
+
+1. **In the Functions list, use the search bar** at the top
+2. **Search for:** `amplify-blendpdf` or just `blendpdf`
+3. **Look for functions** with names like:
    - `amplify-blendpdf-{hash}-api-merge-{hash}`
-   - `amplify-blendpdf-{hash}-api-*`
-4. Click on the function
-5. Go to **Configuration** tab → **General configuration**
-6. Click **Edit** on **Timeout**
-7. **Change from 10 seconds to 30 seconds**
-8. Click **Save**
+   - `amplify-blendpdf-{hash}-api-compress-{hash}`
+   - `amplify-blendpdf-{hash}-api-split-{hash}`
 
-**Option B: Through AWS Amplify Console**
+### Step 3: Increase Timeout
+
+1. **Click on a function name** (start with the merge one)
+2. Go to **Configuration** tab (top menu)
+3. Click **General configuration** (left sidebar)
+4. Find **Timeout** - it probably says **10 seconds**
+5. Click **Edit** button
+6. **Change to 30 seconds**
+7. Click **Save**
+8. **Repeat for all API route functions** (merge, compress, split)
+
+**Option B: Through AWS Amplify Console (Since No Lambda Functions Found)**
+
+Since there are no separate Lambda functions, the timeout is configured at the Amplify hosting level:
 
 1. Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify)
 2. Select your app: **blendpdf**
 3. Go to **App settings** → **Build settings**
-4. Look for **"Function timeout"** or **"Lambda timeout"**
-5. If you see it, change to **30 seconds**
-6. If you DON'T see it, you MUST use Option A (Lambda Console)
+4. Look for:
+   - **"Function timeout"**
+   - **"Compute timeout"**
+   - **"Hosting compute timeout"**
+   - Any timeout-related setting
+5. Change to **30 seconds** (maximum)
+6. **Save** and **redeploy**
+
+**If you don't see timeout settings:**
+- The timeout might be hardcoded at 10 seconds
+- You may need to contact AWS Support
+- Or consider using a different deployment approach
 
 ### Step 2: Verify the Fix
 

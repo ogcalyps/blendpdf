@@ -33,8 +33,11 @@ const log = (message: string, data?: any) => {
 
 export async function POST(request: NextRequest) {
   // Log immediately - even before creating request ID
+  // Use multiple logging methods to ensure visibility
   console.log('========== MERGE API ROUTE CALLED ==========');
   console.error('========== MERGE API ROUTE CALLED ==========');
+  process.stdout.write('MERGE_ROUTE_HANDLER_CALLED\n');
+  process.stderr.write('MERGE_ROUTE_HANDLER_CALLED\n');
   
   const startTime = Date.now();
   const requestId = `merge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -42,9 +45,19 @@ export async function POST(request: NextRequest) {
   // Log with request ID
   console.log(`[${requestId}] MERGE REQUEST INITIATED`);
   console.error(`[${requestId}] MERGE REQUEST INITIATED`);
+  process.stdout.write(`[${requestId}] MERGE REQUEST INITIATED\n`);
+  process.stderr.write(`[${requestId}] MERGE REQUEST INITIATED\n`);
   
   try {
     log(`[${requestId}] ========== MERGE REQUEST STARTED ==========`);
+    
+    // Log before attempting to parse form data
+    log(`[${requestId}] About to parse FormData...`);
+    
+    // Check request headers first
+    const contentType = request.headers.get('content-type');
+    const contentLength = request.headers.get('content-length');
+    log(`[${requestId}] Content-Type: ${contentType}, Content-Length: ${contentLength}`);
     
     // Get form data from request
     const formDataStart = Date.now();
