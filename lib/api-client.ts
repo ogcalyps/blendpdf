@@ -10,23 +10,28 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
   // Base64 increases size by ~33%, so 5MB files = ~6.7MB encoded
   const MAX_BASE64_SIZE = 5 * 1024 * 1024; // 5MB
   
+  console.log(`[Client] Total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB, Max for Base64: ${(MAX_BASE64_SIZE / 1024 / 1024).toFixed(2)}MB`);
+  
   if (totalSize < MAX_BASE64_SIZE) {
     console.log(`[Client] Files are small enough for Base64 encoding, using alternative endpoint`);
     return mergePDFsBase64(files);
   }
   
   // For larger files, try FormData (might still fail on Amplify)
-  console.log(`[Client] Files too large for Base64, trying FormData (may fail on Amplify)`);
+  console.log(`[Client] Files too large for Base64 (${(totalSize / 1024 / 1024).toFixed(2)}MB > ${(MAX_BASE64_SIZE / 1024 / 1024).toFixed(2)}MB), trying FormData (may fail on Amplify)`);
   return mergePDFsFormData(files);
 }
 
 async function mergePDFsBase64(files: File[]): Promise<Blob> {
   const startTime = Date.now();
   console.log(`[Client] Converting ${files.length} files to Base64...`);
+  console.log(`[Client] File sizes:`, files.map(f => `${f.name}: ${(f.size / 1024 / 1024).toFixed(2)}MB`));
   
   // Convert files to Base64 (more efficient method for large files)
   const base64Files = await Promise.all(
-    files.map(async (file) => {
+    files.map(async (file, index) => {
+      const fileStart = Date.now();
+      console.log(`[Client] Converting file ${index + 1}/${files.length} (${file.name}) to Base64...`);
       const arrayBuffer = await file.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
       
@@ -38,6 +43,7 @@ async function mergePDFsBase64(files: File[]): Promise<Blob> {
         binary += String.fromCharCode(...chunk);
       }
       const base64 = btoa(binary);
+      console.log(`[Client] File ${index + 1} converted in ${Date.now() - fileStart}ms, Base64 size: ${(base64.length / 1024 / 1024).toFixed(2)}MB`);
       
       return {
         name: file.name,
@@ -46,12 +52,20 @@ async function mergePDFsBase64(files: File[]): Promise<Blob> {
     })
   );
   
-  console.log(`[Client] Files converted to Base64, sending to /api/merge-base64...`);
+  const totalBase64Size = base64Files.reduce((sum, f) => sum + f.data.length, 0);
+  console.log(`[Client] All files converted to Base64. Total Base64 size: ${(totalBase64Size / 1024 / 1024).toFixed(2)}MB`);
+  console.log(`[Client] Sending to /api/merge-base64...`);
+  console.log(`[Client] Request URL: ${window.location.origin}/api/merge-base64`);
   
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  const timeoutId = setTimeout(() => {
+    console.error(`[Client] Base64 request timeout after 30 seconds`);
+    controller.abort();
+  }, 30000);
   
   try {
+    const requestStart = Date.now();
+    console.log(`[Client] Starting fetch to /api/merge-base64...`);
     const response = await fetch('/api/merge-base64', {
       method: 'POST',
       headers: {
@@ -60,6 +74,7 @@ async function mergePDFsBase64(files: File[]): Promise<Blob> {
       body: JSON.stringify({ files: base64Files }),
       signal: controller.signal,
     });
+    console.log(`[Client] Fetch completed in ${Date.now() - requestStart}ms, status: ${response.status}`);
     
     clearTimeout(timeoutId);
     
