@@ -14,21 +14,51 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
     });
 
     console.log(`[Client] Sending request to /api/merge...`);
+    console.log(`[Client] Request URL: ${window.location.origin}/api/merge`);
+    console.log(`[Client] FormData entries: ${files.length} files`);
+    
     const requestStart = Date.now();
     
-    // Add timeout (30 seconds for large files)
+    // Add timeout (30 seconds for large files, but also check for immediate failures)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => {
+      console.error(`[Client] Request timeout after 30 seconds`);
+      controller.abort();
+    }, 30000);
     
-    const response = await fetch('/api/merge', {
-      method: 'POST',
-      body: formData,
-      signal: controller.signal,
-    });
+    let response: Response;
+    try {
+      response = await fetch('/api/merge', {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal,
+        // Add headers to help with debugging
+        headers: {
+          'X-Request-Type': 'merge',
+          'X-File-Count': String(files.length),
+        },
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      const requestTime = Date.now() - requestStart;
+      console.error(`[Client] Fetch error after ${requestTime}ms:`, fetchError);
+      
+      if (fetchError instanceof Error) {
+        if (fetchError.name === 'AbortError') {
+          throw new Error('Request timed out after 30 seconds. The files may be too large or the server is not responding.');
+        }
+        throw new Error(`Network error: ${fetchError.message}`);
+      }
+      throw fetchError;
+    }
     
     clearTimeout(timeoutId);
     const requestTime = Date.now() - requestStart;
     console.log(`[Client] Request completed in ${requestTime}ms, status: ${response.status}`);
+    
+    if (!response.ok) {
+      console.error(`[Client] Response not OK: ${response.status} ${response.statusText}`);
+    }
 
     if (!response.ok) {
       try {

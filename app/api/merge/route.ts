@@ -10,21 +10,41 @@ const FUNCTION_TIMEOUT = 25000; // 25 seconds (AWS Amplify default is 10s, max 3
 export const maxDuration = 30; // Next.js API route max duration (seconds)
 export const runtime = 'nodejs'; // Use Node.js runtime
 
+// Enhanced logging for AWS Amplify visibility
+// Logs to both stdout and stderr to ensure visibility in AWS logs
+const log = (message: string, data?: any) => {
+  const timestamp = new Date().toISOString();
+  const logMessage = data 
+    ? `${message} ${JSON.stringify(data)}`
+    : message;
+  const fullMessage = `[${timestamp}] ${logMessage}`;
+  console.log(fullMessage);
+  console.error(fullMessage); // Also log to stderr for AWS CloudWatch
+};
+
 export async function POST(request: NextRequest) {
+  // Log immediately - even before creating request ID
+  console.log('========== MERGE API ROUTE CALLED ==========');
+  console.error('========== MERGE API ROUTE CALLED ==========');
+  
   const startTime = Date.now();
   const requestId = `merge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
+  // Log with request ID
+  console.log(`[${requestId}] MERGE REQUEST INITIATED`);
+  console.error(`[${requestId}] MERGE REQUEST INITIATED`);
+  
   try {
-    console.log(`[${requestId}] Merge request started`);
+    log(`[${requestId}] ========== MERGE REQUEST STARTED ==========`);
     
     // Get form data from request
     const formDataStart = Date.now();
     const formData = await request.formData();
-    console.log(`[${requestId}] FormData parsed in ${Date.now() - formDataStart}ms`);
+    log(`[${requestId}] FormData parsed in ${Date.now() - formDataStart}ms`);
     
     // Get all files from form data
     const files = formData.getAll('files') as File[];
-    console.log(`[${requestId}] Received ${files.length} files`);
+    log(`[${requestId}] Received ${files.length} files`);
     
     // Validate: need at least 2 files to merge
     if (files.length < 2) {
