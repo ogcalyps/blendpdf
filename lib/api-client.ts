@@ -6,6 +6,94 @@ export async function mergePDFs(files: File[]): Promise<Blob> {
   
   console.log(`[Client] Starting merge: ${files.length} files, ${(totalSize / 1024 / 1024).toFixed(2)}MB total`);
   
+  // Check if total size is small enough for Base64 encoding (< 5MB total)
+  // Base64 increases size by ~33%, so 5MB files = ~6.7MB encoded
+  const MAX_BASE64_SIZE = 5 * 1024 * 1024; // 5MB
+  
+  if (totalSize < MAX_BASE64_SIZE) {
+    console.log(`[Client] Files are small enough for Base64 encoding, using alternative endpoint`);
+    return mergePDFsBase64(files);
+  }
+  
+  // For larger files, try FormData (might still fail on Amplify)
+  console.log(`[Client] Files too large for Base64, trying FormData (may fail on Amplify)`);
+  return mergePDFsFormData(files);
+}
+
+async function mergePDFsBase64(files: File[]): Promise<Blob> {
+  const startTime = Date.now();
+  console.log(`[Client] Converting ${files.length} files to Base64...`);
+  
+  // Convert files to Base64 (more efficient method for large files)
+  const base64Files = await Promise.all(
+    files.map(async (file) => {
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      
+      // Convert to Base64 in chunks to avoid "Maximum call stack size exceeded"
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.slice(i, i + chunkSize);
+        binary += String.fromCharCode(...chunk);
+      }
+      const base64 = btoa(binary);
+      
+      return {
+        name: file.name,
+        data: base64, // Don't add data: prefix, server will handle it
+      };
+    })
+  );
+  
+  console.log(`[Client] Files converted to Base64, sending to /api/merge-base64...`);
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  
+  try {
+    const response = await fetch('/api/merge-base64', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ files: base64Files }),
+      signal: controller.signal,
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to merge PDFs');
+    }
+    
+    const result = await response.json();
+    // Remove data: prefix if present
+    const base64Data = result.data.replace(/^data:application\/pdf;base64,/, '').replace(/^data:.*;base64,/, '');
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    console.log(`[Client] Base64 merge successful in ${Date.now() - startTime}ms`);
+    return new Blob([bytes], { type: 'application/pdf' });
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timed out after 30 seconds');
+    }
+    throw error;
+  }
+}
+
+async function mergePDFsFormData(files: File[]): Promise<Blob> {
+  const startTime = Date.now();
+  const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+  
+  console.log(`[Client] Using FormData method for ${files.length} files, ${(totalSize / 1024 / 1024).toFixed(2)}MB total`);
+  
   try {
     const formData = new FormData();
     files.forEach((f, index) => {
