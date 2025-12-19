@@ -16,11 +16,11 @@ export async function POST(request: NextRequest) {
   
   // Debug: Log environment variables and Secrets (without exposing values)
   console.log(`[${requestId}] Environment check:`, {
-    hasRegion: !!(process.env._AWS_REGION || process.env.AWS_REGION || process.env.AMPLIFY_SECRET_AWS_REGION),
-    hasAccessKey: !!(process.env._AWS_ACCESS_KEY_ID || process.env.AMPLIFY_SECRET_AWS_ACCESS_KEY_ID),
-    hasSecretKey: !!(process.env._AWS_SECRET_ACCESS_KEY || process.env.AMPLIFY_SECRET_AWS_SECRET_ACCESS_KEY),
-    hasBucketName: !!(process.env._AWS_S3_BUCKET_NAME || process.env.AMPLIFY_SECRET_AWS_S3_BUCKET_NAME),
-    bucketName: process.env._AWS_S3_BUCKET_NAME || process.env.AMPLIFY_SECRET_AWS_S3_BUCKET_NAME || 'NOT SET',
+    hasRegion: !!(process.env.AMAZON_REGION || process.env._AWS_REGION || process.env.AWS_REGION || process.env.AMPLIFY_SECRET_AWS_REGION),
+    hasAccessKey: !!(process.env.AMAZON_ACCESS_KEY_ID || process.env._AWS_ACCESS_KEY_ID || process.env.AMPLIFY_SECRET_AWS_ACCESS_KEY_ID),
+    hasSecretKey: !!(process.env.AMAZON_SECRET_ACCESS_KEY || process.env._AWS_SECRET_ACCESS_KEY || process.env.AMPLIFY_SECRET_AWS_SECRET_ACCESS_KEY),
+    hasBucketName: !!(process.env.AMAZON_S3_BUCKET_NAME || process.env._AWS_S3_BUCKET_NAME || process.env.AMPLIFY_SECRET_AWS_S3_BUCKET_NAME),
+    bucketName: process.env.AMAZON_S3_BUCKET_NAME || process.env._AWS_S3_BUCKET_NAME || process.env.AMPLIFY_SECRET_AWS_S3_BUCKET_NAME || 'NOT SET',
     // Check for Secrets format
     amplifySecrets: Object.keys(process.env).filter(k => k.startsWith('AMPLIFY_SECRET_')).length,
   });

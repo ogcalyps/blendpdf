@@ -42,8 +42,9 @@ export function getS3BucketName(): string {
     return secretBucket;
   }
 
-  // Try environment variables
-  const envBucket = process.env._AWS_S3_BUCKET_NAME || 
+  // Try environment variables (check multiple prefixes)
+  const envBucket = process.env.AMAZON_S3_BUCKET_NAME ||  // User's format
+                    process.env._AWS_S3_BUCKET_NAME || 
                     process.env.AWS_S3_BUCKET_NAME;
   
   if (envBucket) {
@@ -63,16 +64,19 @@ export function getAWSCredentials(): {
   region: string;
 } {
   const region = getAmplifySecret('AWS_REGION') || 
+                 process.env.AMAZON_REGION ||  // User's format
                  process.env._AWS_REGION || 
                  process.env.AWS_REGION || 
                  process.env.AWS_DEFAULT_REGION || 
                  'eu-north-1';
 
   const accessKeyId = getAmplifySecret('AWS_ACCESS_KEY_ID') ||
+                      process.env.AMAZON_ACCESS_KEY_ID ||  // User's format
                       process.env._AWS_ACCESS_KEY_ID ||
                       process.env.AWS_ACCESS_KEY_ID;
 
   const secretAccessKey = getAmplifySecret('AWS_SECRET_ACCESS_KEY') ||
+                          process.env.AMAZON_SECRET_ACCESS_KEY ||  // User's format
                           process.env._AWS_SECRET_ACCESS_KEY ||
                           process.env.AWS_SECRET_ACCESS_KEY;
 
