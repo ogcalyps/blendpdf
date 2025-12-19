@@ -5,20 +5,41 @@ import { getAWSCredentials, getS3BucketName } from './amplify-secrets';
 // Initialize S3 client
 // Use IAM role credentials (default) or explicit credentials from Secrets/env vars
 // Amplify Lambda functions use the execution role by default
-const awsConfig = getAWSCredentials();
-const s3Client = new S3Client({
-  region: awsConfig.region,
-  // Only set credentials if explicitly provided (for local dev or if Secrets are set)
-  // In Amplify, the Lambda execution role will be used automatically if no credentials
-  ...(awsConfig.accessKeyId && awsConfig.secretAccessKey
-    ? {
-        credentials: {
-          accessKeyId: awsConfig.accessKeyId,
-          secretAccessKey: awsConfig.secretAccessKey,
-        },
-      }
-    : {}),
-});
+let s3Client: S3Client;
+
+function initializeS3Client() {
+  const awsConfig = getAWSCredentials();
+  
+  console.log('[initializeS3Client] Config:', {
+    region: awsConfig.region,
+    hasCredentials: !!(awsConfig.accessKeyId && awsConfig.secretAccessKey),
+  });
+
+  // If we have explicit credentials, use them
+  // Otherwise, let AWS SDK use the default credential chain (IAM role)
+  if (awsConfig.accessKeyId && awsConfig.secretAccessKey) {
+    console.log('[initializeS3Client] Using explicit credentials');
+    s3Client = new S3Client({
+      region: awsConfig.region,
+      credentials: {
+        accessKeyId: awsConfig.accessKeyId,
+        secretAccessKey: awsConfig.secretAccessKey,
+      },
+    });
+  } else {
+    console.log('[initializeS3Client] Using default credential chain (IAM role)');
+    // No credentials provided - AWS SDK will use default credential chain
+    // This includes: IAM role, environment variables, etc.
+    s3Client = new S3Client({
+      region: awsConfig.region,
+    });
+  }
+  
+  return s3Client;
+}
+
+// Initialize on module load
+s3Client = initializeS3Client();
 
 // Get bucket name from Amplify Secrets or fallback
 function getBucketName(): string {

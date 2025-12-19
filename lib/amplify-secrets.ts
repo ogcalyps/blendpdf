@@ -63,6 +63,16 @@ export function getAWSCredentials(): {
   secretAccessKey?: string;
   region: string;
 } {
+  // Debug: Log all environment variables that might contain AWS credentials
+  const allEnvKeys = Object.keys(process.env);
+  const awsRelatedKeys = allEnvKeys.filter(k => 
+    k.includes('AWS') || k.includes('AMAZON') || k.includes('S3') || k.includes('ACCESS') || k.includes('SECRET')
+  );
+  
+  console.log('[getAWSCredentials] Checking for credentials...');
+  console.log('[getAWSCredentials] AWS-related env vars found:', awsRelatedKeys.length);
+  console.log('[getAWSCredentials] Keys (without values):', awsRelatedKeys);
+  
   // Check Amplify Secrets first (exact names as shown in Secret management)
   const region = process.env._AWS_REGION ||  // Amplify Secrets format (first priority)
                  getAmplifySecret('AWS_REGION') || 
@@ -80,6 +90,15 @@ export function getAWSCredentials(): {
                           getAmplifySecret('AWS_SECRET_ACCESS_KEY') ||
                           process.env.AMAZON_SECRET_ACCESS_KEY ||
                           process.env.AWS_SECRET_ACCESS_KEY;
+
+  console.log('[getAWSCredentials] Result:', {
+    hasRegion: !!region,
+    hasAccessKey: !!accessKeyId,
+    hasSecretKey: !!secretAccessKey,
+    region: region,
+    accessKeyIdPrefix: accessKeyId ? `${accessKeyId.substring(0, 8)}...` : 'NOT SET',
+    secretKeyPrefix: secretAccessKey ? `${secretAccessKey.substring(0, 8)}...` : 'NOT SET',
+  });
 
   return {
     region,
