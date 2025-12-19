@@ -28,8 +28,8 @@ function getBucketName(): string {
   console.log('S3 Bucket Name Check:', {
     'bucketName': bucketName,
     'source': bucketName === 'blendpdf-uploads' ? 'hardcoded fallback' : 'Secrets/env var',
+    '_AWS_S3_BUCKET_NAME': process.env._AWS_S3_BUCKET_NAME || 'NOT SET',  // Amplify Secrets format (first priority)
     'AMAZON_S3_BUCKET_NAME': process.env.AMAZON_S3_BUCKET_NAME || 'NOT SET',
-    '_AWS_S3_BUCKET_NAME': process.env._AWS_S3_BUCKET_NAME || 'NOT SET',
     'AWS_S3_BUCKET_NAME': process.env.AWS_S3_BUCKET_NAME || 'NOT SET',
     'AMPLIFY_SECRET_AWS_S3_BUCKET_NAME': process.env.AMPLIFY_SECRET_AWS_S3_BUCKET_NAME || 'NOT SET',
   });

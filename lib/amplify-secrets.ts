@@ -33,8 +33,9 @@ export function getAmplifySecret(name: string): string | undefined {
  * Get S3 bucket name from Amplify Secrets or env vars
  */
 export function getS3BucketName(): string {
-  // Try Secrets first
-  const secretBucket = getAmplifySecret('AWS_S3_BUCKET_NAME') || 
+  // Try Amplify Secrets first (exact names as shown in Secret management)
+  const secretBucket = process.env._AWS_S3_BUCKET_NAME ||  // Amplify Secrets format
+                       getAmplifySecret('AWS_S3_BUCKET_NAME') || 
                        getAmplifySecret('S3_BUCKET_NAME') ||
                        getAmplifySecret('BUCKET_NAME');
   
@@ -42,9 +43,8 @@ export function getS3BucketName(): string {
     return secretBucket;
   }
 
-  // Try environment variables (check multiple prefixes)
-  const envBucket = process.env.AMAZON_S3_BUCKET_NAME ||  // User's format
-                    process.env._AWS_S3_BUCKET_NAME || 
+  // Try other environment variable formats
+  const envBucket = process.env.AMAZON_S3_BUCKET_NAME || 
                     process.env.AWS_S3_BUCKET_NAME;
   
   if (envBucket) {
@@ -63,21 +63,22 @@ export function getAWSCredentials(): {
   secretAccessKey?: string;
   region: string;
 } {
-  const region = getAmplifySecret('AWS_REGION') || 
-                 process.env.AMAZON_REGION ||  // User's format
-                 process.env._AWS_REGION || 
+  // Check Amplify Secrets first (exact names as shown in Secret management)
+  const region = process.env._AWS_REGION ||  // Amplify Secrets format (first priority)
+                 getAmplifySecret('AWS_REGION') || 
+                 process.env.AMAZON_REGION ||
                  process.env.AWS_REGION || 
                  process.env.AWS_DEFAULT_REGION || 
                  'eu-north-1';
 
-  const accessKeyId = getAmplifySecret('AWS_ACCESS_KEY_ID') ||
-                      process.env.AMAZON_ACCESS_KEY_ID ||  // User's format
-                      process.env._AWS_ACCESS_KEY_ID ||
+  const accessKeyId = process.env._AWS_ACCESS_KEY_ID ||  // Amplify Secrets format (first priority)
+                      getAmplifySecret('AWS_ACCESS_KEY_ID') ||
+                      process.env.AMAZON_ACCESS_KEY_ID ||
                       process.env.AWS_ACCESS_KEY_ID;
 
-  const secretAccessKey = getAmplifySecret('AWS_SECRET_ACCESS_KEY') ||
-                          process.env.AMAZON_SECRET_ACCESS_KEY ||  // User's format
-                          process.env._AWS_SECRET_ACCESS_KEY ||
+  const secretAccessKey = process.env._AWS_SECRET_ACCESS_KEY ||  // Amplify Secrets format (first priority)
+                          getAmplifySecret('AWS_SECRET_ACCESS_KEY') ||
+                          process.env.AMAZON_SECRET_ACCESS_KEY ||
                           process.env.AWS_SECRET_ACCESS_KEY;
 
   return {
