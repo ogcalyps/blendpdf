@@ -1,0 +1,487 @@
+# BlendPDF
+
+> Free online PDF tools with no sign-up, no watermark, and no fees. Files are deleted from our servers within 1 hour — most immediately after processing. Full Arabic and RTL support (a rarity among PDF tools). Limits: up to 20 files per merge, 50 MB per file. Available in English and Arabic (https://blendpdf.com/ar).
+
+BlendPDF runs each tool as a dedicated page. Upload a file, process it, and download the result — no account is ever required.
+
+## Organize
+
+- [Merge PDF](https://blendpdf.com/merge-pdf): Combine up to 20 PDFs (50 MB each) into one file. Preserves text, links, forms, and RTL content. Free, no watermark.
+- [Split PDF](https://blendpdf.com/split-pdf): Extract page ranges into one combined PDF, or split into separate files delivered as a ZIP.
+- [Rotate PDF](https://blendpdf.com/rotate-pdf): Rotate individual pages or the whole document, with live previews.
+- [Reorder Pages](https://blendpdf.com/reorder-pdf): Drag-and-drop page reordering with live thumbnails.
+- [Delete Pages](https://blendpdf.com/delete-pages): Remove selected pages from a PDF.
+- [Extract Pages](https://blendpdf.com/extract-pages): Pull selected pages into a new PDF (single file or one file per page as ZIP). Runs entirely in your browser.
+- [Images to PDF](https://blendpdf.com/images-to-pdf): Convert JPG, PNG, and WebP images into a single PDF (A4 or fit-to-image pages).
+
+## Convert
+
+- [PDF to Word](https://blendpdf.com/pdf-to-word): Convert PDFs to editable .docx preserving layout, tables, and images (pdf2docx engine).
+- [PDF to Excel](https://blendpdf.com/pdf-to-excel): Extract tables from digital PDFs into .xlsx spreadsheets (one sheet per table).
+- [Word to PDF](https://blendpdf.com/word-to-pdf): Convert .doc/.docx/.odt/.rtf documents to PDF via LibreOffice.
+- [PowerPoint to PDF](https://blendpdf.com/powerpoint-to-pdf): Convert .ppt/.pptx/.odp presentations to PDF via LibreOffice.
+- [Excel to PDF](https://blendpdf.com/excel-to-pdf): Convert .xls/.xlsx/.ods/.csv spreadsheets to PDF via LibreOffice.
+- [PDF to Text](https://blendpdf.com/pdf-to-text): Extract the text layer of a PDF to a .txt file. Runs entirely in your browser — the file is never uploaded.
+- [PDF to Images](https://blendpdf.com/pdf-to-images): Export PDF pages as high-resolution JPG images (ZIP download).
+- [Extract Images](https://blendpdf.com/extract-images): Pull the embedded images out of a PDF as PNG files (ZIP download). Runs entirely in your browser.
+
+## Optimize & Repair
+
+- [Compress PDF](https://blendpdf.com/compress-pdf): Reduce PDF file size while keeping text selectable (Ghostscript-based). Returns the original if the file is already optimized.
+- [OCR PDF](https://blendpdf.com/ocr-pdf): Make scanned PDFs searchable with OCR — first-class Arabic support (plus English and French). Up to 50 pages.
+- [Repair PDF](https://blendpdf.com/repair-pdf): Attempt recovery of corrupted PDF files. Not all corruption is fixable — the tool is honest about failures.
+
+## Security
+
+- [Protect PDF](https://blendpdf.com/protect-pdf): Password-protect a PDF with AES-256 encryption.
+- [Unlock PDF](https://blendpdf.com/unlock-pdf): Remove a password from a PDF you own (password required).
+- [Remove Metadata](https://blendpdf.com/remove-metadata): Strip hidden metadata (author, software traces, timestamps) from a PDF before sharing. Runs entirely in your browser.
+- [Add Watermark](https://blendpdf.com/watermark-pdf): Stamp text or image watermarks on every page.
+
+## Edit & Sign
+
+- [Sign PDF](https://blendpdf.com/sign-pdf): Add a typed or image signature overlay to a PDF (visual signature, not a cryptographic one).
+- [Add Page Numbers](https://blendpdf.com/add-page-numbers): Stamp customizable page numbers.
+- [Crop PDF](https://blendpdf.com/crop-pdf): Trim margins or crop pages by dragging a rectangle on a live preview. Runs entirely in your browser.
+- [Flatten PDF](https://blendpdf.com/flatten-pdf): Make filled form fields permanent and non-editable. Runs entirely in your browser.
+- [Batch Fill Forms](https://blendpdf.com/fill-form): Fill any interactive PDF form, or batch-fill up to 50 copies from an Excel/CSV file with visual field mapping.
+- [Form Templates](https://blendpdf.com/forms): Free fillable business form templates (W-9, NDA, I-9, lease agreement, patient intake) filled entirely in your browser.
+
+## Limits and policies
+
+- Free with no account, no email requirement, and no watermarks on output.
+- Maximum file size: 50 MB per file; merge accepts up to 20 files (100 MB total).
+- Uploaded files are deleted from our servers within 1 hour; most are deleted immediately after processing. Form-template filling happens entirely in your browser — that data never reaches our servers.
+- Privacy policy: https://blendpdf.com/privacy · Terms: https://blendpdf.com/terms
+
+## FAQs
+
+- [Merge PDF FAQ](https://blendpdf.com/merge-pdf/faq)
+- [Compress PDF FAQ](https://blendpdf.com/compress-pdf/faq)
+- [Split PDF FAQ](https://blendpdf.com/split-pdf/faq)
+- [Rotate PDF FAQ](https://blendpdf.com/rotate-pdf/faq)
+- [Reorder Pages FAQ](https://blendpdf.com/reorder-pdf/faq)
+- [Delete Pages FAQ](https://blendpdf.com/delete-pages/faq)
+- [Images to PDF FAQ](https://blendpdf.com/images-to-pdf/faq)
+
+## Optional
+
+- [Blog — PDF guides and tips](https://blendpdf.com/blog)
+- [Arabic version](https://blendpdf.com/ar)
+
+# Tool details and FAQs
+
+## Add Page Numbers to PDF Online
+
+Q: How does adding page numbers work?
+A: We add page numbers to each page of your PDF at the position you choose. The numbers are embedded directly into the PDF, so they'll always be visible when the file is opened.
+
+Q: Where can I place page numbers?
+A: You can place page numbers at the top or bottom of pages, and align them to the left, center, or right. Choose the position that works best for your document.
+
+Q: What page number formats are available?
+A: You can choose from simple numbers (1, 2, 3), numbers with total (1 / 10), 'Page 1' format, or 'Page 1 of 10' format.
+
+Q: Can I start numbering from a different number?
+A: Yes! You can set the starting page number. For example, if you want to start from page 5, set 'Start From' to 5, and the first page will be numbered as 5.
+
+## Compress PDF Files Online
+
+Q: How much can I compress a PDF?
+A: Typically 50-90% reduction depending on the quality level you choose.
+
+Q: Will compression affect text readability?
+A: No. Text remains perfectly readable. Only images are compressed.
+
+## Crop PDF Pages Online
+
+Q: Does cropping remove content or reduce the file size?
+A: No. Cropping hides, not deletes — it sets the page's crop box, so content outside the selection is hidden from view but still stored in the file. That's also why cropping doesn't reduce the file size. If you need a smaller file, try our Compress PDF tool.
+
+Q: Can I undo a crop?
+A: Yes. Because cropping only hides content instead of deleting it, the crop is reversible — the hidden content can be restored later by resetting the crop box (for example by cropping again with a larger area, or with any PDF editor). Your original file also stays untouched on your device.
+
+Q: Can I crop all pages at once?
+A: Yes! Choose "All pages" and the same crop area is applied to every page — ideal for trimming uniform margins across the whole document. You can also crop just the current page.
+
+Q: What if my pages have different sizes?
+A: When cropping all pages, the selection is applied as the same relative area on each page — for example, the middle 80% — so it scales correctly even when page sizes differ.
+
+Q: Is my PDF uploaded to a server?
+A: No. This tool runs 100% in your browser — your file is opened and cropped locally on your device and is never uploaded anywhere. It's free and requires no sign-up.
+
+## Delete PDF Pages Online
+
+Q: Can I delete all pages?
+A: No, you must keep at least one page in the document. This prevents creating an empty PDF file.
+
+Q: Will this affect the quality of remaining pages?
+A: No, the remaining pages will be exactly as they were in the original PDF, with no quality loss.
+
+Q: Can I undo the deletion?
+A: Once you download the modified PDF, the deletion is permanent. Make sure to keep a backup of your original file if needed.
+
+Q: Does it work with password-protected PDFs?
+A: Yes, if you have the password, you can unlock the PDF first and then delete pages from it.
+
+## Excel to PDF - Free Converter
+
+Q: What spreadsheet formats are supported?
+A: We support Microsoft Excel (.xls, .xlsx), OpenDocument Spreadsheet (.ods), and CSV files. All sheets in your workbook are included in the PDF.
+
+Q: How are wide spreadsheets handled?
+A: The PDF follows your sheet's page setup, the same as printing from Excel. Sheets wider than a page are split across multiple PDF pages. For a tighter fit, set the print area or scaling in your spreadsheet before converting.
+
+Q: What happens to formulas?
+A: The PDF shows each cell's calculated value, not the formula behind it. Charts and cell formatting like colors, borders, and number formats are carried over.
+
+Q: What are the file size limits?
+A: You can convert spreadsheets up to 50MB in size. There's no limit on the number of sheets or rows, but larger files may take longer to process.
+
+Q: Is my spreadsheet secure?
+A: Yes. Your files are processed securely and never stored — Files are deleted from our servers within 1 hour — most immediately after processing. We never read or share your spreadsheets.
+
+Q: Is this really free?
+A: Yes, completely free! No sign-up, no credit card, no hidden fees. Convert as many Excel spreadsheets to PDF as you need.
+
+## Extract Images from PDF
+
+Q: Why did I get no images, or just one big image per page?
+A: This tool extracts pictures that are embedded in the PDF as image objects. Charts, logos, and diagrams are often vector graphics — drawn with lines and shapes, not stored as images — so there is nothing to extract. Scanned PDFs work the other way: each page is usually one big photo, so you'll get a single full-page image per page. If you want every page saved as a picture regardless, use our PDF to Images tool instead.
+
+Q: What format do the extracted images come in?
+A: All images are saved as PNG files, which is lossless — nothing is recompressed, so you keep the full quality that was stored in the PDF. Note that images originally embedded as JPEG are converted to PNG on the way out, so file sizes can be larger than the originals.
+
+Q: Is my PDF uploaded to your servers?
+A: No. This tool runs 100% in your browser — your PDF is opened and processed locally on your device and never uploaded anywhere. That's also why it's fast: there's no upload or download wait.
+
+Q: Why do I see fewer images than the PDF appears to contain?
+A: We automatically remove duplicates — a logo or header image that repeats on every page is extracted only once. We also skip tiny images under 16×16 pixels, which are usually invisible artifacts or masks rather than real pictures.
+
+Q: How is this different from the PDF to Images tool?
+A: PDF to Images renders each full page as one picture — text, graphics, and all. Extract Images pulls out only the original photos and pictures embedded inside the PDF, at their original stored resolution. Use this tool to recover the actual photos; use PDF to Images to get page snapshots.
+
+## Extract Pages from PDF
+
+Q: How do I select which pages to extract?
+A: Type page numbers and ranges separated by commas — for example "1-3, 5, 8-10" extracts pages 1, 2, 3, 5, 8, 9, and 10. The counter below the box shows exactly how many pages are selected before you extract.
+
+Q: What's the difference between Extract Pages and Split PDF?
+A: Extract keeps your selection together: you type the exact pages you want and get them in one new PDF (or one file per page). Split PDF is built around picking pages visually from thumbnails and dividing a document. If you want the inverse — remove pages and keep the rest — use our Delete Pages tool.
+
+Q: Does extracting change my original PDF?
+A: No. Your original file stays untouched on your device. The tool creates a brand-new PDF containing copies of the pages you selected.
+
+Q: What does "One file per page" do?
+A: It saves every selected page as its own single-page PDF and bundles them into a ZIP archive that downloads immediately. It's handy when each page needs to go to a different place — invoices, certificates, or slides, for example.
+
+Q: Is my file uploaded to a server?
+A: No. This tool runs 100% in your browser — the PDF is read and the new files are created on your own device. Your file never leaves your computer.
+
+## Flatten PDF Online
+
+Q: What does flattening a PDF mean?
+A: Flattening merges interactive form fields — text boxes, checkboxes, dropdowns, radio buttons — into the page content itself. The answers stay visible, but the fields are gone, so nobody can edit them anymore.
+
+Q: When should I flatten a PDF form?
+A: Flatten after you've filled a form and before you submit, email, or print it. It locks your answers in place and ensures the form looks the same in every PDF viewer. You can fill forms first with our Fill Form tool, then flatten the result here.
+
+Q: Can flattening be undone?
+A: No — flattening is permanent in the output file. The original file on your device is never modified, though, so keep it if you may need to edit the form again later.
+
+Q: Why does it say my PDF has no form fields?
+A: Only PDFs with interactive (AcroForm) fields can be flattened. If your form is a scanned image or plain text with underscores, there is nothing interactive to lock — the document is already non-editable in that sense.
+
+Q: Is my file uploaded to a server?
+A: No. This tool runs 100% in your browser — the PDF is read, flattened, and saved on your own device. Your file never leaves your computer.
+
+## Convert Images to PDF Online
+
+Q: What image formats are supported?
+A: We support JPG, JPEG, PNG, and WEBP image formats. Each image will become one page in the PDF.
+
+Q: What is the maximum file size?
+A: Each image can be up to 10MB in size. There is no limit on the number of images you can convert.
+
+Q: How are images arranged in the PDF?
+A: Images appear in the PDF in the order shown in the grid. You can drag and drop to rearrange them before converting.
+
+Q: Will image quality be preserved?
+A: Images are embedded at high quality, and photo orientation is corrected automatically. You can choose between A4 pages (image scaled to fit, aspect ratio preserved) or pages sized exactly to each image.
+
+## Merge PDF Files Online
+
+Q: How many PDFs can I merge?
+A: You can merge up to 20 PDF files at once, with a max size of 50MB per file.
+
+Q: Does it work with Arabic PDFs?
+A: Yes! BlendPDF correctly handles RTL languages including Arabic, Hebrew, Persian, and Urdu.
+
+Q: Are my files stored?
+A: No. All files are automatically deleted after 1 hour. We never store your data.
+
+## OCR PDF — Make Scanned PDFs Searchable
+
+Q: What is OCR and what does this tool do?
+A: OCR (optical character recognition) turns pictures of text — like scanned pages or photographed documents — into real text a computer can read. This tool adds that recognized text as an invisible layer inside your PDF, so the file looks exactly the same but becomes searchable, selectable, and copyable.
+
+Q: How good is the Arabic OCR?
+A: Arabic is a first-class language here, not an afterthought — we use the Tesseract engine with its dedicated Arabic model, which handles connected script and right-to-left text properly. Accuracy is good but not perfect: it depends heavily on scan quality, so clean 300-DPI scans of printed text work far better than blurry photos or handwriting. For best results, scan straight, well-lit pages.
+
+Q: What are the file limits?
+A: Files can be up to 50MB and 50 pages. OCR is genuinely slow — expect roughly 1–2 seconds per page — so larger documents would time out. If your file is bigger, split it with our Split PDF tool and OCR the parts separately, or compress it first.
+
+Q: Why does it say my PDF already has text?
+A: If every page already contains a text layer (for example, a PDF exported from Word), there is nothing for OCR to add, so we tell you instead of silently returning the same file. If the existing text is wrong or garbled, enable "Re-OCR pages that already have text" to replace it with freshly recognized text.
+
+Q: Is my document safe?
+A: OCR runs on our server, since text recognition is too heavy to do in your browser. Your file is processed in temporary storage and automatically deleted within 1 hour — we never read, share, or keep your documents.
+
+Q: Can I turn the scanned PDF into a Word document?
+A: Yes — a great workflow is to OCR the scan here first, then run the searchable result through our PDF to Word tool. Without the OCR step, a scanned PDF converts to Word as images; with it, you get editable text.
+
+## Convert PDF to Excel Online
+
+Q: How does PDF to Excel conversion work?
+A: We use advanced table detection algorithms to identify tables in your PDF, extract the data, and convert it to Excel format. Multiple tables are saved to separate sheets in the Excel file.
+
+Q: What if my PDF doesn't have tables?
+A: If your PDF doesn't contain extractable table data, the conversion will fail with an error message. This tool is specifically designed for PDFs that contain tabular data.
+
+Q: What happens if my PDF has multiple tables?
+A: If your PDF contains multiple tables, each table will be extracted and saved to a separate sheet in the Excel file. The sheets will be named 'Table_1', 'Table_2', etc.
+
+Q: Will the formatting be preserved?
+A: We extract the data and structure of tables. Basic formatting like cell alignment and borders may be preserved, but complex formatting may be simplified in the Excel output.
+
+## PDF to Images - Free Converter
+
+Q: What image formats are supported?
+A: You can convert PDFs to JPG or PNG format. PNG is recommended for documents with text, while JPG works well for photos.
+
+Q: What image quality will I get?
+A: Images are exported at high resolution (300 DPI) to ensure text and graphics remain clear and readable.
+
+Q: Can I convert all pages at once?
+A: Yes! All pages in your PDF will be converted to separate image files. You'll receive a ZIP file with all images.
+
+Q: Does it work with RTL languages?
+A: Yes! BlendPDF correctly handles Arabic, Hebrew, Persian, Urdu, and other RTL languages. Your text will display correctly in the images.
+
+Q: Is this service free?
+A: Yes, completely free. No sign-up, no credit card, no hidden fees.
+
+## PDF to Text Converter
+
+Q: Is my PDF uploaded to a server?
+A: No. This tool runs 100% in your browser — your file never leaves your device. The text is extracted locally, which also makes it fast and private.
+
+Q: Why is no text extracted from my scanned PDF?
+A: Scanned PDFs are images of pages and have no text layer, so there is no text to extract. That requires OCR (optical character recognition), which we don't offer yet — it's coming soon. This tool works with PDFs that contain real, selectable text.
+
+Q: How do I copy text from a PDF?
+A: Upload your PDF, wait a moment while the text is extracted, then click "Copy to clipboard". You can also download everything as a .txt file, or select just a part of the preview and copy it.
+
+Q: Will the layout and formatting be preserved?
+A: You get plain text: paragraphs and line breaks are kept as well as possible, but fonts, colors, columns and tables are not preserved. For editable formatting, try our PDF to Word tool.
+
+Q: Is this PDF to text converter free?
+A: Yes — completely free, with no sign-up and no watermarks. Files up to 50MB are supported, and since everything runs in your browser there is nothing to wait for on a server.
+
+## PDF to Word - Free Converter
+
+Q: What format will I get?
+A: You'll receive a DOCX file (Microsoft Word format) that you can open and edit in Word, Google Docs, or any compatible word processor.
+
+Q: Will formatting be preserved?
+A: We preserve text, basic formatting, and layout as much as possible. Complex layouts, images, and advanced formatting may require manual adjustment.
+
+Q: Does it work with Arabic and RTL languages?
+A: Yes! BlendPDF correctly handles Arabic, Hebrew, Persian, Urdu, and other RTL languages. Text direction and formatting are preserved.
+
+Q: What are the file size limits?
+A: You can convert PDFs up to 50MB in size. There's no limit on the number of pages, but larger files may take longer to process.
+
+## PowerPoint to PDF - Free Converter
+
+Q: What presentation formats are supported?
+A: We support Microsoft PowerPoint (.ppt, .pptx) and OpenDocument Presentation (.odp) files. Each slide in your presentation becomes one page in the PDF.
+
+Q: Will my slides look the same in the PDF?
+A: Slides keep their layout, images, charts, and text positioning as closely as possible. Presentations that use uncommon fonts may see minor font substitutions — embedding fonts in your PowerPoint file gives the closest match.
+
+Q: What happens to animations and transitions?
+A: PDF is a static format, so animations, transitions, and embedded video or audio are not carried over. Each slide is captured in its final state — build steps appear fully revealed.
+
+Q: What are the file size limits?
+A: You can convert presentations up to 50MB in size. There's no limit on the number of slides, but larger files may take longer to process.
+
+Q: Is my presentation secure?
+A: Yes. Your files are processed securely and never stored — Files are deleted from our servers within 1 hour — most immediately after processing. We never read or share your presentations.
+
+Q: Is this really free?
+A: Yes, completely free! No sign-up, no credit card, no hidden fees. Convert as many PowerPoint presentations to PDF as you need.
+
+## Protect PDF with Password Online
+
+Q: How does PDF password protection work?
+A: We encrypt your PDF using AES-256 encryption. When someone tries to open the PDF, they'll be prompted to enter the password you set. Without the password, the PDF cannot be opened.
+
+Q: What makes a strong password?
+A: Use a combination of uppercase and lowercase letters, numbers, and special characters. Avoid common words or personal information. The longer the password, the more secure it is.
+
+Q: Can I remove the password later?
+A: Yes, you can use our Unlock PDF tool to remove the password if you know it. Simply upload the protected PDF and enter the password to unlock it.
+
+Q: What if I forget the password?
+A: Unfortunately, if you forget the password, there's no way to recover it. The encryption is designed to be secure, so we cannot access your PDF without the password. Make sure to save your password in a secure place.
+
+## Remove PDF Metadata
+
+Q: What metadata does a PDF contain?
+A: Most PDFs carry hidden fields you never see on the page: the author's name (often a real personal or company account name), title, subject, keywords, the software that created it, and creation and modification timestamps. Many also embed an XMP metadata stream with the same details in XML form.
+
+Q: What exactly does this tool remove?
+A: It clears the document information fields (title, author, subject, keywords, creator, producer), deletes the creation and modification dates, and strips the embedded XMP metadata stream. It does not change the visible content of your pages, and it does not remove text, annotations or attachments inside the document.
+
+Q: Is my PDF uploaded to a server?
+A: No. This tool runs 100% in your browser — your file never leaves your device. That matters here more than anywhere: you are cleaning a document for privacy, so it should not travel over the internet at all.
+
+Q: Why should I remove metadata before sharing a PDF?
+A: Metadata can quietly reveal who wrote a document, which software and account created it, and exactly when it was made or edited. Removing it before you share a CV, contract, report or public document prevents leaking names, timelines and internal tooling.
+
+Q: Does it work with password-protected PDFs?
+A: Not directly — encrypted PDFs can't be modified without the password. Use our Unlock PDF tool to remove the password first, then clean the metadata here.
+
+## Reorder PDF Pages Online
+
+Q: How do I reorder pages?
+A: Simply drag and drop the page thumbnails to rearrange them. The blue number shows the new position, and "was X" shows the original position if the page moved.
+
+Q: Can I reset the order?
+A: Yes! Click the "Reset Order" button to restore the original page order at any time.
+
+Q: Does it work with Arabic PDFs?
+A: Yes! BlendPDF correctly handles RTL languages including Arabic, Hebrew, Persian, and Urdu. Reordering preserves text direction correctly.
+
+## Repair PDF Online - Fix Corrupted Files
+
+Q: How does PDF repair work?
+A: We use PDF repair algorithms to attempt to fix corruption issues. The tool tries to recover readable pages and data from the corrupted PDF, creating a new repaired version.
+
+Q: What types of corruption can be repaired?
+A: We can attempt to repair PDFs with structural corruption, missing or damaged page data, and some formatting issues. Severely corrupted files may not be fully recoverable.
+
+Q: Can you guarantee the PDF will be repaired?
+A: While we do our best to repair corrupted PDFs, not all types of corruption can be fixed. The success depends on the extent and type of damage. We'll recover what we can, but some data loss may occur.
+
+Q: Will I lose any data during repair?
+A: In some cases, severely corrupted pages may not be recoverable and will be skipped. We'll preserve all pages that can be successfully recovered. The repaired PDF may have fewer pages than the original if some pages were too damaged.
+
+## Rotate PDF Pages Online
+
+Q: What rotation angles are supported?
+A: You can rotate pages by 90°, 180°, or 270° in either direction. Multiple rotations are cumulative.
+
+Q: Can I rotate all pages at once?
+A: Yes! Use the "Rotate All Pages" controls to apply the same rotation to every page in your PDF.
+
+Q: Does it work with Arabic PDFs?
+A: Yes! BlendPDF correctly handles RTL languages including Arabic, Hebrew, Persian, and Urdu. Rotations preserve text direction correctly.
+
+## Sign PDF Online - Add Electronic Signature
+
+Q: How does PDF signing work?
+A: We add a signature (text or image) to your PDF at the position you choose. The signature is embedded directly into the PDF file, making it part of the document.
+
+Q: What's the difference between text and image signatures?
+A: Text signatures are simple text overlays (like your name). Image signatures use an image file (PNG or JPEG) that you upload, such as a scanned signature or logo.
+
+Q: Is this a legally binding signature?
+A: This tool adds a visual signature to your PDF. For legally binding electronic signatures, you may need specialized services that provide digital certificates and audit trails. This is a simple signature overlay tool.
+
+Q: Can I sign multiple pages?
+A: Currently, you can sign one page at a time. To sign multiple pages, you can process the PDF multiple times or use a PDF editor to copy the signature to other pages.
+
+## Split PDF Online - Free
+
+Q: How do I select pages to extract?
+A: Simply click on the page thumbnails to select them. You can select multiple pages, and they will be extracted in order.
+
+Q: Can I extract non-consecutive pages?
+A: Yes! Click on any pages you want to extract. They will be combined into one PDF in the order you selected them.
+
+Q: Will the page order be preserved?
+A: Yes, pages are extracted in the order they appear in the original PDF, based on your selection.
+
+Q: Does it work with RTL languages?
+A: Yes! BlendPDF correctly handles Arabic, Hebrew, Persian, Urdu, and other RTL languages. Your text will display correctly in the split PDF.
+
+## Unlock PDF Online - Remove Password
+
+Q: Can I remove PDF restrictions without a password?
+A: Yes, if a PDF only has printing, copying, or editing restrictions (owner password), our tool can remove them instantly without requiring you to enter the password.
+
+Q: What's the difference between restrictions and password protection?
+A: Restrictions (owner password) prevent you from printing, copying text, or editing the document, but still allow you to open it. Password protection (user/open password) encrypts the entire file and prevents you from even opening it without the password.
+
+Q: Is it legal to remove PDF restrictions?
+A: Yes, it is legal to remove restrictions from PDFs that you own, created, or have the legal right to modify. Do not use this tool on copyrighted materials you do not have rights to.
+
+Q: What restrictions can be removed?
+A: Our tool removes printing locks, text/image copying restrictions, document assembly locks, and form filling restrictions.
+
+Q: How does PDF unlocking work?
+A: We use the password you provide to decrypt the PDF. The password is required to unlock the file. Once unlocked, the PDF can be opened without a password.
+
+Q: What if I forgot the password?
+A: Unfortunately, if you don't know the password, we cannot unlock the PDF. The encryption is designed to be secure, so the password is required. Make sure you have the correct password before attempting to unlock.
+
+Q: Is it safe to unlock PDFs here?
+A: Yes. Your files are processed securely and never stored — Files are deleted from our servers within 1 hour — most immediately after processing. We never keep your PDFs or passwords.
+
+Q: What if my PDF is not password-protected?
+A: If your PDF is not encrypted, you don't need to unlock it. Simply open it normally. This tool is only for PDFs that require a password to open.
+
+## Add Watermark to PDF Online
+
+Q: How does watermarking work?
+A: We embed the watermark directly into your PDF. Text watermarks are added as text overlays, while image watermarks are embedded as images. The watermark becomes part of the PDF file.
+
+Q: What's the difference between text and image watermarks?
+A: Text watermarks are simple text overlays (like 'DRAFT' or 'CONFIDENTIAL'). Image watermarks use an image file (PNG or JPEG) that you upload. Both can be positioned and adjusted for opacity.
+
+Q: What position options are available?
+A: You can place watermarks in the center, diagonally across the page, or in a tiled pattern that repeats across the entire document.
+
+Q: Can I remove a watermark later?
+A: Once a watermark is embedded in a PDF, it becomes part of the file. To remove it, you would need to use a PDF editor or recreate the PDF without the watermark.
+
+## Word to PDF - Free Converter
+
+Q: What Word formats are supported?
+A: We support Microsoft Word (.doc, .docx), OpenDocument Text (.odt), and Rich Text Format (.rtf) files. All formats will be converted to high-quality PDFs.
+
+Q: Will formatting be preserved?
+A: We preserve formatting, images, tables, and layout as faithfully as possible. Documents that use uncommon fonts may see minor font substitutions — embedding fonts in your Word file gives the closest match.
+
+Q: Will the layout stay the same?
+A: The PDF closely matches your document's layout, margins, headers, footers, and page breaks. Very complex layouts or uncommon fonts may shift slightly.
+
+Q: What are the file size limits?
+A: You can convert Word documents up to 50MB in size. There's no limit on the number of pages, but larger files may take longer to process.
+
+Q: Is my document secure?
+A: Yes. Your files are processed securely and never stored — Files are deleted from our servers within 1 hour — most immediately after processing. We never read or share your documents.
+
+Q: Is this really free?
+A: Yes, completely free! No sign-up, no credit card, no hidden fees. Convert as many Word documents to PDF as you need.
+
+# Policies
+
+- Free to use: no account, no sign-up, no watermark on output, and no paywall.
+- Downloads never require an email address. An optional email-delivery feature exists if you want the result sent to your inbox.
+- Limits: 50 MB per file. Merge accepts up to 20 files (100 MB total per merge).
+- Uploaded files are deleted from our servers within 1 hour; most are deleted immediately after processing.
+- Privacy: document contents are never read, stored, or shared. The site uses Google Analytics for aggregate, anonymous usage measurement only.
+- Privacy policy: https://blendpdf.com/privacy - Terms of service: https://blendpdf.com/terms

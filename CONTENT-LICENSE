@@ -1,0 +1,41 @@
+# Content License
+
+The MIT license in `LICENSE` covers the **source code** in this repository.
+
+It does **not** cover the editorial content, which is copyright (c) 2026
+ogcalyps, **all rights reserved**.
+
+## What counts as content
+
+- `messages/en.json` and `messages/ar.json` — all UI strings, tool
+  descriptions, FAQ questions and answers, and marketing copy
+- `lib/tool-faqs.ts` — FAQ content definitions
+- The prose bodies of any page under `app/[locale]/**` — headings, body
+  paragraphs, FAQ text, and comparison-page copy
+- `public/llms.txt` and `public/llms-full.txt`
+
+The surrounding code — components, layout, routing, schema generation, the
+PDF processing pipeline, and the i18n plumbing itself — is MIT.
+
+## What you may do
+
+- Read it, and use it to run and develop this project locally
+- Fork this repository and use the code under MIT
+- Quote short excerpts with attribution, as normal fair use / fair dealing
+
+## What you may not do
+
+- Republish the content, in whole or in substantial part, on another site
+- Deploy a copy of this project that reuses the content substantially as-is
+- Translate or paraphrase the content at scale to produce a derivative site
+- Use the content to train or fine-tune a model for republication
+
+## Why the split
+
+The code is genuinely meant to be reused — take it, fork it, ship it. The
+content is roughly 54,000 words of hand-written bilingual copy plus a
+large body of FAQ prose, and it is the part that a scraper would lift
+verbatim to stand up a duplicate site. Splitting the licenses keeps the code
+open without making that free.
+
+If you want to use the content, open an issue and ask. The answer is often yes.
