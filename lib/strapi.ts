@@ -132,8 +132,15 @@ function normalizeArticleFromList(
 
 /**
  * Wraps fetch so an unreachable CMS degrades to "no content" instead of throwing.
- * The blog is optional: without a running Strapi instance the site still builds
- * and blog routes render empty, rather than failing the build outright.
+ *
+ * Most call sites already guard with their own try/catch, so this is largely
+ * defence in depth. The exception is the blog post route, where both
+ * generateMetadata and the page component call getStrapiArticleBySlug
+ * unguarded — there a network error surfaced as a 500 rather than the intended
+ * notFound().
+ *
+ * Failures are logged rather than swallowed, matching the convention in
+ * app/sitemap.ts: an unreachable CMS should be visible in logs, not silent.
  */
 async function strapiFetch(url: URL): Promise<Response | null> {
   try {
@@ -141,7 +148,11 @@ async function strapiFetch(url: URL): Promise<Response | null> {
       next: { revalidate: 3600 },
       headers: getStrapiHeaders(),
     });
-  } catch {
+  } catch (error) {
+    console.warn(
+      '[strapi] request failed, treating as no content:',
+      error instanceof Error ? error.message : error
+    );
     return null;
   }
 }
