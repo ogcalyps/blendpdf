@@ -122,7 +122,7 @@ export default function ProtectPDFFAQ() {
                 </p>
                 <p>
                   <strong>Upload Your File</strong><br />
-                  Click "Choose File" or drag and drop a PDF onto the upload area. You can also pick a file straight from Google Drive. The tool works on one PDF at a time, up to 50MB. The upload happens over an encrypted HTTPS connection, so the file is protected in transit before it is ever encrypted at rest.
+                  Click "Choose File" or drag and drop a PDF onto the upload area. The tool works on one PDF at a time, up to 50MB. The upload happens over an encrypted HTTPS connection, so the file is protected in transit before it is ever encrypted at rest.
                 </p>
                 <p>
                   <strong>Set a Password</strong><br />

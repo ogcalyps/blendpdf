@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { UploadCloud, Loader2, X } from 'lucide-react';
 import { useFileStore } from '@/store/use-file-store';
 import { validateFile, formatFileSize } from '@/lib/utils';
-import { GoogleDrivePicker } from '@/components/GoogleDrivePicker';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
 
@@ -178,35 +177,6 @@ export function UploadZone({ maxFiles }: UploadZoneProps = {}) {
             {t('fileInfo')}
           </p>
 
-          {/* Google Drive Integration */}
-          <div className="mt-6">
-            <GoogleDrivePicker
-              onFilesSelected={(files) => {
-                // Validate and add files
-                const validFiles: File[] = [];
-                const errors: string[] = [];
-
-                files.forEach((file) => {
-                  const error = validateFile(file, MAX_FILE_SIZE);
-                  if (error === null) {
-                    validFiles.push(file);
-                  } else {
-                    errors.push(`${file.name}: ${error}`);
-                  }
-                });
-
-                if (errors.length > 0) {
-                  setValidationErrors(errors);
-                }
-
-                if (validFiles.length > 0) {
-                  addFiles(validFiles);
-                }
-              }}
-              disabled={isUploading || isProcessing}
-              multiple={true}
-            />
-          </div>
         </div>
       </div>
 

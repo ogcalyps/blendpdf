@@ -147,7 +147,7 @@ describe('every route taking a PDF upload validates it at the front door', () =>
   // Routes whose input is not a user-supplied PDF, or that must accept files
   // a strict parse would reject.
   const NOT_PDF_INPUT = new Set([
-    'health', 'subscribe', 'unsubscribe', 'send-file-email', 'google-drive',
+    'health', 'subscribe', 'unsubscribe', 'send-file-email',
     'word-to-pdf', 'excel-to-pdf', 'powerpoint-to-pdf', 'images-to-pdf',
     'merge-s3',
     'ev', // first-party events: a query string, the body is never read

@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { Upload, Image as ImageIcon, Download, Zap, Lock } from 'lucide-react';
 import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { UploadCloud, Loader2 } from 'lucide-react';
-import { GoogleDrivePicker } from '@/components/GoogleDrivePicker';
 import { HowItWorks } from '../components/HowItWorks';
 import { ToolFAQ } from '../components/ToolFAQ';
 import { RelatedTools } from '../components/RelatedTools';
@@ -303,47 +302,6 @@ export default function ImagesToPDFPage() {
                         >
                           {isProcessing ? t('common.processing') : isUploading ? t('common.uploading') : t('common.selectImages')}
                         </button>
-
-                        {/* Google Drive Integration */}
-                        <div className="mt-4">
-                          <GoogleDrivePicker
-                            onFilesSelected={async (files) => {
-
-                              // Fix EXIF orientation and convert WebP to PNG for Google Drive selected files
-                              const processedFiles = await Promise.all(files.map(normalizeImage));
-
-                              const imageFiles = processedFiles.filter(file => {
-                                const isValidType = file.type === 'image/jpeg' ||
-                                  file.type === 'image/jpg' ||
-                                  file.type === 'image/png' ||
-                                  file.type === 'image/webp';
-                                const isValidSize = file.size <= MAX_FILE_SIZE;
-
-                                if (!isValidType) {
-                                  alert(t('imagesToPdf.invalidImageType', { name: file.name }));
-                                  return false;
-                                }
-                                if (!isValidSize) {
-                                  alert(t('imagesToPdf.imageTooLarge', { name: file.name }));
-                                  return false;
-                                }
-                                return true;
-                              });
-
-                              if (imageFiles.length > 0) {
-                                const newImages: ImageFile[] = imageFiles.map(file => ({
-                                  id: Math.random().toString(36).substr(2, 9),
-                                  file,
-                                  preview: URL.createObjectURL(file),
-                                }));
-                                setImages(prev => [...prev, ...newImages]);
-                              }
-                            }}
-                            disabled={isProcessing}
-                            multiple={true}
-                            accept={['image/jpeg', 'image/png', 'image/webp']}
-                          />
-                        </div>
 
                         <p className="mt-4 text-sm text-gray-500">
                           {t('imagesToPdf.supportedFormats')}

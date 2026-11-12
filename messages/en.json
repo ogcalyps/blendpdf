@@ -193,7 +193,7 @@
     "intro": "BlendPDF (\"we\", \"our\") respects your privacy. This policy describes what data we collect when you use our PDF tools and how we use it.",
     "dataWeCollect": {
       "title": "Data we collect",
-      "body": "When you use our site we may collect: (1) Files you upload—processed in memory and deleted within 1 hour; (2) Usage data—e.g. device type, IP, pages visited; (3) If you use Google Drive: access to files you select, only to run the tool you chose; (4) Email address—if you choose to subscribe, we collect your email to send updates, tips, and Trustpilot review requests. You can unsubscribe at any time; (5) If you ask us to email you a file, we also pass your email address (never the file) to Trustpilot, which may send you an email asking for a review. We do not sell your data."
+      "body": "When you use our site we may collect: (1) Files you upload—processed in memory and deleted within 1 hour; (2) Usage data—e.g. device type, IP, pages visited; (3) Email address—if you choose to subscribe, we collect your email to send updates, tips, and Trustpilot review requests. You can unsubscribe at any time; (4) If you ask us to email you a file, we also pass your email address (never the file) to Trustpilot, which may send you an email asking for a review. We do not sell your data."
     },
     "cookies": {
       "title": "Cookies and storage",
@@ -202,10 +202,6 @@
     "runCounter": {
       "title": "Anonymous usage counts",
       "body": "So we can see how people use BlendPDF and where it gets in their way, our pages send our server short anonymous messages about what happens on them: the page you opened, the site that sent you here, your type of device (phone, tablet or computer), your choice on the cookie banner, the tool you picked, whether a file was opened, saved, downloaded or emailed, and whether the tool worked. They carry no file, file name, text you typed, cookie or stored ID. A random code kept in the page's memory links the messages from one tab, and it disappears when you refresh or close the page. Like every request to our site, they appear in our server logs with your IP address for a limited time (see Retention and deletion), and what we keep from those logs is daily totals. They are sent whatever you choose on the cookie banner: that choice only turns Google Analytics cookies on or off."
-    },
-    "googleDrive": {
-      "title": "Google Drive",
-      "body": "When you connect Google Drive, we use OAuth to access only the files you pick. We use this access solely to perform the action you requested (e.g. merge, convert). We do not store your Google data; processing is done in memory and files are not retained."
     },
     "retention": {
       "title": "Retention and deletion",
@@ -2226,17 +2222,6 @@
     "rejected": "{name}: this file could not be added.",
     "dismiss": "Dismiss"
   },
-  "googleDrive": {
-    "notConfigured": "Google Drive isn't available right now.",
-    "scriptsLoading": "Google Drive is still loading. Please wait a moment and try again.",
-    "scriptLoadFailed": "Couldn't load Google Drive. Please check your internet connection and refresh the page.",
-    "scriptsTimeout": "Google Drive took too long to load. Please refresh the page.",
-    "openPickerFailed": "Couldn't open the Google Drive picker. Please try again.",
-    "downloadFailed": "Failed to download files from Google Drive.",
-    "connectFailed": "Failed to connect to Google Drive.",
-    "connecting": "Connecting...",
-    "chooseFrom": "Choose from Google Drive"
-  },
   "cropPdf": {
     "title": "Crop PDF Pages Online",
     "description": "Drag to select the area you want to keep and trim PDF margins visually. Free, no sign-up — everything happens in your browser.",
@@ -2437,10 +2422,6 @@
       "conversion": {
         "question": "How long does conversion take?",
         "answer": "Most spreadsheets convert in a few seconds. Very large workbooks with many sheets or thousands of rows take longer, and total time also depends on your upload speed since conversion happens on our servers."
-      },
-      "uploadSpreadsheetsGoogle": {
-        "question": "Can I upload spreadsheets from Google Drive?",
-        "answer": "Yes, the upload area includes a Google Drive picker so you can select an Excel file stored in your Drive without downloading it to your device first."
       },
       "originalSpreadsheetModified": {
         "question": "Is my original spreadsheet modified?",
@@ -2964,17 +2945,13 @@
         "question": "How long does conversion take?",
         "answer": "Most presentations convert in a few seconds. Large, image-heavy decks can take longer, and total time also depends on your upload speed since the conversion happens on our servers."
       },
-      "uploadPresentationsGoogle": {
-        "question": "Can I upload presentations from Google Drive?",
-        "answer": "Yes, the upload area includes a Google Drive picker so you can select a PowerPoint file stored in your Drive without downloading it to your device first."
-      },
       "convertKeynoteGoogle": {
         "question": "Can I convert Keynote or Google Slides presentations?",
         "answer": "Not directly, but both apps can export to PowerPoint format. In Google Slides use File > Download > Microsoft PowerPoint (.pptx); in Keynote use File > Export To > PowerPoint. Then upload the exported .pptx to BlendPDF."
       },
       "originalPresentationModified": {
         "question": "Is my original presentation modified?",
-        "answer": "No, your original file is never modified. BlendPDF creates a brand-new PDF while your PowerPoint file stays untouched on your device or in your Google Drive."
+        "answer": "No, your original file is never modified. BlendPDF creates a brand-new PDF while your PowerPoint file stays untouched on your device."
       },
       "convertPowerpointPdfMobile": {
         "question": "Can I convert PowerPoint to PDF on mobile devices?",
@@ -3134,7 +3111,7 @@
     "steps": {
       "upload": {
         "title": "Upload your scanned PDF",
-        "description": "Drop in a scanned PDF (up to 50MB and 50 pages) from your device or Google Drive."
+        "description": "Drop in a scanned PDF (up to 50MB and 50 pages) from your device."
       },
       "ocr": {
         "title": "Pick the language and run OCR",

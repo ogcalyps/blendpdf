@@ -11,7 +11,6 @@ import { HowToSchema } from '@/components/HowToSchema';
 import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { UploadCloud, Loader2 } from 'lucide-react';
 import { formatFileSize } from '@/lib/utils';
-import { GoogleDrivePicker } from '@/components/GoogleDrivePicker';
 import { Button } from '@/components/ui/Button';
 import { Footer } from '@/components/Footer';
 import { ToolWorkspace } from '@/components/workspace/ToolWorkspace';
@@ -259,37 +258,6 @@ export default function PowerPointToPDFPage() {
                         >
                           {isProcessing ? t('common.processing') : isUploading ? t('common.uploading') : t('powerpointToPdf.selectFile')}
                         </Button>
-
-                        {/* Google Drive Integration */}
-                        <div className="mt-4">
-                          <GoogleDrivePicker
-                            onFilesSelected={async (files) => {
-                              if (files.length === 0) return;
-                              const uploadedFile = files[0];
-                              const error = validatePowerPointFile(uploadedFile, MAX_FILE_SIZE);
-                              if (error) {
-                                let translatedError = error;
-                                if (error.includes('File must be a PowerPoint presentation')) {
-                                  translatedError = t('powerpointToPdf.errors.invalidFileType');
-                                } else if (error.includes('File size exceeds')) {
-                                  translatedError = t('powerpointToPdf.errors.fileTooLarge');
-                                } else if (error.includes('File is empty')) {
-                                  translatedError = t('powerpointToPdf.errors.emptyFile');
-                                }
-                                setInlineError(translatedError);
-                                return;
-                              }
-                              setInlineError(null);
-                              setIsUploading(true);
-                              await new Promise(resolve => setTimeout(resolve, 300));
-                              setFile(uploadedFile);
-                              setIsUploading(false);
-                            }}
-                            disabled={isProcessing}
-                            multiple={false}
-                            accept={['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.ms-powerpoint']}
-                          />
-                        </div>
 
                         <p className="mt-4 text-sm text-gray-500">
                           {t('powerpointToPdf.supportedFormats')}

@@ -115,7 +115,7 @@ export default function PDFToExcelFAQ() {
                 </p>
                 <p>
                   <strong>Upload your PDF</strong><br />
-                  Click "Choose file" or drag and drop the PDF onto the upload area; you can also pick a file from Google Drive. One file at a time, up to 50MB. A thumbnail preview confirms you selected the right document.
+                  Click "Choose file" or drag and drop the PDF onto the upload area. One file at a time, up to 50MB. A thumbnail preview confirms you selected the right document.
                 </p>
                 <p>
                   <strong>Convert</strong><br />

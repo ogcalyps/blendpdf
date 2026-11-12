@@ -115,7 +115,7 @@ export default function RemoveMetadataFAQ() {
                 </p>
                 <p>
                   <strong>Select Your PDF</strong><br />
-                  Click "Select PDF" or drag and drop your file onto the upload area; you can also pick a file from Google Drive. Files up to 50MB are accepted. The moment the file is selected, BlendPDF reads its metadata locally in your browser — the document itself is never uploaded anywhere.
+                  Click "Select PDF" or drag and drop your file onto the upload area. Files up to 50MB are accepted. The moment the file is selected, BlendPDF reads its metadata locally in your browser — the document itself is never uploaded anywhere.
                 </p>
                 <p>
                   <strong>Review What Your PDF Reveals</strong><br />

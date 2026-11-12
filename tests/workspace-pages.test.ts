@@ -243,7 +243,6 @@ describe('the workspace stays out of the first load', () => {
         '@/hooks/useTrackedDropzone',
         '@/hooks/useDeliveryChoice',
         '@/components/FileDeliveryModal',
-        '@/components/GoogleDrivePicker',
         // downloadBlob, which owns the download event (tests/download-helper-guard.test.ts)
         '@/lib/utils',
         '@/lib/edit-pdf',

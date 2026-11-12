@@ -115,7 +115,7 @@ export default function WordToPDFFAQ() {
                 </p>
                 <p>
                   <strong>Upload your document</strong><br />
-                  Click the select button or drag and drop your file onto the upload area; you can also pick a file from Google Drive. Supported formats are .doc, .docx, .odt, and .rtf, up to 50MB.
+                  Click the select button or drag and drop your file onto the upload area. Supported formats are .doc, .docx, .odt, and .rtf, up to 50MB.
                 </p>
                 <p>
                   <strong>Convert</strong><br />

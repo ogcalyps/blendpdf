@@ -143,7 +143,7 @@ export default function WatermarkPDFFAQ() {
                 </p>
                 <p>
                   <strong>Step 1: Upload Your PDF</strong><br />
-                  Drag your file onto the upload area or click to browse. You can also pick a file from Google Drive. One file at a time, up to 50MB.
+                  Drag your file onto the upload area or click to browse. One file at a time, up to 50MB.
                 </p>
                 <p>
                   <strong>Step 2: Choose Text or Image</strong><br />

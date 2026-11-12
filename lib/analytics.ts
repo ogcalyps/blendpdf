@@ -228,15 +228,15 @@ export function trackToolError(tool: string, error: unknown, durationMs?: number
 }
 
 /** Where the files came from: 'home' is a file dropped on the home page and handed to the tool it opens. */
-export type UploadSource = 'local' | 'google_drive' | 'keep_working' | 'home';
+export type UploadSource = 'local' | 'keep_working' | 'home';
 
 /**
  * Fire file_upload for a set of accepted files.
  *
  * Prefer the shared entry points over calling this directly: the
- * useTrackedDropzone hook covers every drag-and-drop/file-picker path and
- * GoogleDrivePicker covers the Drive path, so no upload can silently go
- * uncounted (the same reason downloadBlob owns trackDownload).
+ * useTrackedDropzone hook covers every drag-and-drop/file-picker path, so no
+ * upload can silently go uncounted (the same reason downloadBlob owns
+ * trackDownload).
  *
  * @param role - which slot the file filled; 'document' is the file the tool
  *   operates on, anything else is a secondary asset (watermark image,

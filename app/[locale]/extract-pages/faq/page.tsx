@@ -115,7 +115,7 @@ export default function ExtractPagesFAQ() {
                 </p>
                 <p>
                   <strong>Open Your PDF</strong><br />
-                  Click "Select PDF" or drag and drop your file onto the upload area — files up to 50MB are accepted, and you can also pick a file from Google Drive. The document is read directly in your browser: the tool shows the filename, page count, and file size immediately, without sending anything over the network.
+                  Click "Select PDF" or drag and drop your file onto the upload area — files up to 50MB are accepted. The document is read directly in your browser: the tool shows the filename, page count, and file size immediately, without sending anything over the network.
                 </p>
                 <p>
                   <strong>Type the Pages You Want</strong><br />
@@ -407,7 +407,7 @@ export default function ExtractPagesFAQ() {
                 </p>
                 <p>
                   <strong>Files From Anywhere</strong><br />
-                  You can open PDFs from your phone's local storage, downloads, the Files app, or Google Drive via the built-in picker. Extracted results save through your browser's normal download flow, after which you can share them by email, chat, or any app on your device.
+                  You can open PDFs from your phone's local storage, downloads, or the Files app. Extracted results save through your browser's normal download flow, after which you can share them by email, chat, or any app on your device.
                 </p>
                 <p>
                   <strong>ZIP Mode on Mobile</strong><br />

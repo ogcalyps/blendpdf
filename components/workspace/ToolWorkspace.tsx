@@ -10,7 +10,6 @@ import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { useDeliveryChoice } from '@/hooks/useDeliveryChoice';
 import { FileDeliveryModal } from '@/components/FileDeliveryModal';
 import type { NoticeTone } from '@/components/FileDeliveryPanel';
-import { GoogleDrivePicker } from '@/components/GoogleDrivePicker';
 import { downloadBlob, formatFileSize, formatLimitMb } from '@/lib/utils';
 import { MAX_MERGE_FILES, MAX_PDF_BYTES } from '@/lib/edit-pdf';
 import { MODES } from '@/lib/workspace/modes';
@@ -23,7 +22,7 @@ import type { WatermarkStamp } from '@/lib/edit-pdf/types';
  * a dropzone, then the PDF editor opened in the page's mode.
  *
  * First load stays light: this file statically imports only the dropzone, the
- * Drive picker, the delivery modal and pure data. The editor comes through
+ * delivery modal and pure data. The editor comes through
  * next/dynamic once a PDF is chosen; the save pipeline and the server fixes
  * through import() on first use (tests/workspace-pages.test.ts walks the
  * static imports from here).
@@ -154,16 +153,6 @@ export function ToolWorkspace({ mode, initialFile, deliverOnOpen = false, onClos
     [take],
   );
 
-  const onDriveFiles = useCallback(
-    (picked: File[]) => {
-      if (picked.length === 0) return;
-      if (picked.length > (multiple ? MAX_MERGE_FILES : 1)) return take([], ['too-many-files']);
-      const fits = picked.filter((file) => file.size <= MAX_PDF_BYTES);
-      take(fits, fits.length < picked.length ? ['file-too-large'] : []);
-    },
-    [take, multiple],
-  );
-
   // The tool's main dropzone: it also takes a Keep working / home page handoff on mount
   const { getRootProps, getInputProps, isDragActive } = useTrackedDropzone({
     onDrop,
@@ -286,9 +275,6 @@ export function ToolWorkspace({ mode, initialFile, deliverOnOpen = false, onClos
                 </div>
                 <p className="mt-4 text-sm text-gray-500">{multiple ? t('workspace.drop.several') : t('workspace.drop.one')}</p>
               </div>
-            </div>
-            <div className="mt-4 flex justify-center">
-              <GoogleDrivePicker onFilesSelected={onDriveFiles} multiple={multiple} accept={['application/pdf']} />
             </div>
           </>
         )}

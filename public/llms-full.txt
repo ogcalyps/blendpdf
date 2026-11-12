@@ -358,9 +358,6 @@ A: Yes. CSV files are opened as a spreadsheet on the server and exported to PDF 
 Q: How long does conversion take?
 A: Most spreadsheets convert in a few seconds. Very large workbooks with many sheets or thousands of rows take longer, and total time also depends on your upload speed since conversion happens on our servers.
 
-Q: Can I upload spreadsheets from Google Drive?
-A: Yes, the upload area includes a Google Drive picker so you can select an Excel file stored in your Drive without downloading it to your device first.
-
 Q: Is my original spreadsheet modified?
 A: No, your original file is never modified. BlendPDF creates a new PDF while your spreadsheet stays untouched on your device, with all formulas and data intact.
 
@@ -949,14 +946,11 @@ A: Each slide becomes exactly one PDF page, in the same order as the presentatio
 Q: How long does conversion take?
 A: Most presentations convert in a few seconds. Large, image-heavy decks can take longer, and total time also depends on your upload speed since the conversion happens on our servers.
 
-Q: Can I upload presentations from Google Drive?
-A: Yes, the upload area includes a Google Drive picker so you can select a PowerPoint file stored in your Drive without downloading it to your device first.
-
 Q: Can I convert Keynote or Google Slides presentations?
 A: Not directly, but both apps can export to PowerPoint format. In Google Slides use File > Download > Microsoft PowerPoint (.pptx); in Keynote use File > Export To > PowerPoint. Then upload the exported .pptx to BlendPDF.
 
 Q: Is my original presentation modified?
-A: No, your original file is never modified. BlendPDF creates a brand-new PDF while your PowerPoint file stays untouched on your device or in your Google Drive.
+A: No, your original file is never modified. BlendPDF creates a brand-new PDF while your PowerPoint file stays untouched on your device.
 
 Q: Can I convert PowerPoint to PDF on mobile devices?
 A: Yes, BlendPDF works on smartphones and tablets. Because the conversion runs on our servers, even older phones can convert large presentations — only upload and download speed depend on your connection.

@@ -115,7 +115,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>Upload Your PDF Form</strong><br />
-                  Click "Select PDF" or drag and drop your file onto the upload area; you can also pick a file from Google Drive. Files up to 50MB are accepted. The tool immediately parses the document on your device and looks for interactive form fields — nothing is sent to a server at any point.
+                  Click "Select PDF" or drag and drop your file onto the upload area. Files up to 50MB are accepted. The tool immediately parses the document on your device and looks for interactive form fields — nothing is sent to a server at any point.
                 </p>
                 <p>
                   <strong>Review the Detected Fields</strong><br />

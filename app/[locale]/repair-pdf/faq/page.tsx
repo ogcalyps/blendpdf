@@ -239,7 +239,7 @@ export default function RepairPDFFAQ() {
                 </p>
                 <p>
                   <strong>Step 1: Upload the Damaged File</strong><br />
-                  Go to the Repair PDF tool and drag your file onto the upload area, or click "Choose File" to browse for it. You can also pick a file from Google Drive. One file at a time, up to 50MB. It does not matter that the file will not open on your device — the tool works on the raw bytes, not on a rendered view.
+                  Go to the Repair PDF tool and drag your file onto the upload area, or click "Choose File" to browse for it. One file at a time, up to 50MB. It does not matter that the file will not open on your device — the tool works on the raw bytes, not on a rendered view.
                 </p>
                 <p>
                   <strong>Step 2: Click Repair PDF</strong><br />

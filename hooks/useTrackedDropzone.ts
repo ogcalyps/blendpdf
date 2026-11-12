@@ -12,7 +12,7 @@ export interface TrackedDropzoneOptions extends DropzoneOptions {
    * image, spreadsheet of form data) so they can be segmented out in GA4.
    */
   uploadRole?: string;
-  /** Defaults to 'local' — the Drive path is tracked inside GoogleDrivePicker. */
+  /** Defaults to 'local'. */
   uploadSource?: UploadSource;
 }
 

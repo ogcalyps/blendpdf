@@ -40,16 +40,12 @@ export default function PowerPointToPDFFAQ() {
       answer: 'Most presentations convert in a few seconds. Large, image-heavy decks can take longer, and total time also depends on your upload speed since the conversion happens on our servers.'
     },
     {
-      question: 'Can I upload presentations from Google Drive?',
-      answer: 'Yes, the upload area includes a Google Drive picker so you can select a PowerPoint file stored in your Drive without downloading it to your device first.'
-    },
-    {
       question: 'Can I convert Keynote or Google Slides presentations?',
       answer: 'Not directly, but both apps can export to PowerPoint format. In Google Slides use File > Download > Microsoft PowerPoint (.pptx); in Keynote use File > Export To > PowerPoint. Then upload the exported .pptx to BlendPDF.'
     },
     {
       question: 'Is my original presentation modified?',
-      answer: 'No, your original file is never modified. BlendPDF creates a brand-new PDF while your PowerPoint file stays untouched on your device or in your Google Drive.'
+      answer: 'No, your original file is never modified. BlendPDF creates a brand-new PDF while your PowerPoint file stays untouched on your device.'
     },
     {
       question: 'Can I convert PowerPoint to PDF on mobile devices?',
@@ -96,7 +92,6 @@ export default function PowerPointToPDFFAQ() {
               <li><a href="#slides-to-pages" className="text-blue-600 hover:text-blue-800">How do slides map to PDF pages?</a></li>
               <li><a href="#file-size-limits" className="text-blue-600 hover:text-blue-800">What are the file size limits?</a></li>
               <li><a href="#processing-time" className="text-blue-600 hover:text-blue-800">How long does conversion take?</a></li>
-              <li><a href="#google-drive" className="text-blue-600 hover:text-blue-800">Can I upload presentations from Google Drive?</a></li>
               <li><a href="#other-formats" className="text-blue-600 hover:text-blue-800">Can I convert Keynote or Google Slides presentations?</a></li>
               <li><a href="#original-file" className="text-blue-600 hover:text-blue-800">Is my original presentation modified?</a></li>
               <li><a href="#mobile-devices" className="text-blue-600 hover:text-blue-800">Can I convert PowerPoint to PDF on mobile devices?</a></li>
@@ -115,7 +110,7 @@ export default function PowerPointToPDFFAQ() {
                 </p>
                 <p>
                   <strong>Upload Your Presentation</strong><br />
-                  Click the "Select File" button or drag and drop your presentation directly onto the upload area. BlendPDF accepts PowerPoint files (.ppt and .pptx) and OpenDocument Presentation files (.odp) up to 50MB in size. If your presentation is stored in Google Drive, you can pick it directly from there using the built-in Google Drive picker instead of downloading it to your device first. The upload area validates your file immediately, so if the format or size is wrong you'll see a clear message before any time is wasted.
+                  Click the "Select File" button or drag and drop your presentation directly onto the upload area. BlendPDF accepts PowerPoint files (.ppt and .pptx) and OpenDocument Presentation files (.odp) up to 50MB in size. The upload area validates your file immediately, so if the format or size is wrong you'll see a clear message before any time is wasted.
                 </p>
                 <p>
                   <strong>Convert on Our Servers</strong><br />
@@ -283,29 +278,8 @@ export default function PowerPointToPDFFAQ() {
               </div>
             </section>
 
-            <section id="google-drive" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">9. Can I upload presentations from Google Drive?</h2>
-              <div className="prose prose-lg max-w-none text-gray-700">
-                <p>
-                  Yes. The upload area includes a Google Drive picker, so if your PowerPoint file lives in Drive you can select it there directly instead of downloading it to your device first and re-uploading it.
-                </p>
-                <p>
-                  <strong>How It Works</strong><br />
-                  Click the Google Drive option beneath the main upload button, sign in to your Google account if prompted, and pick the presentation from the familiar Drive file browser. The file is fetched and validated exactly like a local upload — same supported formats (.ppt and .pptx via the picker), same 50MB limit, same conversion pipeline. This is especially convenient on mobile devices and Chromebooks, where juggling downloaded files is more awkward than on a desktop.
-                </p>
-                <p>
-                  <strong>Permissions and Privacy</strong><br />
-                  The Drive picker uses Google's own file-selection dialog, which means BlendPDF only ever receives the single file you explicitly choose — it cannot browse, list, or access anything else in your Drive. The selected file is then handled under the same privacy policy as any other upload: processed automatically, never read by a human, and deleted from our servers within an hour, most immediately after processing.
-                </p>
-                <p>
-                  <strong>A Note on Native Google Slides Files</strong><br />
-                  The picker is for PowerPoint files stored in Drive, not for native Google Slides documents. If your presentation was created in Google Slides, export it first via File &gt; Download &gt; Microsoft PowerPoint (.pptx) inside Slides, then upload the exported file. The next section covers this workflow in detail.
-                </p>
-              </div>
-            </section>
-
             <section id="other-formats" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">10. Can I convert Keynote or Google Slides presentations?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">9. Can I convert Keynote or Google Slides presentations?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Not directly — BlendPDF accepts .ppt, .pptx, and .odp files — but both Keynote and Google Slides export to PowerPoint format in a couple of clicks, and the exported file converts perfectly.
@@ -326,10 +300,10 @@ export default function PowerPointToPDFFAQ() {
             </section>
 
             <section id="original-file" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">11. Is my original presentation modified?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">10. Is my original presentation modified?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
-                  No. Conversion is completely non-destructive: BlendPDF produces a brand-new PDF file, and your original presentation remains exactly as it was on your device or in your Google Drive.
+                  No. Conversion is completely non-destructive: BlendPDF produces a brand-new PDF file, and your original presentation remains exactly as it was on your device.
                 </p>
                 <p>
                   <strong>How the Process Works</strong><br />
@@ -347,7 +321,7 @@ export default function PowerPointToPDFFAQ() {
             </section>
 
             <section id="mobile-devices" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">12. Can I convert PowerPoint to PDF on mobile devices?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">11. Can I convert PowerPoint to PDF on mobile devices?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Yes. BlendPDF is a web tool with a responsive, touch-friendly interface, so it works on iPhones, Android phones, iPads, and tablets without installing any app.
@@ -358,7 +332,7 @@ export default function PowerPointToPDFFAQ() {
                 </p>
                 <p>
                   <strong>Getting Files In and Out on Mobile</strong><br />
-                  You can upload from your device's file storage, from email attachments saved to Files (iOS) or Downloads (Android), or directly from Google Drive using the built-in picker — the Drive option is particularly natural on mobile, where presentations often live in cloud storage rather than local folders. After conversion you can download the PDF to your device, or use the email delivery option to send it to your inbox, which makes it easy to continue on a laptop later.
+                  You can upload from your device's file storage or from email attachments saved to Files (iOS) or Downloads (Android). After conversion you can download the PDF to your device, or use the email delivery option to send it to your inbox, which makes it easy to continue on a laptop later.
                 </p>
                 <p>
                   <strong>A Common Real-World Scenario</strong><br />
@@ -368,7 +342,7 @@ export default function PowerPointToPDFFAQ() {
             </section>
 
             <section id="cost" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">13. Is converting PowerPoint to PDF free?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">12. Is converting PowerPoint to PDF free?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Yes, converting PowerPoint to PDF with BlendPDF is completely free — no fees, no watermarks, and no premium tiers today. Every feature of the converter is available to every user at no charge.
@@ -389,7 +363,7 @@ export default function PowerPointToPDFFAQ() {
             </section>
 
             <section id="data-privacy" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">14. What happens to my files after conversion?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">13. What happens to my files after conversion?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Presentations often contain sensitive material — financial results, product roadmaps, legal content — so BlendPDF treats every upload with strict, automatic data-handling rules. Your file exists on our servers only as long as the conversion requires.
@@ -414,7 +388,7 @@ export default function PowerPointToPDFFAQ() {
             </section>
 
             <section id="technical-support" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">15. What if the conversion fails or produces errors?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">14. What if the conversion fails or produces errors?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Conversions succeed on the first try for the vast majority of files, but when something does go wrong, the cause is usually one of a few identifiable issues. BlendPDF shows a specific error message rather than a generic failure, which makes troubleshooting quick.

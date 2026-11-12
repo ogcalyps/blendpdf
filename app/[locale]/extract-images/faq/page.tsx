@@ -115,7 +115,7 @@ export default function ExtractImagesFAQ() {
                 </p>
                 <p>
                   <strong>Open Your PDF</strong><br />
-                  Click "Select PDF" or drag and drop your file onto the upload area; you can also pick a file from Google Drive. Files up to 50MB are accepted. The document is opened directly in your browser — nothing is uploaded — and scanning begins immediately, so there's no separate "start" button to hunt for.
+                  Click "Select PDF" or drag and drop your file onto the upload area. Files up to 50MB are accepted. The document is opened directly in your browser — nothing is uploaded — and scanning begins immediately, so there's no separate "start" button to hunt for.
                 </p>
                 <p>
                   <strong>Watch the Scan</strong><br />
@@ -415,7 +415,7 @@ export default function ExtractImagesFAQ() {
                 </p>
                 <p>
                   <strong>From Phone Storage or the Cloud</strong><br />
-                  Open PDFs from your device's files, downloads, or Google Drive via the built-in picker. Downloads arrive through the browser's standard mechanism: a single selected image lands as a PNG you can immediately share or set as an attachment; multiple images arrive as a ZIP that both iOS and Android can open natively in their Files apps.
+                  Open PDFs from your device's files or downloads. Downloads arrive through the browser's standard mechanism: a single selected image lands as a PNG you can immediately share or set as an attachment; multiple images arrive as a ZIP that both iOS and Android can open natively in their Files apps.
                 </p>
                 <p>
                   <strong>A Genuinely Useful Mobile Task</strong><br />

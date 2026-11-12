@@ -193,7 +193,7 @@
     "intro": "BlendPDF (“nosotros”, “nuestro”) respeta su privacidad. Esta política describe qué datos recopilamos cuando usted usa nuestras herramientas para PDF y cómo los usamos.",
     "dataWeCollect": {
       "title": "Datos que recopilamos",
-      "body": "Cuando usa nuestro sitio, podemos recopilar: (1) los archivos que usted sube: se procesan en memoria y se eliminan en un plazo de 1 hora; (2) datos de uso: por ejemplo, el tipo de dispositivo, la dirección IP y las páginas visitadas; (3) si usa Google Drive: acceso a los archivos que usted seleccione, únicamente para ejecutar la herramienta que eligió; (4) su dirección de correo electrónico: si decide suscribirse, recopilamos su correo para enviarle novedades, consejos y solicitudes para dejar una opinión en Trustpilot. Puede darse de baja en cualquier momento; (5) si nos pide que le enviemos un archivo por correo electrónico, también le pasamos a Trustpilot su dirección de correo (nunca el archivo), y Trustpilot puede enviarle un correo para pedirle una opinión. No vendemos sus datos."
+      "body": "Cuando usa nuestro sitio, podemos recopilar: (1) los archivos que usted sube: se procesan en memoria y se eliminan en un plazo de 1 hora; (2) datos de uso: por ejemplo, el tipo de dispositivo, la dirección IP y las páginas visitadas; (3) su dirección de correo electrónico: si decide suscribirse, recopilamos su correo para enviarle novedades, consejos y solicitudes para dejar una opinión en Trustpilot. Puede darse de baja en cualquier momento; (4) si nos pide que le enviemos un archivo por correo electrónico, también le pasamos a Trustpilot su dirección de correo (nunca el archivo), y Trustpilot puede enviarle un correo para pedirle una opinión. No vendemos sus datos."
     },
     "cookies": {
       "title": "Cookies y almacenamiento",
@@ -202,10 +202,6 @@
     "runCounter": {
       "title": "Recuentos de uso anónimos",
       "body": "Para ver cómo usan BlendPDF las personas y en qué momentos les complica la tarea, nuestras páginas envían a nuestro servidor mensajes breves y anónimos sobre lo que ocurre en ellas: la página que usted abrió, el sitio desde el que llegó, su tipo de dispositivo (teléfono, tableta o computadora), su elección en el aviso de cookies, la herramienta que eligió, si un archivo se abrió, se guardó, se descargó o se envió por correo electrónico, y si la herramienta funcionó. Estos mensajes no contienen ningún archivo, nombre de archivo, texto que usted haya escrito, cookie ni identificador almacenado. Un código aleatorio que se guarda en la memoria de la página vincula los mensajes de una misma pestaña, y desaparece cuando usted actualiza o cierra la página. Como cualquier solicitud a nuestro sitio, estos mensajes aparecen en los registros de nuestro servidor junto con su dirección IP durante un tiempo limitado (consulte “Conservación y eliminación”), y lo que conservamos de esos registros son totales diarios. Se envían sea cual sea su elección en el aviso de cookies: esa elección solo activa o desactiva las cookies de Google Analytics."
-    },
-    "googleDrive": {
-      "title": "Google Drive",
-      "body": "Cuando conecta Google Drive, usamos OAuth para acceder únicamente a los archivos que usted elige. Usamos este acceso exclusivamente para realizar la acción que solicitó (por ejemplo, unir o convertir). No almacenamos sus datos de Google: el procesamiento se hace en memoria y los archivos no se conservan."
     },
     "retention": {
       "title": "Conservación y eliminación",
@@ -2226,17 +2222,6 @@
     "rejected": "{name}: no se pudo agregar este archivo.",
     "dismiss": "Cerrar"
   },
-  "googleDrive": {
-    "notConfigured": "Google Drive no está disponible en este momento.",
-    "scriptsLoading": "Google Drive todavía se está cargando. Espere un momento y vuelva a intentarlo.",
-    "scriptLoadFailed": "No se pudo cargar Google Drive. Revise su conexión a internet y actualice la página.",
-    "scriptsTimeout": "Google Drive tardó demasiado en cargar. Actualice la página.",
-    "openPickerFailed": "No se pudo abrir el selector de Google Drive. Vuelva a intentarlo.",
-    "downloadFailed": "No se pudieron descargar los archivos de Google Drive.",
-    "connectFailed": "No se pudo conectar con Google Drive.",
-    "connecting": "Conectando…",
-    "chooseFrom": "Elegir desde Google Drive"
-  },
   "cropPdf": {
     "title": "Recortar páginas de un PDF en línea",
     "description": "Arrastre para elegir la zona que quiere conservar y recorte los márgenes del PDF directamente sobre la página. Gratis y sin registrarse: todo ocurre en su navegador.",
@@ -2437,10 +2422,6 @@
       "conversion": {
         "question": "¿Cuánto tarda la conversión?",
         "answer": "La mayoría de las hojas de cálculo se convierten en unos segundos. Los libros muy grandes, con muchas hojas o miles de filas, tardan más, y el tiempo total también depende de su velocidad de subida, ya que la conversión se hace en nuestros servidores."
-      },
-      "uploadSpreadsheetsGoogle": {
-        "question": "¿Puedo subir hojas de cálculo desde Google Drive?",
-        "answer": "Sí. El área para subir archivos incluye un selector de Google Drive, así que puede elegir un archivo de Excel guardado en su Drive sin descargarlo antes a su dispositivo."
       },
       "originalSpreadsheetModified": {
         "question": "¿Se modifica mi hoja de cálculo original?",
@@ -2964,17 +2945,13 @@
         "question": "¿Cuánto tarda la conversión?",
         "answer": "La mayoría de las presentaciones se convierten en unos segundos. Las presentaciones grandes, con muchas imágenes, pueden tardar más, y el tiempo total también depende de la velocidad de subida de su conexión, porque la conversión se hace en nuestros servidores."
       },
-      "uploadPresentationsGoogle": {
-        "question": "¿Puedo subir presentaciones desde Google Drive?",
-        "answer": "Sí. El área para subir archivos incluye un selector de Google Drive, así que puede elegir un archivo de PowerPoint guardado en su Drive sin descargarlo antes a su dispositivo."
-      },
       "convertKeynoteGoogle": {
         "question": "¿Puedo convertir presentaciones de Keynote o de Presentaciones de Google?",
         "answer": "No directamente, pero las dos aplicaciones pueden exportar al formato de PowerPoint. En Presentaciones de Google, use Archivo > Descargar > Microsoft PowerPoint (.pptx); en Keynote, use Archivo > Exportar a > PowerPoint. Después suba a BlendPDF el archivo PPTX exportado."
       },
       "originalPresentationModified": {
         "question": "¿Se modifica mi presentación original?",
-        "answer": "No, su archivo original nunca se modifica. BlendPDF crea un PDF completamente nuevo y su archivo de PowerPoint queda intacto en su dispositivo o en su Google Drive."
+        "answer": "No, su archivo original nunca se modifica. BlendPDF crea un PDF completamente nuevo y su archivo de PowerPoint queda intacto en su dispositivo."
       },
       "convertPowerpointPdfMobile": {
         "question": "¿Puedo convertir PowerPoint a PDF en dispositivos móviles?",
@@ -3134,7 +3111,7 @@
     "steps": {
       "upload": {
         "title": "Suba su PDF escaneado",
-        "description": "Agregue un PDF escaneado (de hasta 50 MB y 50 páginas) desde su dispositivo o desde Google Drive."
+        "description": "Agregue un PDF escaneado (de hasta 50 MB y 50 páginas) desde su dispositivo."
       },
       "ocr": {
         "title": "Elija el idioma y aplique el OCR",

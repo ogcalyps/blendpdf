@@ -115,7 +115,7 @@ export default function PDFToImagesFAQ() {
                 </p>
                 <p>
                   <strong>Upload and choose a format</strong><br />
-                  Drag and drop your PDF onto the upload area or click to browse; Google Drive is also supported. One PDF at a time, up to 50MB and 100 pages. Then pick your output format: JPG or PNG.
+                  Drag and drop your PDF onto the upload area or click to browse. One PDF at a time, up to 50MB and 100 pages. Then pick your output format: JPG or PNG.
                 </p>
                 <p>
                   <strong>Convert</strong><br />

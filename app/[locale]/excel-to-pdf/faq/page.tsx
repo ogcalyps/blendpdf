@@ -44,10 +44,6 @@ export default function ExcelToPDFFAQ() {
       answer: 'Most spreadsheets convert in a few seconds. Very large workbooks with many sheets or thousands of rows take longer, and total time also depends on your upload speed since conversion happens on our servers.'
     },
     {
-      question: 'Can I upload spreadsheets from Google Drive?',
-      answer: 'Yes, the upload area includes a Google Drive picker so you can select an Excel file stored in your Drive without downloading it to your device first.'
-    },
-    {
       question: 'Is my original spreadsheet modified?',
       answer: 'No, your original file is never modified. BlendPDF creates a new PDF while your spreadsheet stays untouched on your device, with all formulas and data intact.'
     },
@@ -97,7 +93,6 @@ export default function ExcelToPDFFAQ() {
               <li><a href="#csv-files" className="text-blue-600 hover:text-blue-800">Can I convert CSV files to PDF?</a></li>
               <li><a href="#file-size-limits" className="text-blue-600 hover:text-blue-800">What are the file size limits?</a></li>
               <li><a href="#processing-time" className="text-blue-600 hover:text-blue-800">How long does conversion take?</a></li>
-              <li><a href="#google-drive" className="text-blue-600 hover:text-blue-800">Can I upload spreadsheets from Google Drive?</a></li>
               <li><a href="#original-file" className="text-blue-600 hover:text-blue-800">Is my original spreadsheet modified?</a></li>
               <li><a href="#mobile-devices" className="text-blue-600 hover:text-blue-800">Can I convert Excel to PDF on mobile devices?</a></li>
               <li><a href="#cost" className="text-blue-600 hover:text-blue-800">Is converting Excel to PDF free?</a></li>
@@ -115,7 +110,7 @@ export default function ExcelToPDFFAQ() {
                 </p>
                 <p>
                   <strong>Upload Your Spreadsheet</strong><br />
-                  Click "Select File" or drag and drop your spreadsheet onto the upload area. BlendPDF accepts Excel files (.xls and .xlsx), OpenDocument Spreadsheets (.ods), and CSV files up to 50MB. If the file lives in Google Drive, use the built-in Drive picker to select it directly. Your file is validated the moment you choose it, so format and size problems surface immediately with a clear message instead of a failed conversion later.
+                  Click "Select File" or drag and drop your spreadsheet onto the upload area. BlendPDF accepts Excel files (.xls and .xlsx), OpenDocument Spreadsheets (.ods), and CSV files up to 50MB. Your file is validated the moment you choose it, so format and size problems surface immediately with a clear message instead of a failed conversion later.
                 </p>
                 <p>
                   <strong>Convert on Our Servers</strong><br />
@@ -304,29 +299,8 @@ export default function ExcelToPDFFAQ() {
               </div>
             </section>
 
-            <section id="google-drive" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">10. Can I upload spreadsheets from Google Drive?</h2>
-              <div className="prose prose-lg max-w-none text-gray-700">
-                <p>
-                  Yes. The upload area includes a Google Drive picker, so an Excel file stored in Drive can be selected there directly — no need to download it to your device and re-upload it.
-                </p>
-                <p>
-                  <strong>How It Works</strong><br />
-                  Click the Google Drive option under the main upload button, sign in to Google if prompted, and choose your spreadsheet from the standard Drive file dialog. The file then flows through the same validation and conversion pipeline as a local upload: same supported Excel formats via the picker, same 50MB limit, same speed. It's particularly handy on phones and Chromebooks, where files tend to live in the cloud rather than in local folders.
-                </p>
-                <p>
-                  <strong>Permissions and Privacy</strong><br />
-                  The picker is Google's own file-selection dialog, which means BlendPDF receives only the single file you explicitly select — it has no ability to browse or list the rest of your Drive. Once fetched, the file is treated like every other upload: processed automatically with no human access and deleted from our servers within an hour, most immediately after processing.
-                </p>
-                <p>
-                  <strong>Native Google Sheets Files</strong><br />
-                  The picker handles Excel files stored in Drive, not native Google Sheets documents. If your spreadsheet was created in Google Sheets, export it first from within Sheets via File &gt; Download &gt; Microsoft Excel (.xlsx), then upload the exported file. Sheets' own File &gt; Download &gt; PDF is also an option, though exporting to .xlsx and converting here keeps your workflow consistent when you're producing PDFs from mixed sources.
-                </p>
-              </div>
-            </section>
-
             <section id="original-file" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">11. Is my original spreadsheet modified?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">10. Is my original spreadsheet modified?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   No. The conversion is entirely non-destructive: BlendPDF produces a new PDF file, and your workbook — data, formulas, formatting, everything — remains exactly as it was.
@@ -347,7 +321,7 @@ export default function ExcelToPDFFAQ() {
             </section>
 
             <section id="mobile-devices" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">12. Can I convert Excel to PDF on mobile devices?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">11. Can I convert Excel to PDF on mobile devices?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Yes. BlendPDF is a responsive web tool that works in the browser on iPhones, Android phones, and tablets — no app to install, no account to create.
@@ -358,24 +332,24 @@ export default function ExcelToPDFFAQ() {
                 </p>
                 <p>
                   <strong>Getting Files In and Out</strong><br />
-                  Upload from your device's file storage, from an email attachment saved to Files (iOS) or Downloads (Android), or straight from Google Drive with the built-in picker — usually the most natural path on mobile, where spreadsheets tend to live in cloud storage. After conversion, download the PDF to your device or use the email delivery option to send it to your inbox and pick it up on your laptop later.
+                  Upload from your device's file storage or from an email attachment saved to Files (iOS) or Downloads (Android). After conversion, download the PDF to your device or use the email delivery option to send it to your inbox and pick it up on your laptop later.
                 </p>
                 <p>
                   <strong>A Common Real-World Scenario</strong><br />
-                  A client asks for the latest price list while you're away from your desk. The .xlsx is in your Drive; sending it raw would expose formulas and cost columns. From your phone: open BlendPDF, pick the file from Drive, convert, and forward the clean PDF showing exactly the sheet you'd print — done in under two minutes without touching a computer.
+                  A client asks for the latest price list while you're away from your desk. The .xlsx is on your phone; sending it raw would expose formulas and cost columns. From your phone: open BlendPDF, pick the file, convert, and forward the clean PDF showing exactly the sheet you'd print — done in under two minutes without touching a computer.
                 </p>
               </div>
             </section>
 
             <section id="cost" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">13. Is converting Excel to PDF free?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">12. Is converting Excel to PDF free?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Yes, converting Excel to PDF with BlendPDF is completely free — no fees, no watermarks, and no premium tiers today. Every capability described on this page is available to every user at no charge.
                 </p>
                 <p>
                   <strong>No Payment and No Upsell</strong><br />
-                  There's no credit card field anywhere, no trial countdown, and no feature matrix where the useful column costs money. Multi-sheet workbooks, charts, CSV input, Google Drive upload, email delivery — all included. The only operational constraint is a fair-use rate limit of 10 conversions per 15 minutes, which exists to keep shared servers responsive, not to sell an upgrade.
+                  There's no credit card field anywhere, no trial countdown, and no feature matrix where the useful column costs money. Multi-sheet workbooks, charts, CSV input, email delivery — all included. The only operational constraint is a fair-use rate limit of 10 conversions per 15 minutes, which exists to keep shared servers responsive, not to sell an upgrade.
                 </p>
                 <p>
                   <strong>Clean, Unbranded Output</strong><br />
@@ -389,7 +363,7 @@ export default function ExcelToPDFFAQ() {
             </section>
 
             <section id="data-privacy" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">14. What happens to my files after conversion?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">13. What happens to my files after conversion?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   Spreadsheets are among the most sensitive files people handle — salaries, revenue, customer lists, account numbers. BlendPDF's data handling is built around that reality: your file exists on our servers only as long as the conversion needs it.
@@ -414,7 +388,7 @@ export default function ExcelToPDFFAQ() {
             </section>
 
             <section id="technical-support" className="scroll-mt-20">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">15. What if the conversion fails or produces errors?</h2>
+              <h2 className="mb-4 text-3xl font-bold text-gray-900">14. What if the conversion fails or produces errors?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
                   The vast majority of spreadsheets convert on the first attempt. When something goes wrong, the cause is usually identifiable from the error message, and the fixes are quick.

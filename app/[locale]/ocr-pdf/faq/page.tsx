@@ -136,7 +136,7 @@ export default function OcrPDFFAQ() {
                 </p>
                 <p>
                   <strong>Upload Your Scanned PDF</strong><br />
-                  Drag and drop your PDF onto the upload area or click "Select File". Files can be up to 50MB and 50 pages, and you can also pick a file directly from Google Drive. The tool checks the file immediately — a password-protected or oversized PDF is flagged before any processing time is spent.
+                  Drag and drop your PDF onto the upload area or click "Select File". Files can be up to 50MB and 50 pages. The tool checks the file immediately — a password-protected or oversized PDF is flagged before any processing time is spent.
                 </p>
                 <p>
                   <strong>Choose Recognition Languages</strong><br />

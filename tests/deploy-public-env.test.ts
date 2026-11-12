@@ -1,7 +1,7 @@
 /**
  * NEXT_PUBLIC_ values are inlined into the JavaScript every visitor downloads.
- * The Google Drive picker is off in production builds, so its browser key and
- * OAuth client ID were shipping for nothing (found while preparing the
+ * The site's old Google Drive picker (now removed) left its browser key and
+ * OAuth client ID shipping for nothing (found while preparing the
  * open-source release). Keep them out of the production build and out of the
  * committed process config.
  */
@@ -15,8 +15,7 @@ const read = (file: string) => readFileSync(join(ROOT, file), 'utf8');
 const deployed = existsSync(join(ROOT, '.github/workflows/deploy.yml')) && existsSync(join(ROOT, 'ecosystem.config.js'));
 
 describe.skipIf(!deployed)('production build env', () => {
-  it('gives the build no Google Drive credentials while the picker is off in production', () => {
-    expect(read('components/GoogleDrivePicker.tsx')).toMatch(/NODE_ENV !== 'production'/);
+  it('gives the build no Google API key or OAuth client ID', () => {
     expect(read('.github/workflows/deploy.yml')).not.toMatch(/NEXT_PUBLIC_GOOGLE_(API_KEY|CLIENT_ID)\s*:/);
   });
 

@@ -7,9 +7,9 @@ import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 
 // Real last-revision date of this policy text — update when the policy changes.
-const POLICY_UPDATED = new Date('2026-10-29');
+const POLICY_UPDATED = new Date('2026-11-12');
 
-const SECTION_KEYS = ['dataWeCollect', 'cookies', 'runCounter', 'googleDrive', 'retention', 'yourRights', 'contact'] as const;
+const SECTION_KEYS = ['dataWeCollect', 'cookies', 'runCounter', 'retention', 'yourRights', 'contact'] as const;
 
 export default function PrivacyPage() {
   const t = useTranslations('privacy');

@@ -61,11 +61,11 @@ describe('trackFileUpload', () => {
   it('carries the upload source and role when given', () => {
     const calls = installWindow('/ar/watermark-pdf');
 
-    trackFileUpload([makeFile('logo.png', 0)], 'google_drive', 'watermark_image');
+    trackFileUpload([makeFile('logo.png', 0)], 'keep_working', 'watermark_image');
 
     expect(calls[0][2]).toMatchObject({
       tool_name: 'watermark_pdf',
-      upload_source: 'google_drive',
+      upload_source: 'keep_working',
       upload_role: 'watermark_image',
     });
   });

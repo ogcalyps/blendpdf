@@ -122,7 +122,7 @@ export default function SignPDFFAQ() {
                 </p>
                 <p>
                   <strong>Upload the Document</strong><br />
-                  Click "Choose File" or drag your PDF onto the upload area (Google Drive import is also available). The file can be up to 50MB, a live preview shows every page, and the file stays in your browser — it is never uploaded to a server.
+                  Click "Choose File" or drag your PDF onto the upload area. The file can be up to 50MB, a live preview shows every page, and the file stays in your browser — it is never uploaded to a server.
                 </p>
                 <p>
                   <strong>Create Your Signature</strong><br />

@@ -115,7 +115,7 @@ export default function PdfToTextFAQ() {
                 </p>
                 <p>
                   <strong>Select Your PDF</strong><br />
-                  Click the "Select PDF" button or drag and drop your file onto the upload area. You can also pick a file straight from Google Drive. PDFs up to 50MB are accepted. The moment the file is selected, extraction begins automatically — there is no separate "convert" step to trigger and no upload to wait for, because the file is read directly on your device.
+                  Click the "Select PDF" button or drag and drop your file onto the upload area. PDFs up to 50MB are accepted. The moment the file is selected, extraction begins automatically — there is no separate "convert" step to trigger and no upload to wait for, because the file is read directly on your device.
                 </p>
                 <p>
                   <strong>Watch the Extraction Progress</strong><br />

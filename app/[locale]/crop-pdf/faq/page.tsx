@@ -115,7 +115,7 @@ export default function CropPDFFAQ() {
                 </p>
                 <p>
                   <strong>Open Your PDF</strong><br />
-                  Click the "Select PDF" button or drag and drop your file onto the upload area. BlendPDF accepts PDF files up to 50MB, and you can also pick a file from Google Drive. The important difference from most online tools: your file is opened directly in your browser using a built-in PDF renderer — it is never uploaded to a server. As soon as the file loads, you'll see a live preview of the first page along with the total page count.
+                  Click the "Select PDF" button or drag and drop your file onto the upload area. BlendPDF accepts PDF files up to 50MB. The important difference from most online tools: your file is opened directly in your browser using a built-in PDF renderer — it is never uploaded to a server. As soon as the file loads, you'll see a live preview of the first page along with the total page count.
                 </p>
                 <p>
                   <strong>Draw Your Crop Area</strong><br />
@@ -403,7 +403,7 @@ export default function CropPDFFAQ() {
                 </p>
                 <p>
                   <strong>Files From Anywhere on Your Phone</strong><br />
-                  You can open PDFs from your device's local storage, from the Files app, from downloads, or directly from Google Drive via the built-in picker. The cropped result downloads to your device like any other file.
+                  You can open PDFs from your device's local storage, from the Files app, or from downloads. The cropped result downloads to your device like any other file.
                 </p>
                 <p>
                   <strong>Performance on Mobile</strong><br />

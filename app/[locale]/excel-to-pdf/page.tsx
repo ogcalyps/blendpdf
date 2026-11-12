@@ -11,7 +11,6 @@ import { HowToSchema } from '@/components/HowToSchema';
 import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { UploadCloud, Loader2 } from 'lucide-react';
 import { formatFileSize } from '@/lib/utils';
-import { GoogleDrivePicker } from '@/components/GoogleDrivePicker';
 import { Button } from '@/components/ui/Button';
 import { Footer } from '@/components/Footer';
 import { ToolWorkspace } from '@/components/workspace/ToolWorkspace';
@@ -262,37 +261,6 @@ export default function ExcelToPDFPage() {
                         >
                           {isProcessing ? t('common.processing') : isUploading ? t('common.uploading') : t('excelToPdf.selectFile')}
                         </Button>
-
-                        {/* Google Drive Integration */}
-                        <div className="mt-4">
-                          <GoogleDrivePicker
-                            onFilesSelected={async (files) => {
-                              if (files.length === 0) return;
-                              const uploadedFile = files[0];
-                              const error = validateExcelFile(uploadedFile, MAX_FILE_SIZE);
-                              if (error) {
-                                let translatedError = error;
-                                if (error.includes('File must be an Excel spreadsheet')) {
-                                  translatedError = t('excelToPdf.errors.invalidFileType');
-                                } else if (error.includes('File size exceeds')) {
-                                  translatedError = t('excelToPdf.errors.fileTooLarge');
-                                } else if (error.includes('File is empty')) {
-                                  translatedError = t('excelToPdf.errors.emptyFile');
-                                }
-                                setInlineError(translatedError);
-                                return;
-                              }
-                              setInlineError(null);
-                              setIsUploading(true);
-                              await new Promise(resolve => setTimeout(resolve, 300));
-                              setFile(uploadedFile);
-                              setIsUploading(false);
-                            }}
-                            disabled={isProcessing}
-                            multiple={false}
-                            accept={['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']}
-                          />
-                        </div>
 
                         <p className="mt-4 text-sm text-gray-500">
                           {t('excelToPdf.supportedFormats')}

@@ -115,7 +115,7 @@ export default function PDFToWordFAQ() {
                 </p>
                 <p>
                   <strong>Upload your PDF</strong><br />
-                  Click "Select PDF" or drag and drop your file onto the upload area. You can also pick a file straight from Google Drive. One PDF at a time, up to 50MB. You will see a thumbnail preview so you can confirm you grabbed the right document.
+                  Click "Select PDF" or drag and drop your file onto the upload area. One PDF at a time, up to 50MB. You will see a thumbnail preview so you can confirm you grabbed the right document.
                 </p>
                 <p>
                   <strong>Convert</strong><br />
