@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بتحويل عروض PowerPoint التقديمية (PPT، PPTX، ODP) إلى PDF مجاناً عبر الإنترنت. تتحول كل شريحة إلى صفحة PDF مع الحفاظ على الخطوط والصور. لا حاجة للتسجيل، وتُحذف الملفات خلال ساعة.',
       keywords: 'powerpoint إلى pdf، ppt إلى pdf، pptx إلى pdf، تحويل powerpoint إلى pdf',
     },
+    fr: {
+      title: 'Convertir un PowerPoint en PDF en ligne gratuitement - PPT en PDF | BlendPDF',
+      description:
+        'Convertissez vos présentations PowerPoint (PPT, PPTX, ODP) en PDF gratuitement. Chaque diapositive devient une page PDF, polices et images comprises. Sans inscription, fichiers supprimés dans l’heure.',
+      keywords:
+        'powerpoint en pdf, ppt en pdf, pptx en pdf, convertir powerpoint en pdf, odp en pdf, présentation en pdf',
+    },
+    es: {
+      title: 'PowerPoint a PDF online gratis: convertir PPT y PPTX a PDF | BlendPDF',
+      description:
+        'Convierta su PowerPoint (PPT, PPTX, ODP) a PDF gratis: cada diapositiva será una página, con sus fuentes e imágenes. Sin registro; se borra en menos de 1 hora.',
+      keywords:
+        'powerpoint a pdf, ppt a pdf, pptx a pdf, convertir powerpoint a pdf, pasar powerpoint a pdf, odp a pdf, presentación a pdf, ppt a pdf online gratis',
+    },
   };
 
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/powerpoint-to-pdf`,
-        'ar': `${baseUrl}/ar/powerpoint-to-pdf`,
-        'x-default': `${baseUrl}/powerpoint-to-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/powerpoint-to-pdf'),
     },
   };
 }
@@ -55,5 +67,5 @@ export default function PowerPointToPDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="powerpointToPdf">{children}</PageMessages>;
 }

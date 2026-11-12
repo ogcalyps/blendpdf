@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client, getBucketName, deleteStaleUploads } from '@/lib/s3-client';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { hasPdfMagicBytes } from '@/lib/pdf-validation';
+import { fileLogMeta } from '@/lib/log-redact';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -22,8 +24,7 @@ function sanitizeKeyFilename(name: string): string {
 }
 
 /**
- * PDF merge flow: upload files to S3 via Next (not Strapi's POST /api/upload).
- * Path is /api/merge-upload so nginx can proxy /api/upload → Strapi for the CMS admin.
+ * PDF merge flow: upload files to S3 via Next.
  * POST body: FormData with 'files' field — returns { keys: string[] }.
  */
 export async function POST(request: NextRequest) {
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (invalidFiles.length > 0) {
-      console.warn(`[${requestId}] Validation failed: invalid files`, invalidFiles);
+      console.warn(`[${requestId}] Validation failed: ${invalidFiles.length} invalid file(s)`, files.map(fileLogMeta));
       return NextResponse.json(
         {
           error: 'Some files are invalid. Please ensure all files are valid PDFs and under 50MB each.',
@@ -141,13 +142,12 @@ export async function POST(request: NextRequest) {
 
     const notPdfContent = files
       .filter((file, index) => {
-        const buffer = fileBuffers[index];
-        return buffer.length < 5 || buffer.toString('utf8', 0, 5) !== '%PDF-';
+        return !hasPdfMagicBytes(fileBuffers[index]);
       })
       .map((file) => file.name);
 
     if (notPdfContent.length > 0) {
-      console.warn(`[${requestId}] Validation failed: files without PDF magic bytes`, notPdfContent);
+      console.warn(`[${requestId}] Validation failed: ${notPdfContent.length} file(s) without PDF magic bytes`);
       return NextResponse.json(
         {
           error: "Some files don't appear to be valid PDFs. Please check your files and try again.",
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
 
           await writeFile(filePath, buffer);
           console.log(
-            `[${requestId}] DEV MODE: Stored file ${index + 1}/${files.length} (${file.name}) in temp: ${filePath}`
+            `[${requestId}] DEV MODE: Stored file ${index + 1}/${files.length} (${fileLogMeta(file).fileRef}) in temp`
           );
 
           uploadedKeys.push(key);
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
         const key = `${UPLOAD_PREFIX}${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${sanitizeKeyFilename(file.name)}`;
         const fileStart = Date.now();
 
-        console.log(`[${requestId}] Uploading file ${index + 1}/${files.length} (${file.name}) to S3...`);
+        console.log(`[${requestId}] Uploading file ${index + 1}/${files.length} (${fileLogMeta(file).fileRef}) to S3...`);
 
         const buffer = fileBuffers[index];
 
@@ -284,9 +284,10 @@ export async function POST(request: NextRequest) {
       } else if (error.message.includes('size') || error.message.includes('too large')) {
         errorMessage = 'Files are too large. Maximum file size is 50MB per file.';
         statusCode = 413;
-      } else {
-        errorMessage = error.message;
       }
+      // No `else { errorMessage = error.message }`: an unrecognised failure is
+      // exactly the case where the raw message is an S3/SDK internal, so it
+      // keeps the generic copy above.
     }
 
     return NextResponse.json(

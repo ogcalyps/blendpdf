@@ -11,12 +11,13 @@ import { Footer } from '@/components/Footer';
 import { BreadcrumbSchema } from '@/components/BreadcrumbSchema';
 import { HowToSchema } from '@/components/HowToSchema';
 import { Button } from '@/components/ui/Button';
-import { useDropzone } from 'react-dropzone';
+import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { validateFile, validateSpreadsheetFile, formatFileSize, downloadBlob } from '@/lib/utils';
 import * as XLSX from 'xlsx';
 import JSZip from 'jszip';
 import { initializePdfJsWorker } from '@/lib/pdfjs-init';
-import { trackToolStart, trackToolComplete, trackToolError } from '@/lib/analytics';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
+import { trackToolStart, trackToolComplete, trackToolError, responseError } from '@/lib/analytics';
 import { substituteDateTokens, todayHijri, formatGregorianDate, TOKEN_TODAY, TOKEN_TODAY_HIJRI } from '@/lib/hijri';
 
 const MAX_PDF_SIZE = 50 * 1024 * 1024;
@@ -255,6 +256,7 @@ export default function FillFormPage() {
 
     // Technical row-limit notice (server enforces the same cap per request)
     const [showRowLimitNotice, setShowRowLimitNotice] = useState(false);
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
 
     // Read Sheet
     const onSheetDrop = useCallback((acceptedFiles: File[]) => {
@@ -318,7 +320,7 @@ export default function FillFormPage() {
             });
 
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Failed to extract fields');
+            if (!response.ok) throw responseError(response, t('fillForm.failedToExtractFields'), data?.errorCode);
 
             if (data.fields.length === 0) {
                 alert(t('fillForm.noFormFields'));
@@ -362,12 +364,12 @@ export default function FillFormPage() {
         }
     }, [sheetColumns, pdfFields, mapping]);
 
-    const { getRootProps: getPdfProps, getInputProps: getPdfInput, isDragActive: isPdfDrag } = useDropzone({
+    const { getRootProps: getPdfProps, getInputProps: getPdfInput, isDragActive: isPdfDrag } = useTrackedDropzone({
         onDrop: onPdfDrop, accept: { 'application/pdf': ['.pdf'] }, maxFiles: 1, disabled: isProcessing || isExtracting
     });
 
-    const { getRootProps: getSheetProps, getInputProps: getSheetInput, isDragActive: isSheetDrag } = useDropzone({
-        onDrop: onSheetDrop, accept: { 'text/csv': ['.csv'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] }, maxFiles: 1, disabled: isProcessing
+    const { getRootProps: getSheetProps, getInputProps: getSheetInput, isDragActive: isSheetDrag } = useTrackedDropzone({
+        onDrop: onSheetDrop, accept: { 'text/csv': ['.csv'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] }, maxFiles: 1, disabled: isProcessing, uploadRole: 'spreadsheet'
     });
 
     const handleGenerate = async () => {
@@ -432,8 +434,8 @@ export default function FillFormPage() {
                 });
 
                 if (!res.ok) {
-                    const data = await res.json();
-                    throw new Error(data.error || 'Failed to process chunk');
+                    const data = await res.json().catch(() => null);
+                    throw responseError(res, t('fillForm.failedToGenerate'), data?.errorCode);
                 }
 
                 const data = await res.json();
@@ -702,7 +704,11 @@ export default function FillFormPage() {
                             </p>
 
                             <div className="flex flex-col sm:flex-row justify-center gap-4">
-                                <Button onClick={() => results.zipBlob && downloadBlob(results.zipBlob, 'filled_forms.zip')} size="lg" className="bg-green-600 hover:bg-green-700">
+                                <Button onClick={() => {
+                                    if (!results.zipBlob) return;
+                                    downloadBlob(results.zipBlob, 'filled_forms.zip');
+                                    markSuccess();
+                                }} size="lg" className="bg-green-600 hover:bg-green-700">
                                     <Download className="w-5 h-5 me-2" />
                                     Download ZIP
                                 </Button>
@@ -714,6 +720,8 @@ export default function FillFormPage() {
                                     Download Log
                                 </Button>
                             </div>
+
+                            {reviewAsk}
 
                             <div className="mt-8">
                                 <Button onClick={resetAll} variant="secondary">Run Another Batch</Button>

@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
             // The forms library is English-only content: canonicalize every locale to the EN URL
             canonical: 'https://blendpdf.com/forms'
         },
-        // English-only content served under /ar would read as thin duplicates to Google: noindex it
-        ...(locale === 'ar' ? { robots: { index: false, follow: true } } : {}),
+        // English-only content served under /ar, /fr or /es would read as thin duplicates to Google: noindex it
+        ...(locale !== 'en' ? { robots: { index: false, follow: true } } : {}),
     };
 }
 
@@ -62,11 +62,7 @@ const formsList = [
     }
 ];
 
-export default async function FormsDirectoryPage({ params }: any) {
-    // Await the params before accessing its properties (Next.js 15 recommendation)
-    const resolvedParams = await params;
-    const locale = resolvedParams.locale;
-
+export default async function FormsDirectoryPage() {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -103,7 +99,6 @@ export default async function FormsDirectoryPage({ params }: any) {
                             slug={form.slug}
                             title={form.title}
                             description={form.description}
-                            locale={locale}
                         />
                     ))}
                 </div>

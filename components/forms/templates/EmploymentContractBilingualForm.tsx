@@ -6,6 +6,7 @@ import { fillPdfForm } from '@/lib/pdf-generation';
 import { Loader2, ArrowRight, ArrowLeft, Users, Briefcase, Wallet, Scale, PenTool, CheckCircle2, Download } from 'lucide-react';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 // Wizard steps mirror the `section` entries of
@@ -35,6 +36,7 @@ function BilingualLabel({ en, ar, required, className }: { en: string; ar: strin
 }
 
 export function EmploymentContractBilingualForm() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('employment-bilingual', {
         employerName: '',
         employerAddress: '',
@@ -137,6 +139,7 @@ export function EmploymentContractBilingualForm() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'Bilingual_Employment_Contract_Completed.pdf');
+        markSuccess();
         clearPersistedData();
         setCurrentStep(1);
         setPreviewFile(null);
@@ -455,6 +458,7 @@ export function EmploymentContractBilingualForm() {
                     </button>
                 )}
             </div>
+            {reviewAsk}
         </div>
     );
 }

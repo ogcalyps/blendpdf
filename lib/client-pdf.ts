@@ -40,6 +40,14 @@ export class ClientPdfError extends Error {
   }
 }
 
+/**
+ * True when a client-first page retries this browser failure on the server:
+ * anything except a ClientPdfError marked retryOnServer=false.
+ */
+export function fallsBackToServer(error: unknown): boolean {
+  return !(error instanceof ClientPdfError && !error.retryOnServer);
+}
+
 interface Pending {
   resolve: (bytes: Uint8Array) => void;
   reject: (err: ClientPdfError) => void;

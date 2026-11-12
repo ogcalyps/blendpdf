@@ -1,0 +1,5 @@
+# Sample docs may be personal/sensitive (Emirates IDs, certificates) — never commit them.
+samples/*
+!samples/README.md
+# Run outputs (extracted text, thumbnails, reports).
+out/

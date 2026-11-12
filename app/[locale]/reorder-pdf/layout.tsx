@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بإعادة ترتيب صفحات PDF بالسحب والإفلات. منظم صفحات PDF مجاني مع معاينة مرئية. يعمل مع جميع اللغات. لا حاجة للتسجيل.',
       keywords: 'إعادة ترتيب صفحات pdf، ترتيب pdf، تنظيم صفحات pdf',
     },
+    fr: {
+      title: 'Réorganiser les pages d’un PDF en ligne gratuitement - glisser-déposer | BlendPDF',
+      description:
+        'Changez l’ordre des pages d’un PDF par glisser-déposer, avec un aperçu visuel. Gratuit, fonctionne dans toutes les langues, y compris l’arabe. Sans inscription.',
+      keywords:
+        'réorganiser pages pdf, changer ordre pages pdf, déplacer pages pdf, organiser pdf, réorganiser pdf en ligne gratuit',
+    },
+    es: {
+      title: 'Ordenar páginas de un PDF online gratis: arrastrar y soltar | BlendPDF',
+      description:
+        'Cambie el orden de las páginas de un PDF arrastrándolas, con vista previa. Gratis y online, en todos los idiomas, incluido el árabe. Sin registrarse.',
+      keywords:
+        'ordenar páginas pdf, reordenar páginas pdf, ordenar páginas de un pdf, cambiar el orden de las páginas de un pdf, organizar pdf, mover páginas pdf, ordenar pdf online gratis',
+    },
   };
   
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/reorder-pdf`,
-        'ar': `${baseUrl}/ar/reorder-pdf`,
-        'x-default': `${baseUrl}/reorder-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/reorder-pdf'),
     },
   };
 }
@@ -55,6 +67,6 @@ export default function ReorderPDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="reorderPdf">{children}</PageMessages>;
 }
 

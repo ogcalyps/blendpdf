@@ -7,6 +7,7 @@ import { w9Template, formDefinitions } from '@/lib/form-templates-data';
 import { Loader2, ArrowRight, ArrowLeft, Building2, MapPin, Hash, PenTool, CheckCircle2, Download, FileCheck } from 'lucide-react';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 const STEPS = [
@@ -18,6 +19,7 @@ const STEPS = [
 ];
 
 export function W9Form() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('w9_form', {
         fullName: '',
         businessName: '',
@@ -129,6 +131,7 @@ export function W9Form() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'W-9_Completed.pdf');
+        markSuccess();
         clearPersistedData();
         setCurrentStep(1); // Reset
         setPreviewFile(null);
@@ -384,6 +387,7 @@ export function W9Form() {
                 </button>
             )}
         </div>
+        {reviewAsk}
     </div>
 </div>
 );

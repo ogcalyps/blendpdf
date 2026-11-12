@@ -1,14 +1,18 @@
 'use client';
 
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 
 interface GoogleTagManagerProps {
   gtmId?: string;
 }
 
 export function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
-  // Only render if GTM ID is provided
-  if (!gtmId) {
+  const pathname = usePathname();
+  // Only render if GTM ID is provided, and never in the back office: a tag
+  // loader could inject any script into pages that show subscriber addresses.
+  const isAdmin = pathname === '/admin' || (pathname?.startsWith('/admin/') ?? false);
+  if (!gtmId || isAdmin) {
     return null;
   }
 

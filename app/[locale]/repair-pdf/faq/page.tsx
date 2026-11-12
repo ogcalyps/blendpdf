@@ -39,7 +39,7 @@ export default function RepairPDFFAQ() {
     },
     {
       question: 'Is it safe to upload a corrupted PDF?',
-      answer: 'Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share the contents of your documents, and no account is needed. We use Google Analytics for aggregate, anonymous usage measurement only — never your document contents.'
+      answer: 'Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share the contents of your documents, and no account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents.'
     },
     {
       question: 'What are the file size limits?',

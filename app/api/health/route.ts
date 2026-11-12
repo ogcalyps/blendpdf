@@ -88,9 +88,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error(`[HEALTH] POST error:`, error);
+    // Unauthenticated endpoint: say it failed, not why.
     return NextResponse.json({
       status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Health check failed.',
     }, { status: 500 });
   }
 }

@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بتحويل مستندات Word (DOC، DOCX، ODT، RTF) إلى تنسيق PDF مجاناً عبر الإنترنت. يحافظ على التنسيق والتخطيط. لا حاجة للتسجيل. يعمل مع جميع اللغات.',
       keywords: 'word إلى pdf، docx إلى pdf، doc إلى pdf، تحويل word إلى pdf',
     },
+    fr: {
+      title: 'Convertir Word en PDF en ligne gratuitement - DOCX en PDF | BlendPDF',
+      description:
+        'Convertissez vos documents Word (DOC, DOCX, ODT, RTF) en PDF gratuitement, en conservant la mise en forme et la mise en page. Sans inscription, fonctionne dans toutes les langues.',
+      keywords:
+        'word en pdf, docx en pdf, doc en pdf, convertir word en pdf, odt en pdf, rtf en pdf, word en pdf gratuit',
+    },
+    es: {
+      title: 'Word a PDF online gratis: convertir DOCX y DOC a PDF | BlendPDF',
+      description:
+        'Convierta documentos de Word (DOC, DOCX, ODT, RTF) a PDF gratis, sin perder el formato ni el diseño de página. Funciona en cualquier idioma y sin registrarse.',
+      keywords:
+        'word a pdf, convertir word a pdf, pasar word a pdf, docx a pdf, doc a pdf, odt a pdf, rtf a pdf, word a pdf online gratis',
+    },
   };
   
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/word-to-pdf`,
-        'ar': `${baseUrl}/ar/word-to-pdf`,
-        'x-default': `${baseUrl}/word-to-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/word-to-pdf'),
     },
   };
 }
@@ -55,5 +67,5 @@ export default function WordToPDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="wordToPdf">{children}</PageMessages>;
 }

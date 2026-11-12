@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بإصلاح ملفات PDF التالفة أو المعطوبة مجاناً عبر الإنترنت. استعادة ملفات PDF المكسورة. يعمل مع جميع اللغات. لا حاجة للتسجيل.',
       keywords: 'إصلاح pdf، إصلاح ملف pdf، ملف pdf تالف، أداة إصلاح pdf',
     },
+    fr: {
+      title: 'Réparer un PDF en ligne gratuitement - fichier endommagé ou corrompu | BlendPDF',
+      description:
+        'Réparez gratuitement un fichier PDF endommagé ou corrompu et récupérez les PDF qui ne s’ouvrent plus. Fonctionne dans toutes les langues, sans inscription.',
+      keywords:
+        'réparer pdf, pdf corrompu, pdf endommagé, réparer pdf endommagé, outil réparation pdf, pdf qui ne s’ouvre pas',
+    },
+    es: {
+      title: 'Reparar PDF online gratis: recuperar archivos PDF dañados | BlendPDF',
+      description:
+        'Repare gratis archivos PDF dañados o corruptos y recupere los PDF que ya no se abren, para que vuelvan a funcionar. En cualquier idioma y sin registrarse.',
+      keywords:
+        'reparar pdf, reparar pdf dañado, pdf dañado, pdf corrupto, recuperar pdf dañado, pdf no se abre, reparar pdf online gratis',
+    },
   };
   
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/repair-pdf`,
-        'ar': `${baseUrl}/ar/repair-pdf`,
-        'x-default': `${baseUrl}/repair-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/repair-pdf'),
     },
   };
 }
@@ -55,6 +67,6 @@ export default function RepairPDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="repairPdf">{children}</PageMessages>;
 }
 

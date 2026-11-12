@@ -16,6 +16,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description:
         'املأ أي نموذج PDF مجاناً عبر الإنترنت. ارفع النموذج، وعيّن الحقول بصرياً، واملأ عشرات النسخ دفعة واحدة من ملف Excel أو CSV.',
     },
+    fr: {
+      title: 'Remplir des formulaires PDF en ligne gratuitement - en série depuis Excel ou CSV | BlendPDF',
+      description:
+        'Remplissez gratuitement n’importe quel formulaire PDF. Importez le formulaire, associez les champs visuellement, puis remplissez des dizaines d’exemplaires en une fois à partir d’un fichier Excel ou CSV. Sans inscription.',
+    },
+    es: {
+      title: 'Completar formularios PDF gratis: en serie desde Excel o CSV | BlendPDF',
+      description:
+        'Complete cualquier formulario PDF gratis. Súbalo, asocie los campos de forma visual y genere decenas de copias desde un archivo Excel o CSV. Sin registrarse.',
+    },
   };
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
 

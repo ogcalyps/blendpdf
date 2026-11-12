@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PDFDocument, PDFName, PDFRef, PDFPage } from 'pdf-lib';
 import { rateLimitMiddleware } from '@/lib/rate-limit';
+import { hasPdfMagicBytes } from '@/lib/pdf-validation';
 
 const MAX_PDF_SIZE = 50 * 1024 * 1024; // 50MB decoded template
 // Base64 inflates ~4/3, plus mapping/rows payload
@@ -130,6 +131,13 @@ export async function POST(request: Request) {
 
         if (pdfBytes.length > MAX_PDF_SIZE) {
             return NextResponse.json({ error: 'PDF template exceeds the 50MB limit.' }, { status: 413 });
+        }
+
+        if (!hasPdfMagicBytes(Buffer.from(pdfBytes))) {
+            return NextResponse.json(
+                { error: "The template doesn't appear to be a valid PDF.", errorCode: 'INVALID_FILE_CONTENT' },
+                { status: 400 }
+            );
         }
 
         const results = [];
@@ -270,10 +278,10 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ results, logs });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error in batch processing chunk:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to process batch chunk' },
+            { error: 'Failed to process this batch. Please try again.', errorCode: 'BATCH_FAILED' },
             { status: 500 }
         );
     }

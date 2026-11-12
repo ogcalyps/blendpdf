@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-// Root-level 404 — rendered for any unmatched route in either locale, so it
-// carries both languages inline rather than relying on next-intl context.
+// Root-level 404 — rendered for any unmatched route in any locale, so it
+// carries every language inline rather than relying on next-intl context.
 export default function NotFound() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
@@ -10,6 +10,12 @@ export default function NotFound() {
           404
         </p>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Page not found</h1>
+        <p className="text-lg text-gray-700 mb-1" lang="es">
+          Página no encontrada
+        </p>
+        <p className="text-lg text-gray-700 mb-1" lang="fr">
+          Page introuvable
+        </p>
         <p className="text-lg text-gray-700 mb-1" dir="rtl" lang="ar">
           الصفحة غير موجودة
         </p>

@@ -52,9 +52,13 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(
         (el) => el.offsetParent !== null || el === document.activeElement
       );
 
-    // Initial focus: first focusable element, or the container as a fallback
+    // Initial focus: where the dialog's content already put it (the delivery
+    // panel lands on Download, past its file-name field), else the first
+    // focusable element, or the container as a fallback
     const focusables = getFocusable();
-    if (focusables.length > 0) {
+    if (container.contains(document.activeElement)) {
+      // keep it
+    } else if (focusables.length > 0) {
       focusables[0].focus();
     } else {
       if (!container.hasAttribute('tabindex')) {

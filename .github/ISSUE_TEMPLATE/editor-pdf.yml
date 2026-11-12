@@ -1,0 +1,34 @@
+name: A PDF the editor gets wrong
+description: A line you can't edit, or a saved line that looks or searches wrong.
+labels: [editor]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The most useful thing you can send is the file. If it's private, describe how it was made instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Which line, what you typed, and what the saved file shows (or the message the editor gave).
+    validations:
+      required: true
+  - type: input
+    id: made-with
+    attributes:
+      label: How the PDF was made
+      description: The app and font, if you know them. For example "Word, Times New Roman" or "printed from Chrome".
+  - type: dropdown
+    id: script
+    attributes:
+      label: Script
+      options: [Arabic, Persian or Urdu, Hebrew, Latin, Other]
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+  - type: textarea
+    id: file
+    attributes:
+      label: The PDF
+      description: Drag it here if you can share it.

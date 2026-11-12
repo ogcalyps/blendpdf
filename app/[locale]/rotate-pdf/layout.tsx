@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بتدوير صفحات PDF بزوايا 90 أو 180 أو 270 درجة مجاناً عبر الإنترنت. معاينة مرئية. يعمل مع جميع اللغات. لا حاجة للتسجيل.',
       keywords: 'تدوير pdf، تدوير صفحات pdf، أداة تدوير pdf، تدوير صفحات pdf مجاناً',
     },
+    fr: {
+      title: 'Faire pivoter un PDF en ligne gratuitement - rotation 90°, 180°, 270° | BlendPDF',
+      description:
+        'Faites pivoter les pages d’un PDF de 90, 180 ou 270 degrés, gratuitement et en ligne, avec aperçu visuel. Fonctionne dans toutes les langues, y compris l’arabe. Sans inscription.',
+      keywords:
+        'pivoter pdf, faire pivoter pdf, tourner pdf, rotation pdf, tourner page pdf en ligne gratuit',
+    },
+    es: {
+      title: 'Rotar PDF online gratis: girar páginas 90°, 180° o 270° | BlendPDF',
+      description:
+        'Gire las páginas de un PDF 90, 180 o 270 grados, online y gratis, con vista previa. Funciona en todos los idiomas, incluido el árabe. Sin registrarse.',
+      keywords:
+        'rotar pdf, girar pdf, girar páginas de un pdf, rotar páginas pdf, girar pdf y guardar, rotar pdf online gratis',
+    },
   };
   
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/rotate-pdf`,
-        'ar': `${baseUrl}/ar/rotate-pdf`,
-        'x-default': `${baseUrl}/rotate-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/rotate-pdf'),
     },
   };
 }
@@ -55,6 +67,6 @@ export default function RotatePDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="rotatePdf">{children}</PageMessages>;
 }
 

@@ -23,7 +23,7 @@ export default function WordToPDFFAQ() {
     },
     {
       question: 'Is it safe to upload my document?',
-      answer: 'Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We use Google Analytics for aggregate, anonymous usage measurement only.'
+      answer: 'Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents.'
     },
     {
       question: 'Will my formatting and layout be preserved?',
@@ -55,7 +55,7 @@ export default function WordToPDFFAQ() {
     },
     {
       question: 'Can I edit the PDF afterward, or convert it back to Word?',
-      answer: 'PDFs are not meant for heavy editing, so keep your original Word file as the master copy. If you no longer have it, the BlendPDF PDF to Word tool converts the PDF back to an editable DOCX, faithfully for typical documents though not always identically.'
+      answer: "Yes, for additions. Edit PDF lets you add text in Arabic or English, images, signatures and highlights, and fix the pages, right in your browser. To change wording that's already there, edit your original Word file and convert it again, or turn the PDF back into a DOCX with PDF to Word."
     },
     {
       question: 'Why use this instead of Word\'s built-in Save as PDF?',
@@ -325,8 +325,8 @@ export default function WordToPDFFAQ() {
                   PDFs are a final-form format, designed to look identical everywhere rather than to be edited, so the right habit is simple: keep your Word file as the master and regenerate the PDF whenever the content changes.
                 </p>
                 <p>
-                  <strong>Small additions are possible</strong><br />
-                  You do not need Word for everything. BlendPDF has tools that work directly on the PDF: add a visual signature with the sign tool, stamp a watermark, add page numbers, merge it with other PDFs, or delete and reorder pages. Note that watermark, page-number, and typed-signature text currently supports Latin characters only; Arabic text support there is coming.
+                  <strong>Additions don&apos;t need Word</strong><br />
+                  <Link href="/edit-pdf" className="text-blue-600 hover:text-blue-800">Edit PDF</Link> works directly on the PDF in your browser: add text in Arabic or English, images, a signature, drawings and highlights, and rotate, reorder or delete pages. BlendPDF can also stamp a watermark, add page numbers, or merge the PDF with others. Edit PDF&apos;s Edit text tool (in beta) can change a line of the wording already in the PDF; for anything more, edit your Word file and convert it again.
                 </p>
                 <p>
                   <strong>Lost the original?</strong><br />

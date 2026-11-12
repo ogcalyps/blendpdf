@@ -2,7 +2,7 @@
 
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { GitMerge, FileMinus, Image as ImageIcon, Scissors, RotateCw, ArrowUpDown, Trash2, FileImage, FileText, File, Table, Wrench, Shield, Key, Unlock, Hash, Droplets, PenTool, Presentation, FileSpreadsheet, AlignLeft, FileOutput, Images, Crop, Layers, EyeOff, ScanText } from 'lucide-react';
+import { GitMerge, FileMinus, Image as ImageIcon, Scissors, RotateCw, ArrowUpDown, Trash2, FileImage, FileText, File, Table, Wrench, Shield, Key, Unlock, Hash, Droplets, PenTool, Presentation, FileSpreadsheet, AlignLeft, FileOutput, Images, Crop, Layers, EyeOff, ScanText, FilePenLine, FileBadge } from 'lucide-react';
 
 interface Tool {
   id: string;
@@ -33,9 +33,9 @@ const relatedByTool: Record<string, string[]> = {
   protect: ['unlock', 'remove-metadata', 'sign', 'watermark'],
   unlock: ['protect', 'repair', 'sign', 'merge'],
   'add-page-numbers': ['watermark', 'sign', 'reorder', 'merge'],
-  watermark: ['add-page-numbers', 'protect', 'sign', 'compress'],
-  sign: ['flatten-pdf', 'protect', 'watermark', 'add-page-numbers'],
-  'fill-form': ['flatten-pdf', 'sign', 'merge', 'pdf-to-word'],
+  watermark: ['edit-pdf', 'add-page-numbers', 'protect', 'sign'],
+  sign: ['edit-pdf', 'flatten-pdf', 'protect', 'watermark'],
+  'fill-form': ['edit-pdf', 'flatten-pdf', 'sign', 'pdf-to-word'],
   // New tools (pages pass camelCase ids)
   powerpointToPdf: ['word-to-pdf', 'excel-to-pdf', 'pdf-to-images', 'compress'],
   excelToPdf: ['word-to-pdf', 'powerpoint-to-pdf', 'pdf-to-excel', 'compress'],
@@ -43,9 +43,11 @@ const relatedByTool: Record<string, string[]> = {
   ocrPdf: ['pdf-to-text', 'pdf-to-word', 'pdf-to-excel', 'repair'],
   extractPages: ['split', 'delete-pages', 'merge', 'reorder'],
   extractImages: ['pdf-to-images', 'images-to-pdf', 'pdf-to-text', 'compress'],
-  cropPdf: ['rotate', 'delete-pages', 'reorder', 'compress'],
-  flattenPdf: ['sign', 'remove-metadata', 'watermark', 'merge'],
+  cropPdf: ['edit-pdf', 'rotate', 'delete-pages', 'reorder'],
+  flattenPdf: ['edit-pdf', 'sign', 'remove-metadata', 'watermark'],
   removeMetadata: ['protect', 'flatten-pdf', 'unlock', 'compress'],
+  editPdf: ['pdf-to-word', 'sign', 'compress', 'watermark'],
+  pdfa: ['word-to-pdf', 'merge', 'compress', 'ocr-pdf'],
 };
 
 export function RelatedTools({ currentTool }: RelatedToolsProps) {
@@ -129,6 +131,13 @@ export function RelatedTools({ currentTool }: RelatedToolsProps) {
       href: '/pdf-to-excel',
       icon: <Table className="h-6 w-6" />,
       description: t('pdfToExcel.description'),
+    },
+    {
+      id: 'pdf-to-pdfa',
+      name: t('pdfToPdfa.title'),
+      href: '/pdf-to-pdfa',
+      icon: <FileBadge className="h-6 w-6" />,
+      description: t('pdfToPdfa.description'),
     },
     {
       id: 'repair',
@@ -234,6 +243,13 @@ export function RelatedTools({ currentTool }: RelatedToolsProps) {
       href: '/ocr-pdf',
       icon: <ScanText className="h-6 w-6" />,
       description: t('ocrPdf.description'),
+    },
+    {
+      id: 'edit-pdf',
+      name: t('editPdf.title'),
+      href: '/edit-pdf',
+      icon: <FilePenLine className="h-6 w-6" />,
+      description: t('editPdf.description'),
     },
   ];
   

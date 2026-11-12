@@ -144,4 +144,10 @@ describe('formatGregorianDate', () => {
         expect(ar).toMatch(/[٠-٩]/);
         expect(ar).toContain('أغسطس');
     });
+
+    it('writes the month in the page language on /fr and /es', () => {
+        const date = new Date(2026, 7, 10);
+        expect(formatGregorianDate(date, 'fr')).toBe('10 août 2026');
+        expect(formatGregorianDate(date, 'es')).toBe('10 de agosto de 2026');
+    });
 });

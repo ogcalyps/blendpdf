@@ -7,6 +7,7 @@ import { i9Template, formDefinitions } from '@/lib/form-templates-data';
 import { Loader2, ArrowRight, ArrowLeft, UserCircle, Briefcase, FileCheck, PenTool, CheckCircle2, Download } from 'lucide-react';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 const STEPS = [
@@ -18,6 +19,7 @@ const STEPS = [
 ];
 
 export function I9Form() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('i9_form', {
         lastName: '',
         firstName: '',
@@ -126,6 +128,7 @@ export function I9Form() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'I-9_Completed.pdf');
+        markSuccess();
         clearPersistedData();
         setCurrentStep(1); // Reset
         setPreviewFile(null);
@@ -419,6 +422,7 @@ export function I9Form() {
                         </button>
                     )}
                 </div>
+                {reviewAsk}
             </div>
         </div>
     );

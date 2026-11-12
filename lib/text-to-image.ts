@@ -150,3 +150,130 @@ export async function renderTextToImage(
     height: canvas.height,
   };
 }
+
+// ── Multi-line text block (the /edit-pdf fallback) ──────────────────────────
+
+export interface TextBlockImageOptions {
+  /** Any length; "\n" separates paragraphs. */
+  text: string;
+  /** Font size in PDF points. */
+  size: number;
+  /** Wrap width in PDF points (the image is exactly this wide). */
+  width: number;
+  /** CSS colour. */
+  color: string;
+  /** Direction of a block with no strong character at all (the UI locale's). */
+  fallbackDirection: 'ltr' | 'rtl';
+  /** Canvas pixels per PDF point. Draw the PNG at width x (height / scale) points. */
+  scale: number;
+  /** CSS font-family stack; defaults to the site's Arabic-capable stack. */
+  fontFamily?: string;
+  /** Line pitch as a multiple of `size`. Default 1.6, like lib/pdf-text. */
+  lineHeight?: number;
+}
+
+/** Grapheme clusters, so an over-long word never splits a letter from its marks. */
+function graphemes(text: string): string[] {
+  if (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function') {
+    return [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((s) => s.segment);
+  }
+  return [...text];
+}
+
+/** Greedy wrap on spaces with the canvas's own measurements; a word wider than the line is cut between graphemes. */
+function wrapParagraph(ctx: CanvasRenderingContext2D, paragraph: string, maxWidth: number): string[] {
+  const words = paragraph.split(' ');
+  const lines: string[] = [];
+  let line = '';
+  const push = (word: string) => {
+    if (ctx.measureText(word).width <= maxWidth) return word;
+    let piece = '';
+    for (const g of graphemes(word)) {
+      if (piece && ctx.measureText(piece + g).width > maxWidth) {
+        lines.push(piece);
+        piece = g;
+      } else {
+        piece += g;
+      }
+    }
+    return piece;
+  };
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (!line || ctx.measureText(candidate).width <= maxWidth) {
+      line = line ? candidate : push(word);
+    } else {
+      lines.push(line);
+      line = push(word);
+    }
+  }
+  lines.push(line);
+  return lines;
+}
+
+/**
+ * Render a text box to a transparent PNG exactly `width` points wide, for a
+ * box whose characters the vector font lacks (emoji, CJK). Each paragraph
+ * takes its own direction like a textarea with dir="auto" (the same rule as
+ * lib/pdf-text) and aligns to its start. No length cap. Browser only.
+ */
+export async function renderTextBlockToImage(options: TextBlockImageOptions): Promise<TextImageResult> {
+  if (typeof document === 'undefined') throw new Error('renderTextBlockToImage is browser-only');
+  const { text, size, width, color, fallbackDirection, scale } = options;
+  if (!(size > 0) || !(width > 0) || !(scale > 0)) throw new RangeError('size, width and scale must be positive');
+  // bidi-js is loaded on demand: this file is imported statically by pages that never need it.
+  const { resolveParagraphDirections } = await import('./pdf-text/bidi');
+
+  const fontPx = size * scale;
+  const font = `${fontPx}px ${options.fontFamily ?? DEFAULT_FONT_FAMILY}`;
+  const pitch = (options.lineHeight ?? 1.6) * fontPx;
+  if (typeof document.fonts?.load === 'function') {
+    try {
+      await document.fonts.load(font, text);
+    } catch {
+      // Best effort: fallback fonts still draw.
+    }
+  }
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas 2D is not supported in this browser');
+  const pixelWidth = Math.max(1, Math.ceil(width * scale));
+  const style = (c: CanvasRenderingContext2D, direction: 'ltr' | 'rtl') => {
+    c.font = font;
+    try {
+      c.direction = direction;
+    } catch {
+      /* keep the browser default */
+    }
+    c.textBaseline = 'alphabetic';
+    c.textAlign = direction === 'rtl' ? 'right' : 'left';
+    c.fillStyle = color;
+  };
+
+  const paragraphs = text.replace(/\r\n|[\r\u2028\u2029]/g, '\n').replace(/\t/g, ' ').split('\n');
+  const directions = resolveParagraphDirections(paragraphs, 'auto', fallbackDirection);
+  const lines: Array<{ text: string; direction: 'ltr' | 'rtl' }> = [];
+  paragraphs.forEach((paragraph, i) => {
+    style(ctx, directions[i]);
+    for (const line of wrapParagraph(ctx, paragraph, pixelWidth)) lines.push({ text: line, direction: directions[i] });
+  });
+
+  canvas.width = pixelWidth;
+  canvas.height = Math.max(1, Math.ceil(lines.length * pitch));
+  // Same half-leading model as lib/pdf-text: the em box centred in each line.
+  style(ctx, 'ltr');
+  const m = ctx.measureText('Hg');
+  const ascent = m.fontBoundingBoxAscent > 0 ? m.fontBoundingBoxAscent : fontPx * 0.8;
+  const descent = m.fontBoundingBoxDescent > 0 ? m.fontBoundingBoxDescent : fontPx * 0.2;
+  const baseline = (pitch - (ascent + descent)) / 2 + ascent;
+  lines.forEach((line, i) => {
+    style(ctx, line.direction);
+    ctx.fillText(line.text, line.direction === 'rtl' ? pixelWidth : 0, i * pitch + baseline);
+  });
+
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Failed to export text image'))), 'image/png');
+  });
+  return { bytes: await blob.arrayBuffer(), width: canvas.width, height: canvas.height };
+}

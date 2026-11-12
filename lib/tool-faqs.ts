@@ -80,6 +80,7 @@ export const TOOL_FAQ_KEYS: Record<string, readonly string[]> = {
     'filesDeletion',
     'pageDeletionFails',
   ],
+  editPdf: ['arabicText', 'existingText', 'private', 'forms', 'free', 'phone', 'password'],
   excelToPdf: [
     'formats',
     'layout',
@@ -245,6 +246,17 @@ export const TOOL_FAQ_KEYS: Record<string, readonly string[]> = {
     'convertPasswordProtected',
     'screenshots',
     'conversionFailsZip',
+  ],
+  pdfToPdfa: [
+    'whatIsPdfa',
+    'whichLevel',
+    'veraPdf',
+    'thesis',
+    'whatChanges',
+    'scanned',
+    'signed',
+    'arabic',
+    'freePrivacy',
   ],
   pdfToText: [
     'inBrowser',

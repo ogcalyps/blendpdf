@@ -6,11 +6,16 @@ import { randomUUID } from 'crypto';
 import { exec, execFile } from 'child_process';
 import { promisify } from 'util';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { toHeaderSafeFilename } from '@/lib/pdf-processor';
+import { hasPdfMagicBytes } from '@/lib/pdf-validation';
+import { runProcess } from '@/lib/run-process';
 
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
+
+const PYPDF_REPAIR_TIMEOUT_MS = 120_000;
 
 /**
  * Repair with qpdf (primary strategy): a plain rewrite recovers xref/structure
@@ -151,15 +156,27 @@ except Exception as e:
     const pathParts = pathEnv.split(':').filter((p) => p);
     const updatedPath = [...new Set([...commonPaths, ...pathParts])].join(':');
 
-    const { stdout, stderr } = await execAsync(`python3 "${pythonScriptPath}"`, {
-      timeout: 120000,
-      maxBuffer: 50 * 1024 * 1024,
+    // No shell, own process group: on timeout python itself is killed, and
+    // this returns only once it has exited, so the finally below cannot delete
+    // the output before its last write (see lib/run-process.ts).
+    const { stdout, stderr, exitCode, signal, timedOut } = await runProcess('python3', [pythonScriptPath], {
+      timeoutMs: PYPDF_REPAIR_TIMEOUT_MS,
       env: { ...process.env, PATH: updatedPath },
     });
 
-    if (stderr && !stdout.includes('SUCCESS')) {
-      logger.error(`[repair-pdf] Python script error`, { stderr }, requestId);
-      throw new Error(`Failed to repair PDF: ${stderr}`);
+    if (timedOut) {
+      logger.warn(`[repair-pdf] Timed out; process group killed`, { timeoutMs: PYPDF_REPAIR_TIMEOUT_MS }, requestId);
+      throw Object.assign(new Error(`pypdf repair timed out after ${PYPDF_REPAIR_TIMEOUT_MS / 1000}s`), { errorCode: 'TIMEOUT' });
+    }
+
+    if (exitCode !== 0 || !stdout.includes('SUCCESS')) {
+      // Without a shell in between, a native crash arrives as the signal
+      // itself rather than as exit code 139.
+      const crashed = signal !== null;
+      logger.error(`[repair-pdf] Python script error`, { stderr, exitCode, signal, crashed }, requestId);
+      throw Object.assign(new Error(`Failed to repair PDF: ${stderr || `exit ${exitCode ?? signal}`}`), {
+        errorCode: crashed ? 'CONVERTER_CRASHED' : 'REPAIR_FAILED',
+      });
     }
 
     const repairedPdf = await readFile(outputPath);
@@ -167,7 +184,7 @@ except Exception as e:
 
     return repairedPdf;
   } catch (error: any) {
-    logger.error(`[repair-pdf] Error repairing PDF`, { error: error.message }, requestId);
+    logger.error(`[repair-pdf] Error repairing PDF`, { error: error.message, errorCode: error.errorCode }, requestId);
     throw error;
   } finally {
     try {
@@ -213,8 +230,21 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Magic bytes only. This route exists to accept structurally broken PDFs,
+    // so inspectPdf()'s parse check would reject precisely the files it is
+    // meant to repair. A file that is not a PDF at all is still worth catching
+    // here rather than after two engine timeouts.
+    if (!hasPdfMagicBytes(buffer)) {
+      logger.warn('Repair rejected: not a PDF', { bytes: buffer.length }, requestId);
+      return NextResponse.json(
+        { error: "This file doesn't appear to be a PDF at all, so there's nothing to repair.", errorCode: 'INVALID_FILE_CONTENT', requestId },
+        { status: 400 }
+      );
+    }
+
     const fileSizeMB = (buffer.length / 1024 / 1024).toFixed(2);
-    logger.info('Repair PDF started', { fileSize: `${fileSizeMB}MB`, fileName: file.name }, requestId);
+    logger.info('Repair PDF started', { ...fileLogMeta(file) }, requestId);
 
     // Try qpdf first (real structural repair: rebuilds xref tables, recovers
     // damaged objects). Fall back to the pypdf page-copy path if qpdf fails.
@@ -251,7 +281,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    logger.error('Repair PDF failed', { error: error.message }, requestId);
-    return NextResponse.json({ error: error.message || 'Failed to repair PDF.', requestId }, { status: 500 });
+    // error.message here is the repair script's stderr — log only.
+    logger.error('Repair PDF failed', { error: error?.message, errorCode: error?.errorCode, stack: error?.stack }, requestId);
+    return NextResponse.json(
+      { error: "This PDF is damaged beyond what we can repair automatically.", errorCode: 'REPAIR_FAILED', requestId },
+      { status: 500 }
+    );
   }
 }

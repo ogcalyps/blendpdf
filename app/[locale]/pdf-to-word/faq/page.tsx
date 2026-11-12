@@ -15,7 +15,7 @@ export default function PDFToWordFAQ() {
     },
     {
       question: 'Is BlendPDF\'s PDF to Word converter really free?',
-      answer: 'Yes. There is no watermark on the output, no page limit, no daily quota that pushes you to a paid plan, and no sign-up. The only practical limits are technical ones: 50MB per file and a processing window of about two minutes.'
+      answer: 'Yes. There is no watermark on the output, no daily quota that pushes you to a paid plan, and no sign-up. The only limits are technical ones: 50MB and 500 pages per file, and a processing window of about two minutes.'
     },
     {
       question: 'Do I need an account or email address to download my file?',
@@ -23,7 +23,7 @@ export default function PDFToWordFAQ() {
     },
     {
       question: 'Is it safe to convert my PDF online?',
-      answer: 'Uploads are encrypted in transit, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We use Google Analytics for aggregate, anonymous usage measurement only.'
+      answer: 'Uploads are encrypted in transit, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents.'
     },
     {
       question: 'How accurate is the conversion?',
@@ -43,7 +43,7 @@ export default function PDFToWordFAQ() {
     },
     {
       question: 'What are the file size and page limits?',
-      answer: 'One PDF at a time, up to 50MB. There is no fixed page limit, but processing is capped at about two minutes, so very long or very complex documents can time out. If that happens, split the PDF and convert it in parts.'
+      answer: 'One PDF at a time, up to 50MB and 500 pages. Processing is capped at about two minutes, so very long or very complex documents can time out. If that happens, split the PDF and convert it in parts.'
     },
     {
       question: 'Can I convert a password-protected PDF?',
@@ -271,11 +271,11 @@ export default function PDFToWordFAQ() {
               <h2 className="mb-4 text-3xl font-bold text-gray-900">9. What are the file size and page limits?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
-                  The limits are simple: one PDF per conversion, up to 50MB.
+                  The limits are simple: one PDF per conversion, up to 50MB and 500 pages.
                 </p>
                 <p>
                   <strong>Pages and processing time</strong><br />
-                  There is no fixed page limit. Instead, each conversion gets a processing window of about two minutes. A 100-page text document fits comfortably; a 400-page PDF dense with images and tables might not. If a large document times out, split it into parts with the BlendPDF split tool, convert each part, and reassemble the sections in Word.
+                  Each conversion takes up to 500 pages and gets a processing window of about two minutes. A 100-page text document fits comfortably; a long PDF packed with tables can run out of time well before 500 pages. If a document is over the limit or times out, split it into parts with the BlendPDF split tool, convert each part, and reassemble the sections in Word.
                 </p>
                 <p>
                   <strong>Reducing file size first</strong><br />

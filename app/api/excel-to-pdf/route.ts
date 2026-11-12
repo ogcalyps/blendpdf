@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { writeFile, readFile, unlink, stat } from 'fs/promises';
+import { writeFile, unlink, stat } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { randomUUID } from 'crypto';
+import { convertWithLibreOffice } from '@/lib/libreoffice';
 
 const execAsync = promisify(exec);
+
+const LIBREOFFICE_TIMEOUT_MS = 90_000;
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -105,7 +109,6 @@ async function convertExcelToPdfLibreOffice(excelBuffer: Buffer, inputExtension:
   const tempDir = tmpdir();
   const inputId = randomUUID();
   const inputPath = join(tempDir, `${inputId}${inputExtension}`);
-  const expectedOutputPath = join(tempDir, `${inputId}.pdf`);
 
   try {
     const libreOfficeCmd = await getLibreOfficeCommand();
@@ -149,16 +152,12 @@ async function convertExcelToPdfLibreOffice(excelBuffer: Buffer, inputExtension:
     // --headless: Run without GUI
     // --nodefault: Don't start default document
     // --nolockcheck: Don't check for file locks
-    // --convert-to pdf: Convert to PDF format
-    // --outdir: Output directory
-    // Simplified command without quotes in paths to avoid shell interpretation issues
-    const baseCommand = `${libreOfficeCmd} --headless --nodefault --nolockcheck --convert-to pdf --outdir ${tempDir} ${inputPath}`;
-    const command = useXvfb ? `xvfb-run -a ${baseCommand}` : baseCommand;
+    // (--convert-to and --outdir are added by convertWithLibreOffice)
+    const flags = ['--headless', '--nodefault', '--nolockcheck'];
 
     logger.info(`[LibreOffice] Converting: ${inputId}${inputExtension}`, {
       inputPath,
-      tempDir,
-      command,
+      flags,
       useXvfb,
     }, requestId);
 
@@ -179,117 +178,50 @@ async function convertExcelToPdfLibreOffice(excelBuffer: Buffer, inputExtension:
 
     // Set environment variables for LibreOffice
     const homeDir = process.env.HOME || '/tmp';
-    const tempDirEnv = tempDir;
-    const libreOfficeUserProfile = join(homeDir, '.libreoffice-profile');
 
-    const { stdout, stderr } = await execAsync(command, {
-      timeout: 90000,
-      maxBuffer: 50 * 1024 * 1024,
-      cwd: tempDir,
-      shell: '/bin/bash',
+    const { output, stdout, stderr, exitCode, signal, timedOut } = await convertWithLibreOffice(libreOfficeCmd, inputPath, 'pdf', {
+      flags,
+      timeoutMs: LIBREOFFICE_TIMEOUT_MS,
+      useXvfb,
       env: {
         ...process.env,
         PATH: updatedPath,
         HOME: homeDir,
-        TMPDIR: tempDirEnv,
         DISPLAY: useXvfb ? undefined : ':99', // Use virtual display or set to :99
         QT_QPA_PLATFORM: 'offscreen', // Prevent Qt from trying to use X11
         SAL_USE_VCLPLUGIN: 'gen',
         SAL_DISABLE_OPENCL: '1',
         SAL_NO_DEFAULT: '1',
-        LIBREOFFICE_USER_PROFILE: libreOfficeUserProfile,
       },
     });
+
+    if (timedOut) {
+      logger.warn('[LibreOffice] Timed out; process group killed', { timeoutMs: LIBREOFFICE_TIMEOUT_MS }, requestId);
+      throw Object.assign(new Error(`LibreOffice timed out after ${LIBREOFFICE_TIMEOUT_MS / 1000}s`), { errorCode: 'TIMEOUT' });
+    }
+
+    if (exitCode !== 0) {
+      // No crash/refusal split here: soffice.bin runs under its launcher
+      // (oosplash), which reports a segfault as a plain exit 1.
+      logger.warn('[LibreOffice] Conversion failed', { stdout, stderr, exitCode, signal }, requestId);
+      throw Object.assign(new Error(`LibreOffice exited with ${exitCode ?? signal}: ${stderr}`), {
+        errorCode: 'CONVERSION_FAILED',
+      });
+    }
 
     if (stderr && !stderr.includes('Application Error')) {
       logger.warn('LibreOffice conversion warning', { stderr }, requestId);
     }
 
-    // Parse stdout to find the actual output file path
-    let parsedOutputPath: string | null = null;
-    if (stdout) {
-      const match = stdout.match(/->\s+([^\s]+\.pdf)/);
-      if (match && match[1]) {
-        parsedOutputPath = match[1];
-      }
-    }
-
-    // Wait for file system sync
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Try to find the output file
-    const { readdir } = await import('fs/promises');
-    let pdfBuffer: Buffer | null = null;
-    const pathsToTry = [
-      parsedOutputPath,
-      expectedOutputPath,
-      join(tempDir, `${inputId}.pdf`),
-    ].filter((p): p is string => p !== null);
-
-    // First, try the expected paths
-    for (const path of pathsToTry) {
-      try {
-        const stats = await stat(path);
-        if (stats.isFile() && stats.size > 0) {
-          pdfBuffer = await readFile(path);
-          break;
-        }
-      } catch (err) {
-        // Continue to next path
-      }
-    }
-
-    // If still not found, search for any recent .pdf file in temp directory
-    if (!pdfBuffer) {
-      try {
-        const files = await readdir(tempDir);
-        const pdfFiles = files.filter(f => f.endsWith('.pdf'));
-
-        // Sort by modification time (most recent first)
-        const filesWithStats = await Promise.all(
-          pdfFiles.map(async (file) => {
-            try {
-              const filePath = join(tempDir, file);
-              const stats = await stat(filePath);
-              return { file, path: filePath, mtime: stats.mtimeMs, size: stats.size };
-            } catch {
-              return null;
-            }
-          })
-        );
-
-        const validFiles = filesWithStats.filter(f => f !== null && f.size > 0) as Array<{file: string, path: string, mtime: number, size: number}>;
-        validFiles.sort((a, b) => b.mtime - a.mtime);
-
-        // Try the most recent file (likely our output)
-        if (validFiles.length > 0) {
-          const mostRecent = validFiles[0];
-          const now = Date.now();
-          if (now - mostRecent.mtime < 30000) {
-            pdfBuffer = await readFile(mostRecent.path);
-          }
-        }
-      } catch (dirError) {
-        // Ignore directory read errors
-      }
-    }
-
-    if (!pdfBuffer) {
+    if (!output) {
       throw new Error('LibreOffice conversion failed: Output file not found');
     }
-
-    // Cleanup
+    
     await unlink(inputPath).catch(() => {});
-    await unlink(expectedOutputPath).catch(() => {});
-    if (parsedOutputPath) {
-      await unlink(parsedOutputPath).catch(() => {});
-    }
-
-    return pdfBuffer;
+    return output;
   } catch (error) {
     // Cleanup on error
     await unlink(inputPath).catch(() => {});
-    await unlink(expectedOutputPath).catch(() => {});
     throw error;
   }
 }
@@ -397,7 +329,7 @@ export async function POST(request: NextRequest) {
     }
 
     const fileSizeMB = (buffer.length / 1024 / 1024).toFixed(2);
-    logger.info('Excel to PDF conversion started', { fileSize: `${fileSizeMB}MB`, fileName: file.name, fileType: fileExtension }, requestId);
+    logger.info('Excel to PDF conversion started', { ...fileLogMeta(file), fileType: fileExtension }, requestId);
 
     // Check if LibreOffice is available
     const hasLibreOffice = await checkLibreOffice();
@@ -437,15 +369,13 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Excel to PDF conversion failed', { error: error instanceof Error ? error.message : 'Unknown error', stack: error instanceof Error ? error.stack : undefined }, requestId);
-
-    const errorMessage = error instanceof Error
-      ? error.message
-      : 'An unknown error occurred while converting the spreadsheet';
+    logger.error('Excel to PDF conversion failed', { error: error instanceof Error ? error.message : 'Unknown error', errorCode: (error as { errorCode?: string })?.errorCode, stack: error instanceof Error ? error.stack : undefined }, requestId);
 
     return NextResponse.json(
       {
-        error: errorMessage,
+        // LibreOffice's stderr used to land here verbatim. Logged above only.
+        error: "We couldn't convert this spreadsheet. Please check the file and try again.",
+        errorCode: 'CONVERSION_FAILED',
         requestId,
       },
       { status: 500 }

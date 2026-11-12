@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { GitMerge, FileMinus, Image as ImageIcon, Scissors, RotateCw, ArrowUpDown, Trash2, FileImage, ChevronDown, Lock, Shield, Zap, FileText, File, Table, Wrench, Key, Unlock, Hash, Droplets, PenTool, LayoutGrid, FileType, Edit3, Presentation, FileSpreadsheet, AlignLeft, FileOutput, Images, Crop, Layers as LayersIcon, EyeOff, ScanText } from 'lucide-react';
+import { GitMerge, FileMinus, Image as ImageIcon, Scissors, RotateCw, ArrowUpDown, Trash2, FileImage, ChevronDown, Lock, Shield, Zap, FileText, File, Table, Wrench, Key, Unlock, Hash, Droplets, PenTool, LayoutGrid, FileType, Edit3, Presentation, FileSpreadsheet, AlignLeft, FileOutput, Images, Crop, Layers as LayersIcon, EyeOff, ScanText, FilePenLine, FileBadge } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { ToolCard } from '@/components/ToolCard';
 import { Button } from '@/components/ui/Button';
@@ -11,11 +11,13 @@ import { ItemListSchema } from '@/components/ItemListSchema';
 import { TrustpilotWidget } from '@/components/TrustpilotWidget';
 import { ProofSection } from '@/components/ProofSection';
 import { Footer } from '@/components/Footer';
+import { HomeDropZone } from '@/components/HomeDropZone';
 
 type Category = 'all' | 'organize' | 'optimize' | 'convert' | 'edit' | 'security' | 'forms';
 
 export default function Home() {
   const t = useTranslations();
+  const locale = useLocale();
   const [activeCategory, setActiveCategory] = useState<Category>('all');
 
   const tools = [
@@ -27,6 +29,7 @@ export default function Home() {
     { id: 'word-to-pdf', name: t('nav.tools.wordToPdf.title'), url: '/word-to-pdf', description: t('nav.tools.wordToPdf.description'), icon: <File className="w-full h-full" />, category: 'convert' },
     { id: 'pdf-to-images', name: t('nav.tools.pdfToImages.title'), url: '/pdf-to-images', description: t('nav.tools.pdfToImages.description'), icon: <ImageIcon className="w-full h-full" />, category: 'convert' },
     { id: 'images-to-pdf', name: t('nav.tools.imagesToPdf.title'), url: '/images-to-pdf', description: t('nav.tools.imagesToPdf.description'), icon: <FileImage className="w-full h-full" />, category: 'convert' },
+    { id: 'edit-pdf', name: t('nav.tools.editPdf.title'), url: '/edit-pdf', description: t('nav.tools.editPdf.description'), icon: <FilePenLine className="w-full h-full" />, category: 'edit', badge: t('home.new'), badgeColor: 'green' },
     { id: 'edit', name: t('nav.tools.addPageNumbers.title'), url: '/add-page-numbers', description: t('nav.tools.addPageNumbers.description'), icon: <Hash className="w-full h-full" />, category: 'edit' },
     { id: 'watermark', name: t('nav.tools.addWatermark.title'), url: '/watermark-pdf', description: t('nav.tools.addWatermark.description'), icon: <Droplets className="w-full h-full" />, category: 'edit' },
     { id: 'rotate', name: t('nav.tools.rotatePdf.title'), url: '/rotate-pdf', description: t('nav.tools.rotatePdf.description'), icon: <RotateCw className="w-full h-full" />, category: 'organize' },
@@ -40,6 +43,7 @@ export default function Home() {
     { id: 'powerpoint-to-pdf', name: t('nav.tools.powerpointToPdf.title'), url: '/powerpoint-to-pdf', description: t('nav.tools.powerpointToPdf.description'), icon: <Presentation className="w-full h-full" />, category: 'convert', badge: t('home.new'), badgeColor: 'green' },
     { id: 'excel-to-pdf', name: t('nav.tools.excelToPdf.title'), url: '/excel-to-pdf', description: t('nav.tools.excelToPdf.description'), icon: <FileSpreadsheet className="w-full h-full" />, category: 'convert', badge: t('home.new'), badgeColor: 'green' },
     { id: 'pdf-to-text', name: t('nav.tools.pdfToText.title'), url: '/pdf-to-text', description: t('nav.tools.pdfToText.description'), icon: <AlignLeft className="w-full h-full" />, category: 'convert' },
+    { id: 'pdf-to-pdfa', name: t('nav.tools.pdfToPdfa.title'), url: '/pdf-to-pdfa', description: t('nav.tools.pdfToPdfa.description'), icon: <FileBadge className="w-full h-full" />, category: 'convert', badge: t('home.new'), badgeColor: 'green' },
     { id: 'extract-images', name: t('nav.tools.extractImages.title'), url: '/extract-images', description: t('nav.tools.extractImages.description'), icon: <Images className="w-full h-full" />, category: 'convert' },
     { id: 'extract-pages', name: t('nav.tools.extractPages.title'), url: '/extract-pages', description: t('nav.tools.extractPages.description'), icon: <FileOutput className="w-full h-full" />, category: 'organize' },
     { id: 'crop', name: t('nav.tools.cropPdf.title'), url: '/crop-pdf', description: t('nav.tools.cropPdf.description'), icon: <Crop className="w-full h-full" />, category: 'edit', badge: t('home.new'), badgeColor: 'green' },
@@ -63,21 +67,55 @@ export default function Home() {
     ? tools
     : tools.filter(tool => tool.category === activeCategory);
 
+  // Cold arrivals land here from links and search with no idea the tools exist
+  // below the hero, so the highest-intent few are repeated above the fold.
+  // Pulled from `tools` by id so names, URLs and icons stay single-sourced.
+  const quickPickIds = ['merge', 'split', 'compress', 'pdf-to-word'];
+  const quickPicks = quickPickIds
+    .map((id) => tools.find((tool) => tool.id === id))
+    .filter((tool): tool is (typeof tools)[number] => tool !== undefined);
+
+  // The jobs Arabic searchers come for, under the RTL proof. On /ar they also
+  // give the home page Arabic anchor text into those tools.
+  const arabicFiles = [
+    { id: 'ocr', url: '/ocr-pdf', icon: <ScanText className="w-full h-full" /> },
+    { id: 'edit', url: '/edit-pdf', icon: <FilePenLine className="w-full h-full" /> },
+    { id: 'compress', url: '/compress-pdf', icon: <FileMinus className="w-full h-full" /> },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col">
       <ItemListSchema tools={tools.map(t => ({ name: t.name, url: t.url, description: t.description }))} />
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-20 pb-12 px-4 bg-gradient-to-b from-orange-50/50 to-white">
+      <section className="pt-10 pb-8 sm:pt-20 sm:pb-12 px-4 bg-gradient-to-b from-orange-50/50 to-white">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 sm:mb-6 tracking-tight">
             {t('hero.title')}
           </h1>
 
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
             {t('hero.subtitle')}
           </p>
+
+          <HomeDropZone />
+
+          <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t('hero.mostUsed')}
+          </p>
+          <div className="mb-6 sm:mb-8 flex flex-wrap justify-center gap-2">
+            {quickPicks.map((tool) => (
+              <Link
+                key={tool.id}
+                href={tool.url}
+                className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-100 hover:text-gray-900"
+              >
+                <span className="h-4 w-4 shrink-0">{tool.icon}</span>
+                {tool.name}
+              </Link>
+            ))}
+          </div>
 
           <Button
             size="lg"
@@ -144,6 +182,25 @@ export default function Home() {
             </p>
           </div>
           <ProofSection />
+
+          <div className="mt-16">
+            <h3 className="mb-8 text-center text-2xl font-bold text-gray-900">
+              {t('home.arabicFiles.title')}
+            </h3>
+            <div className="grid gap-6 md:grid-cols-3">
+              {arabicFiles.map((card) => (
+                <ToolCard
+                  key={card.id}
+                  href={card.url}
+                  icon={card.icon}
+                  title={t(`home.arabicFiles.${card.id}.title`)}
+                  description={t(`home.arabicFiles.${card.id}.description`)}
+                  iconBgColor="bg-orange-100"
+                  iconColor="text-primary"
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -178,7 +235,7 @@ export default function Home() {
       {process.env.NEXT_PUBLIC_TRUSTPILOT_BUSINESS_UNIT_ID && (
         <section className="py-12 px-4">
           <div className="max-w-3xl mx-auto">
-            <TrustpilotWidget variant="mini" />
+            <TrustpilotWidget variant="mini" locale={locale === 'fr' ? 'fr-FR' : locale === 'es' ? 'es-ES' : 'en-US'} />
           </div>
         </section>
       )}

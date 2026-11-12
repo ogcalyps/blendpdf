@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { watermarkPDF, isWinAnsiEncodable, toHeaderSafeFilename } from '@/lib/pdf-processor';
 import { rateLimitMiddleware } from '@/lib/rate-limit';
+import { inspectPdf, pdfRejectionResponse } from '@/lib/pdf-validation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -55,6 +56,16 @@ export async function POST(request: NextRequest) {
 
     const arrayBuffer = await file.arrayBuffer();
 
+    // Front-door check. Without it a non-PDF reached pdf-lib and came back as a
+    // 500 carrying the parser's own words — production was answering
+    // "Failed to parse PDF document (line:0 col:54 offset=27): No PDF header
+    // found" to anyone who uploaded the wrong file.
+    const inspection = await inspectPdf(Buffer.from(arrayBuffer));
+    if (!inspection.ok) {
+      console.warn(`[${requestId}] Rejected: ${inspection.rejection.errorCode}`, inspection.rejection.detail ?? {});
+      return pdfRejectionResponse(inspection.rejection, requestId);
+    }
+
     const pdfBytes = await watermarkPDF(arrayBuffer, {
       type: watermarkType,
       text,
@@ -71,8 +82,12 @@ export async function POST(request: NextRequest) {
         'X-Request-ID': requestId,
       },
     });
-  } catch (error: any) {
-    console.error('Error adding watermark:', error);
-    return NextResponse.json({ error: error.message || 'Failed to add watermark.', requestId }, { status: 500 });
+  } catch (error) {
+    // Log the engine's words; never return them.
+    console.error(`[${requestId}] Error adding watermark:`, error);
+    return NextResponse.json(
+      { error: 'Failed to add the watermark. Please try again.', errorCode: 'WATERMARK_FAILED', requestId },
+      { status: 500 }
+    );
   }
 }

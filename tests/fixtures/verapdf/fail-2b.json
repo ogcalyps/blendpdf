@@ -1,0 +1,76 @@
+{
+ "report": {
+  "buildInformation": {
+   "releaseDetails": [
+    {
+     "id": "core",
+     "version": "1.30.4",
+     "buildDate": 1794229680000
+    },
+    {
+     "id": "validation-model",
+     "version": "1.30.4",
+     "buildDate": 1794229860000
+    },
+    {
+     "id": "apps",
+     "version": "1.30.4",
+     "buildDate": 1794231600000
+    }
+   ]
+  },
+  "jobs": [
+   {
+    "itemDetails": {
+     "name": "/tmp/pdfa-XXXX/output.pdf",
+     "size": 300464
+    },
+    "validationResult": [
+     {
+      "details": {
+       "passedRules": 143,
+       "failedRules": 1,
+       "passedChecks": 22413,
+       "failedChecks": 1,
+       "ruleSummaries": [
+        {
+         "ruleStatus": "FAILED",
+         "specification": "ISO 19005-2:2011",
+         "clause": "6.2.4.2",
+         "testNumber": 1,
+         "status": "failed",
+         "failedChecks": 1,
+         "description": "The profile that forms the stream of an ICCBased colour space shall conform to ICC.1:1998-09, ICC.1:2001-12, ICC.1:2003-09 or ISO 15076-1",
+         "object": "ICCInputProfile",
+         "test": "(deviceClass == \"prtr\" || deviceClass == \"mntr\" || deviceClass == \"scnr\" || deviceClass == \"spac\") && (colorSpace == \"RGB \" || colorSpace == \"CMYK\" || colorSpace == \"GRAY\" || colorSpace == \"Lab \") && version < 5.0",
+         "checks": [
+          {
+           "status": "failed",
+           "context": "root/document[0]/pages[0](6 0 obj PDPage)/contentStream[0](54 0 obj PDContentStream)/operators[201]/xObject[0](75 0 obj PDXImage)/imageCS[0](28 0 obj PDICCBased)/iccProfile[0]",
+           "errorMessage": "The embedded ICC profile (Device Class = null, color space = null, version = null) is either invalid or does not satisfy PDF 1.7 requirements",
+           "errorArguments": [
+            null,
+            null,
+            null
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "jobEndStatus": "normal",
+      "profileName": "PDF/A-2b validation profile",
+      "statement": "PDF file is not compliant with Validation Profile requirements.",
+      "compliant": false
+     }
+    ],
+    "processingTime": {
+     "start": 1794477682676,
+     "finish": 1794477683028,
+     "duration": "00:00:00.352",
+     "difference": 352
+    }
+   }
+  ]
+ }
+}

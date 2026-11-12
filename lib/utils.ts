@@ -14,7 +14,17 @@ export function cn(...inputs: ClassValue[]): string {
 const FILE_SIZE_UNITS: Record<string, string[]> = {
   en: ['Bytes', 'KB', 'MB', 'GB'],
   ar: ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'],
+  fr: ['octets', 'Ko', 'Mo', 'Go'],
+  es: ['bytes', 'KB', 'MB', 'GB'],
 };
+
+/** Locales that write a decimal comma and a no-break space before the unit (1,5 Mo, 1,5 MB). */
+const DECIMAL_COMMA: Record<string, string> = { fr: 'fr-FR', es: 'es-ES' };
+
+/** A size limit in MB as the visitor reads it: 1.5, or 1,5 in French and Spanish. */
+export function formatLimitMb(mb: number, locale: string): string {
+  return mb.toLocaleString(DECIMAL_COMMA[locale] ?? 'en-US', { maximumFractionDigits: 1 });
+}
 
 /**
  * Convert bytes to human-readable file size format
@@ -25,12 +35,15 @@ const FILE_SIZE_UNITS: Record<string, string[]> = {
 export function formatFileSize(bytes: number, locale: string = 'en'): string {
   const sizes = FILE_SIZE_UNITS[locale] ?? FILE_SIZE_UNITS.en;
 
-  if (bytes === 0) return `0 ${sizes[0]}`;
+  if (bytes === 0) return `0${DECIMAL_COMMA[locale] ? '\u00a0' : ' '}${sizes[0]}`;
 
   const k = 1024;
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  const value = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
+  // French writes 1,5 Mo and Spanish 1,5 MB, with a no-break space before the unit
+  if (DECIMAL_COMMA[locale]) return `${value.toLocaleString(DECIMAL_COMMA[locale])}\u00a0${sizes[i]}`;
+  return `${value} ${sizes[i]}`;
 }
 
 /**

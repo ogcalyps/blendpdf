@@ -5,6 +5,7 @@ import { AlertTriangle, Download, FileDown, Loader2, X } from 'lucide-react';
 import { generateCsvTemplate } from '@/lib/csv-parsing';
 import { fillPdfForm, pdfBytesToBlob } from '@/lib/pdf-generation';
 import { createZipAndDownload } from '@/lib/zip-generation';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { MonetizationModal } from './MonetizationModal';
 import { BatchGrid } from './batch/BatchGrid';
 import { ImportWizard } from './batch/ImportWizard';
@@ -64,6 +65,7 @@ export function BatchFillUploader({ templateBase64, formDef, filenamePrefix }: a
     const [preview, setPreview] = useState<PreviewState | null>(null);
     const [showLimitModal, setShowLimitModal] = useState(false);
     const [attemptedRows, setAttemptedRows] = useState(0);
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
 
     // Guard for the async preview generation: closing the modal (or starting
     // a newer preview) bumps the token so stale results are dropped instead of
@@ -365,6 +367,7 @@ export function BatchFillUploader({ templateBase64, formDef, filenamePrefix }: a
         try {
             if (generatedFiles.length > 0) {
                 await createZipAndDownload(generatedFiles, `${filenamePrefix}_batch.zip`);
+                markSuccess();
             }
         } catch (e: any) {
             console.error(e);
@@ -573,6 +576,8 @@ export function BatchFillUploader({ templateBase64, formDef, filenamePrefix }: a
                         </div>
                     );
                 })()}
+
+                {reviewAsk}
             </div>
 
             {preview && (

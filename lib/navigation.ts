@@ -82,6 +82,12 @@ export const getConvertTools = (t: TranslationFunction): NavItem[] => [
     href: '/pdf-to-text',
   },
   {
+    title: t('nav.tools.pdfToPdfa.title'),
+    description: t('nav.tools.pdfToPdfa.description'),
+    href: '/pdf-to-pdfa',
+    badge: 'NEW',
+  },
+  {
     title: t('nav.tools.extractImages.title'),
     description: t('nav.tools.extractImages.description'),
     href: '/extract-images',
@@ -126,6 +132,12 @@ export const getSecurityTools = (t: TranslationFunction): NavItem[] => [
 ];
 
 export const getEditTools = (t: TranslationFunction): NavItem[] => [
+  {
+    title: t('nav.tools.editPdf.title'),
+    description: t('nav.tools.editPdf.description'),
+    href: '/edit-pdf',
+    badge: 'NEW',
+  },
   {
     title: t('nav.tools.cropPdf.title'),
     description: t('nav.tools.cropPdf.description'),

@@ -1,13 +1,12 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 interface FormListingCardProps {
     slug: string;
     title: string;
     description: string;
-    locale: string;
 }
 
-export function FormListingCard({ slug, title, description, locale }: FormListingCardProps) {
+export function FormListingCard({ slug, title, description }: FormListingCardProps) {
     return (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-lg transition flex flex-col h-full">
             <div className="flex-1">
@@ -15,10 +14,11 @@ export function FormListingCard({ slug, title, description, locale }: FormListin
                 <p className="text-gray-600 mb-6">{description}</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-                <Link href={`/${locale}/forms/${slug}?mode=single`} className="flex-1 text-center bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">
+                {/* Plain URL, not /en/... or ?mode=single: crawlers follow the page's canonical address with no redirect */}
+                <Link href={`/forms/${slug}`} className="flex-1 text-center bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">
                     Fill Single Form
                 </Link>
-                <Link href={`/${locale}/forms/${slug}?mode=batch`} className="flex-1 text-center bg-blue-50 text-blue-700 py-2.5 rounded-xl font-semibold hover:bg-blue-100 transition">
+                <Link href={`/forms/${slug}?mode=batch`} className="flex-1 text-center bg-blue-50 text-blue-700 py-2.5 rounded-xl font-semibold hover:bg-blue-100 transition">
                     Batch Fill
                 </Link>
             </div>

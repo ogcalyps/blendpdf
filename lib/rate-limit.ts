@@ -107,14 +107,46 @@ export function getClientIP(request: Request): string {
 }
 
 /**
- * Rate limit middleware for Next.js API routes
+ * Every API route together, per IP: the per-route budgets below add up to
+ * well over 100 heavy calls per window, so this keeps one IP's total near
+ * the old single shared counter (20). A real workspace save chains at most
+ * unlock, OCR, compress and protect (4 calls); three tries of that, plus a
+ * couple of other tools, stay far under it.
+ */
+export const GLOBAL_MAX_REQUESTS = 40;
+export const GLOBAL_WINDOW_MS = 15 * 60 * 1000;
+
+/**
+ * The route a request reaches, as the limiter keys it. Next routes
+ * /api/ocr%2Dpdf to the same handler as /api/ocr-pdf, so the key is the
+ * decoded path (repeated and trailing slashes dropped); a malformed escape
+ * keeps the raw path, and the global counter still applies to it.
+ */
+export function routeKey(request: Request): string {
+  const raw = new URL(request.url).pathname;
+  let path = raw;
+  try {
+    path = decodeURIComponent(raw);
+  } catch {
+    path = raw;
+  }
+  return path.replace(/\/{2,}/g, '/').replace(/(.)\/+$/, '$1');
+}
+
+/**
+ * Rate limit middleware for Next.js API routes. Each route keeps its own
+ * budget per IP (one workspace save can chain unlock, OCR, compress and
+ * protect, and a shared counter would let those use up OCR's 5), and every
+ * call also counts against the IP's GLOBAL_MAX_REQUESTS across all routes.
  */
 export function rateLimitMiddleware(
   request: Request,
   options: Partial<RateLimitOptions> = {}
 ): { allowed: boolean; remaining: number; resetTime: number; error?: string } {
   const ip = getClientIP(request);
-  const result = checkRateLimit(ip, options);
+  const route = checkRateLimit(`route:${routeKey(request)}:${ip}`, options);
+  const global = checkRateLimit(`all:${ip}`, { windowMs: GLOBAL_WINDOW_MS, maxRequests: GLOBAL_MAX_REQUESTS });
+  const result = route.allowed && !global.allowed ? global : route;
 
   if (!result.allowed) {
     return {
@@ -123,6 +155,5 @@ export function rateLimitMiddleware(
     };
   }
 
-  return result;
+  return { ...result, remaining: Math.min(route.remaining, global.remaining) };
 }
-

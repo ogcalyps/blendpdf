@@ -1,0 +1,52 @@
+{
+ "report": {
+  "buildInformation": {
+   "releaseDetails": [
+    {
+     "id": "core",
+     "version": "1.30.4",
+     "buildDate": 1794229680000
+    },
+    {
+     "id": "validation-model",
+     "version": "1.30.4",
+     "buildDate": 1794229860000
+    },
+    {
+     "id": "apps",
+     "version": "1.30.4",
+     "buildDate": 1794231600000
+    }
+   ]
+  },
+  "jobs": [
+   {
+    "itemDetails": {
+     "name": "/tmp/pdfa-XXXX/output.pdf",
+     "size": 50712
+    },
+    "validationResult": [
+     {
+      "details": {
+       "passedRules": 144,
+       "failedRules": 0,
+       "passedChecks": 2892,
+       "failedChecks": 0,
+       "ruleSummaries": []
+      },
+      "jobEndStatus": "normal",
+      "profileName": "PDF/A-2b validation profile",
+      "statement": "PDF file is compliant with Validation Profile requirements.",
+      "compliant": true
+     }
+    ],
+    "processingTime": {
+     "start": 1794477684051,
+     "finish": 1794477684286,
+     "duration": "00:00:00.235",
+     "difference": 235
+    }
+   }
+  ]
+ }
+}

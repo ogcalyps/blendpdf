@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بإزالة الصفحات غير المرغوب فيها من ملفات PDF مجاناً عبر الإنترنت. اختيار مرئي للصفحات. يعمل مع جميع اللغات. لا حاجة للتسجيل.',
       keywords: 'حذف صفحات pdf، إزالة صفحات pdf، أداة حذف صفحات pdf',
     },
+    fr: {
+      title: 'Supprimer des pages d’un PDF en ligne gratuitement | BlendPDF',
+      description:
+        'Retirez les pages inutiles d’un PDF, gratuitement et en ligne, en les sélectionnant visuellement. Fonctionne dans toutes les langues, y compris l’arabe. Sans inscription.',
+      keywords:
+        'supprimer pages pdf, retirer pages pdf, enlever page pdf, supprimer page pdf en ligne gratuit',
+    },
+    es: {
+      title: 'Eliminar páginas de un PDF online gratis: quitar las que sobran | BlendPDF',
+      description:
+        'Quite de su PDF las páginas que sobran, online y gratis, eligiéndolas en una vista previa. Funciona en todos los idiomas, incluido el árabe. Sin registrarse.',
+      keywords:
+        'eliminar páginas pdf, eliminar páginas de un pdf, borrar páginas pdf, quitar páginas de un pdf, eliminar hojas de un pdf, eliminar páginas pdf online gratis',
+    },
   };
   
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/delete-pages`,
-        'ar': `${baseUrl}/ar/delete-pages`,
-        'x-default': `${baseUrl}/delete-pages`,
-      },
+      languages: languageAlternates(baseUrl, '/delete-pages'),
     },
   };
 }
@@ -55,6 +67,6 @@ export default function DeletePagesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="deletePages">{children}</PageMessages>;
 }
 

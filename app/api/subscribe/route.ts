@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PutCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { getDynamoDBClient, getEmailsTableName } from '@/lib/dynamodb-client';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { emailLogRef } from '@/lib/log-redact';
 
 /**
  * API Route: Subscribe user email
@@ -34,6 +35,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email } = body;
+    // Picks the language of the one-time review request (lib/backoffice/review-requests.ts)
+    const locale = body.locale === 'ar' || body.locale === 'fr' || body.locale === 'es' ? body.locale : 'en';
 
     if (!email) {
       return NextResponse.json(
@@ -68,6 +71,7 @@ export async function POST(request: NextRequest) {
             createdAt: new Date().toISOString(),
             unsubscribed: false,
             reviewRequestSent: false,
+            locale,
             // TTL (optional): Automatically delete after 2 years if you want
             // expiresAt: Math.floor(Date.now() / 1000) + (2 * 365 * 24 * 60 * 60),
           },
@@ -75,44 +79,40 @@ export async function POST(request: NextRequest) {
           ConditionExpression: 'attribute_not_exists(email)',
         }));
 
-        console.log('[Email Capture] Successfully stored email in DynamoDB:', normalizedEmail);
+        console.log('[Email Capture] Stored new email in DynamoDB:', emailLogRef(normalizedEmail));
       } catch (error: any) {
         // If email already exists (ConditionalCheckFailedException), that's okay
-        // Just update the record to refresh the timestamp
+        // Just update the record to refresh the timestamp. reviewRequestSent is
+        // left alone, so signing up again never brings a second review request.
         if (error.name === 'ConditionalCheckFailedException') {
-          await client.send(new PutCommand({
+          const now = new Date().toISOString();
+          await client.send(new UpdateCommand({
             TableName: tableName,
-            Item: {
-              email: normalizedEmail,
-              source: 'download-capture',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              unsubscribed: false,
-              reviewRequestSent: false,
-            },
+            Key: { email: normalizedEmail },
+            UpdateExpression: 'SET #s = :s, createdAt = :now, updatedAt = :now, unsubscribed = :f, #l = :l REMOVE unsubscribedAt',
+            ExpressionAttributeNames: { '#s': 'source', '#l': 'locale' },
+            ExpressionAttributeValues: { ':s': 'download-capture', ':now': now, ':f': false, ':l': locale },
           }));
-          console.log('[Email Capture] Email already exists, updated timestamp:', normalizedEmail);
+          console.log('[Email Capture] Email already exists, updated timestamp:', emailLogRef(normalizedEmail));
         } else {
           // Re-throw other errors
           throw error;
         }
       }
     } catch (dynamoError: any) {
-      // Fallback for DEV: If DynamoDB is not available, just log the email
+      // Fallback for DEV: If DynamoDB is not available, just log a marker for the email
       // This allows the feature to work in DEV without AWS setup
       const isDev = process.env.NODE_ENV === 'development' || !process.env.AWS_REGION;
       
       if (isDev) {
-        console.log('[Email Capture] DEV MODE - DynamoDB not available, logging email:', normalizedEmail);
-        console.log('[Email Capture] Email would be stored:', {
-          email: normalizedEmail,
+        console.log('[Email Capture] DEV MODE - DynamoDB not available, email not stored:', emailLogRef(normalizedEmail));
+        console.log('[Email Capture] Record would be stored:', {
           source: 'download-capture',
           createdAt: new Date().toISOString(),
           unsubscribed: false,
           reviewRequestSent: false,
         });
         // In DEV, we still return success so the UI flow continues
-        // The email is logged to console for testing
       } else {
         // In production, re-throw the error
         throw dynamoError;

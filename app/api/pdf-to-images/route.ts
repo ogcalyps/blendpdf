@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 import { getPdfJs } from '@/lib/pdf-processor';
 import { createCanvas } from 'canvas';
-import { randomUUID } from 'crypto';
-import { writeFile, readFile, unlink, mkdir } from 'fs/promises';
+import { writeFile, readFile, mkdtemp, rm } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import JSZip from 'jszip';
+import { inspectPdf, pdfRejectionResponse } from '@/lib/pdf-validation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -76,10 +77,14 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileSizeMB = (buffer.length / 1024 / 1024).toFixed(2);
+
+    const inspection = await inspectPdf(buffer);
+    if (!inspection.ok) {
+      logger.warn('PDF rejected before conversion', { errorCode: inspection.rejection.errorCode, ...inspection.rejection.detail }, requestId);
+      return pdfRejectionResponse(inspection.rejection, requestId);
+    }
     logger.info('PDF to Images conversion started', { 
-      fileSize: `${fileSizeMB}MB`, 
-      fileName: file.name,
+      ...fileLogMeta(file),
       format,
       dpi 
     }, requestId);
@@ -118,13 +123,14 @@ export async function POST(request: NextRequest) {
     // (requested DPI == actual output DPI)
     const scale = dpi / 72;
 
-    // Create temp directory for images
-    const tempDir = join(tmpdir(), `pdf-images-${randomUUID()}`);
-    await mkdir(tempDir, { recursive: true });
-
-    const imageFiles: Array<{ path: string; pageNumber: number }> = [];
+    // Private (0700) temp directory for the page images. The finally below
+    // removes the whole directory on every exit path; removing only the page
+    // files left an empty pdf-images-* directory in /tmp after each conversion.
+    const tempDir = await mkdtemp(join(tmpdir(), 'pdf-images-'));
 
     try {
+      const imageFiles: Array<{ path: string; pageNumber: number }> = [];
+
       // Convert each page to an image
       for (let pageNum = 1; pageNum <= numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
@@ -176,11 +182,6 @@ export async function POST(request: NextRequest) {
         format 
       }, requestId);
 
-      // Cleanup temp files
-      for (const { path } of imageFiles) {
-        await unlink(path).catch(() => {});
-      }
-
       // Sanitize filename for Content-Disposition header
       const originalFilename = file.name.replace(/\.pdf$/i, '');
       const sanitizedFilename = originalFilename
@@ -200,12 +201,12 @@ export async function POST(request: NextRequest) {
           'X-DPI': String(dpi),
         },
       });
-    } catch (conversionError) {
-      // Cleanup on error
-      for (const { path } of imageFiles) {
-        await unlink(path).catch(() => {});
-      }
-      throw conversionError;
+    } finally {
+      await rm(tempDir, { recursive: true, force: true }).catch((error) => {
+        logger.warn('Could not remove temp directory', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }, requestId);
+      });
     }
   } catch (error) {
     logger.error('PDF to Images conversion failed', { 
@@ -213,13 +214,10 @@ export async function POST(request: NextRequest) {
       stack: error instanceof Error ? error.stack : undefined 
     }, requestId);
 
-    const errorMessage = error instanceof Error
-      ? error.message
-      : 'An unknown error occurred while converting the PDF to images';
-
     return NextResponse.json(
       {
-        error: errorMessage,
+        error: "We couldn't convert this PDF to images. Please try again.",
+        errorCode: 'CONVERSION_FAILED',
         requestId,
       },
       { status: 500 }

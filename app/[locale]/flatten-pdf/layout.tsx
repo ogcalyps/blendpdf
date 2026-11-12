@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بتسطيح حقول نماذج PDF مجاناً عبر الإنترنت. اجعل النماذج المعبأة غير قابلة للتعديل. المعالجة تتم بالكامل في متصفحك — ملفاتك لا تغادر جهازك. لا حاجة للتسجيل.',
       keywords: 'تسطيح pdf، تسطيح نموذج pdf، جعل pdf غير قابل للتعديل، قفل حقول نموذج pdf',
     },
+    fr: {
+      title: 'Aplatir un PDF en ligne gratuitement - formulaires non modifiables | BlendPDF',
+      description:
+        'Aplatissez les champs d’un formulaire PDF gratuitement : les réponses saisies ne peuvent plus être modifiées. Tout se passe dans votre navigateur, vos fichiers ne quittent pas votre appareil. Sans inscription.',
+      keywords:
+        'aplatir pdf, aplatir formulaire pdf, pdf non modifiable, verrouiller champs pdf, aplatir pdf en ligne gratuit',
+    },
+    es: {
+      title: 'Aplanar PDF online gratis: hacer un formulario PDF no editable | BlendPDF',
+      description:
+        'Aplane los campos de un formulario PDF gratis para que las respuestas ya no se puedan cambiar. Todo ocurre en su navegador, sin subir el archivo ni registrarse.',
+      keywords:
+        'aplanar pdf, aplanar formulario pdf, hacer un pdf no editable, pdf no editable, bloquear campos de un pdf, aplanar pdf online gratis',
+    },
   };
 
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/flatten-pdf`,
-        'ar': `${baseUrl}/ar/flatten-pdf`,
-        'x-default': `${baseUrl}/flatten-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/flatten-pdf'),
     },
   };
 }
@@ -55,5 +67,5 @@ export default function FlattenPDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="flattenPdf">{children}</PageMessages>;
 }

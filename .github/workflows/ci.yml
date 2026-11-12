@@ -9,19 +9,28 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Audit production dependencies (critical)
+        run: npm audit --omit=dev --audit-level=critical
 
       - name: Type check
         run: npx tsc --noEmit
@@ -29,17 +38,11 @@ jobs:
       - name: Tests
         run: npm test
 
-      - name: Audit production dependencies (critical)
-        run: npm audit --omit=dev --audit-level=critical
-
-      # Deliberately NOT gates here:
+      # Not gates here:
       #
-      #   npm run lint  - the codebase carries ~2k pre-existing ESLint errors.
+      #   npm run lint  - the codebase carries a backlog of old ESLint errors.
       #                   Lint has never been enforced, so gating on it would
-      #                   just mean permanently red CI. Chipping away at it is
-      #                   a genuinely useful contribution; see CONTRIBUTING.md.
+      #                   mean permanently red CI. See CONTRIBUTING.md.
       #
-      #   npm run build - needs native canvas bindings plus the conversion
-      #                   binaries from scripts/provision-server.sh.
-      #
-      # Type check + tests are the meaningful signal for a PR.
+      #   npm run build - needs native canvas bindings; the server tools also
+      #                   need the programs from scripts/provision-server.sh.

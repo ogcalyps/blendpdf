@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بتحويل صفحات PDF إلى صور عالية الجودة (JPG، PNG) مجاناً عبر الإنترنت. اختر جودة DPI. يعمل مع العربية والعبرية وجميع اللغات. لا حاجة للتسجيل.',
       keywords: 'pdf إلى jpg، pdf إلى png، pdf إلى صور، تحويل pdf إلى صورة',
     },
+    fr: {
+      title: 'Convertir un PDF en images en ligne gratuitement - PDF en JPG, PNG | BlendPDF',
+      description:
+        'Convertissez les pages d’un PDF en images de haute qualité (JPG, PNG) gratuitement, à la résolution de votre choix (DPI). Fonctionne avec l’arabe, l’hébreu et toutes les langues. Sans inscription.',
+      keywords:
+        'pdf en jpg, pdf en png, pdf en image, convertir pdf en image, convertir pdf en jpg gratuit, convertisseur pdf png',
+    },
+    es: {
+      title: 'PDF a JPG online gratis: convertir un PDF en imágenes JPG o PNG | BlendPDF',
+      description:
+        'Pase gratis las páginas de un PDF a imágenes JPG o PNG de alta calidad y elija la resolución (DPI). Funciona con árabe, hebreo y cualquier idioma. Sin registro.',
+      keywords:
+        'pdf a jpg, pdf a png, pdf a imagen, convertir pdf a imagen, convertir pdf a jpg, pasar pdf a jpg, pdf a jpg online gratis',
+    },
   };
   
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/pdf-to-images`,
-        'ar': `${baseUrl}/ar/pdf-to-images`,
-        'x-default': `${baseUrl}/pdf-to-images`,
-      },
+      languages: languageAlternates(baseUrl, '/pdf-to-images'),
     },
   };
 }
@@ -55,6 +67,6 @@ export default function PDFToImagesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="pdfToImages">{children}</PageMessages>;
 }
 

@@ -1,13 +1,13 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useDropzone, ErrorCode, type FileRejection } from 'react-dropzone';
+import { ErrorCode, type FileRejection } from 'react-dropzone';
+import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { useLocale, useTranslations } from 'next-intl';
 import { UploadCloud, Loader2, X } from 'lucide-react';
 import { useFileStore } from '@/store/use-file-store';
 import { validateFile, formatFileSize } from '@/lib/utils';
 import { GoogleDrivePicker } from '@/components/GoogleDrivePicker';
-import { trackEvent, currentToolFromPath } from '@/lib/analytics';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
 
@@ -52,13 +52,6 @@ export function UploadZone({ maxFiles }: UploadZoneProps = {}) {
 
       if (validFiles.length > 0) {
         setIsUploading(true);
-
-        trackEvent('file_upload', {
-          tool_name: currentToolFromPath(),
-          upload_source: 'local',
-          file_count: validFiles.length,
-          total_size_mb: Math.round((validFiles.reduce((s, f) => s + f.size, 0) / 1024 / 1024) * 100) / 100,
-        });
 
         // Add files to store
         addFiles(validFiles);
@@ -105,7 +98,7 @@ export function UploadZone({ maxFiles }: UploadZoneProps = {}) {
     [tUpload, maxFiles, locale]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useTrackedDropzone({
     onDrop,
     onDropRejected,
     accept: {
@@ -207,12 +200,6 @@ export function UploadZone({ maxFiles }: UploadZoneProps = {}) {
                 }
 
                 if (validFiles.length > 0) {
-                  trackEvent('file_upload', {
-                    tool_name: currentToolFromPath(),
-                    upload_source: 'google_drive',
-                    file_count: validFiles.length,
-                    total_size_mb: Math.round((validFiles.reduce((s, f) => s + f.size, 0) / 1024 / 1024) * 100) / 100,
-                  });
                   addFiles(validFiles);
                 }
               }}

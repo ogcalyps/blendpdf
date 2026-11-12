@@ -2,6 +2,7 @@
 
 import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
+import { localeDir } from '@/i18n';
 
 /**
  * Client component that syncs the HTML lang and dir attributes
@@ -10,7 +11,7 @@ import { useEffect } from 'react';
  */
 export function LocaleSync() {
   const locale = useLocale();
-  const dir = locale === 'ar' ? 'rtl' : 'ltr';
+  const dir = localeDir(locale);
 
   useEffect(() => {
     // Update HTML attributes immediately when locale changes

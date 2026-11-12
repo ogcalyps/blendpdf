@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { getClientIP } from '../lib/rate-limit';
 import { normalizeEmail, signUnsubscribeEmail, verifyUnsubscribeSig } from '../lib/unsubscribe';
 
@@ -46,5 +46,39 @@ describe('unsubscribe HMAC', () => {
   it('rejects garbage signatures without throwing', () => {
     expect(verifyUnsubscribeSig('user@example.com', '')).toBe(false);
     expect(verifyUnsubscribeSig('user@example.com', 'zz')).toBe(false);
+  });
+
+  describe('production refuses a shipped default key', () => {
+    // This source is published, so a hardcoded fallback secret would let anyone
+    // forge an unsubscribe link for any address. Production must have no key
+    // rather than a guessable one.
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('refuses to sign when the secret is missing', () => {
+      vi.stubEnv('NODE_ENV', 'production');
+      vi.stubEnv('UNSUBSCRIBE_SECRET', '');
+
+      expect(() => signUnsubscribeEmail('user@example.com')).toThrow(/UNSUBSCRIBE_SECRET/);
+    });
+
+    it('treats every signature as invalid when the secret is missing', () => {
+      // Signature minted with the non-production fallback key.
+      const devSig = signUnsubscribeEmail('user@example.com');
+
+      vi.stubEnv('NODE_ENV', 'production');
+      vi.stubEnv('UNSUBSCRIBE_SECRET', '');
+
+      expect(verifyUnsubscribeSig('user@example.com', devSig)).toBe(false);
+    });
+
+    it('signs and verifies once a real secret is configured', () => {
+      vi.stubEnv('NODE_ENV', 'production');
+      vi.stubEnv('UNSUBSCRIBE_SECRET', 'a'.repeat(64));
+
+      const sig = signUnsubscribeEmail('user@example.com');
+      expect(verifyUnsubscribeSig('user@example.com', sig)).toBe(true);
+    });
   });
 });

@@ -1,0 +1,218 @@
+{
+  "ar/add-letterhead-to-pdf-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/add-letterhead-to-pdf-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/add-letterhead-to-pdf-3": {
+    "width": 576,
+    "height": 718
+  },
+  "ar/compress-pdf-under-size-limit-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/compress-pdf-under-size-limit-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/edit-pdf-text-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/edit-pdf-text-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/how-blendpdf-works-1": {
+    "width": 1344,
+    "height": 520
+  },
+  "ar/how-blendpdf-works-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/how-blendpdf-works-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/how-blendpdf-works-4": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/merge-split-reorder-pages-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/merge-split-reorder-pages-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/merge-split-reorder-pages-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/sign-and-stamp-pdf-1": {
+    "width": 1024,
+    "height": 1092
+  },
+  "ar/sign-and-stamp-pdf-2": {
+    "width": 1024,
+    "height": 960
+  },
+  "ar/sign-and-stamp-pdf-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "ar/sign-and-stamp-pdf-4": {
+    "width": 1024,
+    "height": 1220
+  },
+  "en/add-letterhead-to-pdf-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/add-letterhead-to-pdf-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/add-letterhead-to-pdf-3": {
+    "width": 576,
+    "height": 838
+  },
+  "en/compress-pdf-under-size-limit-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/compress-pdf-under-size-limit-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/edit-pdf-text-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/edit-pdf-text-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/how-blendpdf-works-1": {
+    "width": 1344,
+    "height": 522
+  },
+  "en/how-blendpdf-works-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/how-blendpdf-works-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/how-blendpdf-works-4": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/merge-split-reorder-pages-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/merge-split-reorder-pages-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/merge-split-reorder-pages-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/sign-and-stamp-pdf-1": {
+    "width": 1024,
+    "height": 1308
+  },
+  "en/sign-and-stamp-pdf-2": {
+    "width": 1024,
+    "height": 960
+  },
+  "en/sign-and-stamp-pdf-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "en/sign-and-stamp-pdf-4": {
+    "width": 1024,
+    "height": 1220
+  },
+  "fr/add-letterhead-to-pdf-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/add-letterhead-to-pdf-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/add-letterhead-to-pdf-3": {
+    "width": 576,
+    "height": 838
+  },
+  "fr/compress-pdf-under-size-limit-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/compress-pdf-under-size-limit-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/edit-pdf-text-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/edit-pdf-text-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/how-blendpdf-works-1": {
+    "width": 1344,
+    "height": 520
+  },
+  "fr/how-blendpdf-works-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/how-blendpdf-works-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/how-blendpdf-works-4": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/merge-split-reorder-pages-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/merge-split-reorder-pages-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/merge-split-reorder-pages-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/sign-and-stamp-pdf-1": {
+    "width": 1024,
+    "height": 1308
+  },
+  "fr/sign-and-stamp-pdf-2": {
+    "width": 1024,
+    "height": 960
+  },
+  "fr/sign-and-stamp-pdf-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "fr/sign-and-stamp-pdf-4": {
+    "width": 1024,
+    "height": 1220
+  }
+}

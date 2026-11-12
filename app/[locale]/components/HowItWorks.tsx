@@ -10,16 +10,18 @@ interface Step {
 
 interface HowItWorksProps {
   steps: Step[];
+  /** The task as people search for it ("How to merge PDF files"); defaults to "How it works". */
+  title?: string;
 }
 
-export function HowItWorks({ steps }: HowItWorksProps) {
+export function HowItWorks({ steps, title }: HowItWorksProps) {
   const t = useTranslations('howItWorks');
 
   return (
     <section className="py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <h2 className="mb-12 text-center text-3xl font-bold text-dark">
-          {t('title')}
+          {title ?? t('title')}
         </h2>
         <div className="grid gap-8 md:grid-cols-3">
           {steps.map((step, index) => (

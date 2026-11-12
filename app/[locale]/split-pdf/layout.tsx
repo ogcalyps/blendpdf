@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بتقسيم ملفات PDF مجاناً عبر الإنترنت. استخراج صفحات محددة أو تقسيم PDF إلى عدة ملفات. اختيار مرئي للصفحات. لا حاجة للتسجيل.',
       keywords: 'تقسيم pdf، استخراج صفحات pdf، مقسم pdf، تقسيم pdf مجاناً',
     },
+    fr: {
+      title: 'Diviser un PDF en ligne gratuitement - séparer en plusieurs fichiers | BlendPDF',
+      description:
+        'Divisez gratuitement un PDF en plusieurs fichiers ou extrayez certaines pages, avec une sélection visuelle des pages. Sans inscription.',
+      keywords:
+        'diviser pdf, séparer pdf, couper pdf, scinder pdf, séparer pages pdf, diviser pdf en ligne gratuit',
+    },
+    es: {
+      title: 'Dividir PDF online gratis: separar un PDF en varios archivos | BlendPDF',
+      description:
+        'Divida un PDF online y gratis: extraiga páginas concretas o sepárelo en varios archivos, eligiendo las páginas en una vista previa. Sin registrarse.',
+      keywords:
+        'dividir pdf, separar pdf, separar páginas de un pdf, dividir un pdf en varios archivos, extraer páginas pdf, dividir pdf online gratis',
+    },
   };
   
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/split-pdf`,
-        'ar': `${baseUrl}/ar/split-pdf`,
-        'x-default': `${baseUrl}/split-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/split-pdf'),
     },
   };
 }
@@ -55,6 +67,6 @@ export default function SplitPDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="splitPdf">{children}</PageMessages>;
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { mergePDFs } from '@/lib/pdf-processor';
 import { downloadFromS3, deleteMultipleFromS3 } from '@/lib/s3-client';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { logRef, errorLogFields } from '@/lib/log-redact';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
           
           try {
             const buffer = await readFile(filePath);
-            console.log(`[${requestId}] DEV MODE: Read file ${index + 1}/${keys.length} (${key}) from temp in ${Date.now() - fileStart}ms, size: ${(buffer.length / 1024 / 1024).toFixed(2)}MB`);
+            console.log(`[${requestId}] DEV MODE: Read file ${index + 1}/${keys.length} (${logRef(key)}) from temp in ${Date.now() - fileStart}ms, size: ${(buffer.length / 1024 / 1024).toFixed(2)}MB`);
             return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
           } catch (fileError) {
             // If file not found in temp, try S3 (might be a real S3 key)
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
               const buffer = await downloadFromS3(key);
               return buffer;
             } catch (s3Error) {
-              throw new Error(`File not found: ${key}. Error: ${fileError instanceof Error ? fileError.message : 'Unknown'}`);
+              throw new Error(`File not found: ${logRef(key)}. Error: ${fileError instanceof Error ? fileError.message : 'Unknown'}`);
             }
           }
         })
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
         keys.map(async (key: string, index: number) => {
           const fileStart = Date.now();
           const buffer = await downloadFromS3(key);
-          console.log(`[${requestId}] Downloaded file ${index + 1}/${keys.length} (${key}) in ${Date.now() - fileStart}ms, size: ${(buffer.byteLength / 1024 / 1024).toFixed(2)}MB`);
+          console.log(`[${requestId}] Downloaded file ${index + 1}/${keys.length} (${logRef(key)}) in ${Date.now() - fileStart}ms, size: ${(buffer.byteLength / 1024 / 1024).toFixed(2)}MB`);
           return buffer;
         })
       );
@@ -222,7 +223,7 @@ export async function POST(request: NextRequest) {
     }
 
     const totalTime = Date.now() - startTime;
-    console.error(`[${requestId}] Error after ${totalTime}ms:`, error);
+    console.error(`[${requestId}] Error after ${totalTime}ms:`, errorLogFields(error));
     
     // Provide user-friendly error messages
     let errorMessage = 'Failed to merge PDFs. Please try again.';
@@ -247,9 +248,8 @@ export async function POST(request: NextRequest) {
       } else if (error.message.includes('memory') || error.message.includes('out of memory')) {
         errorMessage = 'Files are too large to process. Please try with smaller files or split them into smaller batches.';
         statusCode = 413;
-      } else {
-        errorMessage = error.message;
       }
+      // No raw-message fallback — see compress/merge-upload.
     }
 
     return NextResponse.json(

@@ -13,7 +13,7 @@ export default function OcrPDFFAQ() {
     },
     {
       question: 'How to make a scanned PDF searchable',
-      answer: 'Upload your scanned PDF, tick the recognition languages it contains (Arabic, English, or French), and click the OCR button. Processing takes roughly 1-2 seconds per page, then the searchable PDF downloads with an invisible text layer added over each scan.'
+      answer: 'Upload your scanned PDF, tick the recognition languages it contains (Arabic, English, French, or Spanish), and click the OCR button. Processing takes roughly 1-2 seconds per page, then the searchable PDF downloads with an invisible text layer added over each scan.'
     },
     {
       question: 'How good is the Arabic OCR?',
@@ -21,7 +21,7 @@ export default function OcrPDFFAQ() {
     },
     {
       question: 'Which languages are supported?',
-      answer: 'Three languages are supported: Arabic, English, and French. You can select any combination for mixed-language documents, such as Arabic contracts with English clauses. At least one language must be selected before running OCR.'
+      answer: 'Four languages are supported: Arabic, English, French, and Spanish. You can select any combination for mixed-language documents, such as Arabic contracts with English clauses. At least one language must be selected before running OCR.'
     },
     {
       question: 'Does OCR change how my PDF looks?',
@@ -123,7 +123,7 @@ export default function OcrPDFFAQ() {
                 </p>
                 <p>
                   <strong>The Engine Behind It</strong><br />
-                  Recognition runs on our servers using the Tesseract OCR engine via ocrmypdf — a mature, widely trusted open-source pipeline used in production archiving systems worldwide. Three language models are installed: Arabic, English, and French, selectable in any combination. Pages that already contain text are skipped by default, so running OCR on a partially digital document only processes the pages that need it.
+                  Recognition runs on our servers using the Tesseract OCR engine via ocrmypdf — a mature, widely trusted open-source pipeline used in production archiving systems worldwide. Four language models are installed: Arabic, English, French, and Spanish, selectable in any combination. Pages that already contain text are skipped by default, so running OCR on a partially digital document only processes the pages that need it.
                 </p>
               </div>
             </section>
@@ -182,7 +182,7 @@ export default function OcrPDFFAQ() {
               <h2 className="mb-4 text-3xl font-bold text-gray-900">4. Which languages are supported?</h2>
               <div className="prose prose-lg max-w-none text-gray-700">
                 <p>
-                  The tool supports exactly three recognition languages: Arabic, English, and French. You select them with checkboxes before running OCR, and any combination is allowed.
+                  The tool supports exactly four recognition languages: Arabic, English, French, and Spanish. You select them with checkboxes before running OCR, and any combination is allowed.
                 </p>
                 <p>
                   <strong>Why These Three</strong><br />
@@ -379,7 +379,7 @@ export default function OcrPDFFAQ() {
                 </p>
                 <p>
                   <strong>Free Where It Usually Isn't</strong><br />
-                  Because OCR is computationally expensive, most online PDF services offer it only in paid plans, cap free users at a few pages, or stamp watermarks on output. BlendPDF's OCR — including the Arabic recognition that's genuinely hard to find elsewhere — is simply free: full documents up to the 50-page limit, all three languages, invisible-text-layer output, no branding added to your files.
+                  Because OCR is computationally expensive, most online PDF services offer it only in paid plans, cap free users at a few pages, or stamp watermarks on output. BlendPDF's OCR — including the Arabic recognition that's genuinely hard to find elsewhere — is simply free: full documents up to the 50-page limit, all four languages, invisible-text-layer output, no branding added to your files.
                 </p>
                 <p>
                   <strong>The One Honest Constraint: Rate Limiting</strong><br />

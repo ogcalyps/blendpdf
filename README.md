@@ -1,170 +1,186 @@
 # BlendPDF
 
-**PDF tools that treat Arabic as a first-class language.** 27 tools, fully
-bilingual English/Arabic with real RTL layout, and most of them run entirely
-in your browser — your files never leave the machine.
+Free PDF tools in English, French, Spanish and Arabic. This is the code behind
+[blendpdf.com](https://blendpdf.com).
 
-![BlendPDF](public/og-image.jpg)
+The part worth a look is the editor. You can open a PDF, change the Arabic
+text that is already in it, add new Arabic lines, and save. Letters join the
+way they should, numbers inside a right-to-left line still read left to
+right, the changed line keeps the document's own font when the file makes
+that possible, and the text you edited can still be searched and copied. All
+of it runs in the browser: the file is not uploaded for editing.
 
-Live at **[blendpdf.com](https://blendpdf.com)** · No sign-up, no watermarks,
-no upload for browser-side tools.
+![Editing an Arabic PDF in the browser: adding a line, changing an existing line, then searching the saved file](.github/readme/arabic-edit.gif)
 
-## Why this exists
+*Recorded on blendpdf.com: a new line typed with the Text tool, a surname changed with Edit existing text, then both words searched in the saved file with pdf.js.*
 
-The open-source PDF space is well served for English — [Stirling
-PDF](https://github.com/Stirling-Tools/Stirling-PDF) is excellent and you
-should use it if English is all you need.
+There is a longer write-up of how this works, and of what still fails, at
+[blendpdf.com/blog/editing-arabic-text-in-pdf](https://blendpdf.com/blog/editing-arabic-text-in-pdf).
 
-Arabic is a different story. Most PDF tooling breaks on it in ways that are
-easy to miss if you don't read the language: text renders unshaped
-(disconnected letterforms), bidirectional runs get reordered wrongly, RTL
-layouts are LTR layouts with `direction: rtl` bolted on, and OCR either isn't
-offered or is trained on Latin script. That's the gap this project exists to
-close.
+## Why Arabic is the hard part
 
-Concretely:
+A PDF stores glyphs, not letters. For Latin text that mostly doesn't matter.
+For Arabic it does:
 
-- **1,757 translated strings at full parity** across English and Arabic — not
-  a partial translation with English fallbacks
-- **Real RTL layout**, not mirrored CSS — including form fields, signature
-  placement, and page-order controls
-- **Arabic OCR** via Tesseract's `ara` traineddata, alongside English and French
-- **Hijri date handling** in form filling, with a test suite
-- **Arabic-native document templates** — NDA, employment contract, lease
+- **Shaping.** An Arabic letter has up to four shapes depending on whether it
+  joins the letter before it, the one after, both or neither. Lam followed by
+  alef becomes one glyph. New text has to be shaped into those glyphs before
+  it is written, and pdf-lib's `drawText` can't do it (no bidi, and it drops
+  every GPOS offset).
+- **Direction.** The line runs right to left, but numbers and Latin words in
+  it run left to right. That is the Unicode bidi algorithm, and it has to run
+  per line after the line breaks are known.
+- **Searchable text.** What makes a glyph searchable is its entry in the font's
+  ToUnicode map. Get it wrong and the page looks right but nobody can find
+  the word. Producers get it wrong too: Chrome writes Times New Roman's
+  reverse cmap into ToUnicode, so some Arabic letters come out named as their
+  Persian look-alikes (ی for ي, ھ for ه), and an Arabic search misses them.
+- **Editing in place.** Changing a line means taking the old glyphs out of the
+  page content without disturbing anything else, then drawing the new words
+  with glyphs that match the rest of the line. Usually the embedded font is a
+  subset that only has the glyphs the document already used.
 
-## Tools
+## What runs where
 
-**Organize** — merge · split · extract pages · delete pages · reorder ·
-rotate · crop · add page numbers
+If `pdf-lib`, `pdf.js` or PDFium (as WebAssembly) can do the job, it runs in
+the browser and the file stays on your machine. If it needs a native
+program, the file goes to the server, is processed there, and is not kept:
+routes that need temporary files delete their folder when they finish.
+Two server tools (images to PDF and form filling) only use pdf-lib and could
+move to the browser. That would make a good first PR.
 
-**Convert** — PDF↔Word · PDF↔Excel · PDF→images · PDF→text · PowerPoint→PDF ·
-images→PDF
+**In the browser:** edit text (Arabic and Latin), add text, images,
+signatures and stamps, merge, split, extract pages, delete pages, reorder,
+rotate, crop, watermark, page numbers, flatten, remove metadata, PDF to text,
+extract images.
 
-**Optimize** — compress · repair · flatten · remove metadata · extract images
+**On the server:** compress (Ghostscript), OCR (ocrmypdf and Tesseract, in
+Arabic, English and French), PDF to Word, PDF to Excel, PDF to images, PDF to
+PDF/A (checked with veraPDF), Word, Excel and PowerPoint to PDF (LibreOffice),
+images to PDF, password protect and unlock (qpdf), repair, and filling form
+fields.
 
-**Secure** — password-protect · unlock · sign (free signature placement)
+The workspace runs one save as a pipeline (`lib/workspace/save.ts`), so a
+single save can mix both: your edits are applied in the browser, then the
+result goes to the server only if you also asked for something like
+compression or a password.
 
-**Text** — OCR (Arabic, English, French)
+## How the Arabic editing works
 
-**Forms** — fill PDF forms · bilingual templates · batch fill from an
-editable grid
+The code is split by job. Each folder has a long comment at the top of its
+main files explaining the decisions.
 
-**Other** — watermark
+- `lib/pdf-text/` writes **new** text. bidi-js resolves direction (UAX #9),
+  fontkit shapes each run with the font's GSUB and GPOS tables, and every
+  glyph is placed with its own text matrix through pdf-lib. pdf-lib is pinned
+  to exactly 1.17.1 because this needs four of its internals; a test fails if
+  they move. A glyph that stands for several right-to-left characters (lam
+  alef) gets its ToUnicode entry reversed, because viewers flip RTL text back
+  to logical order after extracting it, including the inside of that entry.
+- `lib/edit-pdf/keep-font/` **changes** an existing line in its own font. It
+  reads every line the document draws in that font and records which glyph is
+  used for each letter in each joining form, plus kerning, mark offsets and
+  ligatures. A changed word is shaped into those glyphs. Words you didn't
+  touch are redrawn from their original glyphs at their original positions.
+- `lib/edit-pdf/keep-font/lookalike.ts` handles the case where the subset
+  doesn't have a glyph you typed. The line is redrawn in the closest bundled
+  font: Liberation Sans, Serif and Mono, Carlito, Caladea, Noto Sans Arabic or
+  Cairo, all self-hosted with their licences in `public/fonts/`. Amiri and
+  Noto Naskh Arabic are left out on purpose; the comment explains why.
+- `lib/edit-pdf/replace.ts` takes the old line out with PDFium. Every page it
+  rewrites is rendered before and after, and if anything outside the edited
+  lines changed, the page is refused instead of saved. That check is what
+  catches pages with text shadows or soft masks, which PDFium 2.15.1 drops when
+  it rewrites a page. The saved file is opened again to make sure no old glyph
+  is left on a replaced line.
+- `lib/edit-pdf/prefill.ts` reads a line back into the edit box in logical
+  order, glyph by glyph, and folds the Persian look-alike letters back to
+  Arabic when the line is Arabic.
 
-## Architecture
+## Running it
 
-The interesting design decision is the **browser-first split**.
-
-Anything that can be done with [`pdf-lib`](https://pdf-lib.js.org) or
-[`pdf.js`](https://mozilla.github.io/pdf.js/) runs client-side in a Web
-Worker — merging, splitting, rotating, watermarking, signing, metadata
-stripping, page manipulation. Those files are never uploaded anywhere. This
-isn't a privacy marketing line; there is no network round-trip in the code
-path.
-
-The remainder needs native binaries and therefore a server: OCR
-(`ocrmypdf`/`tesseract`), Office conversion (LibreOffice), aggressive
-compression (Ghostscript), and table extraction (`tabula`). Those live in
-`app/api/*` as Next.js route handlers that shell out to the binaries listed in
-`scripts/provision-server.sh`.
-
-```
-app/[locale]/          Localized pages — one directory per tool
-app/api/               Server-side route handlers (native-binary tools)
-components/            Shared UI
-lib/                   PDF pipeline, i18n helpers, FAQ content, AWS clients
-workers/               Web Worker entry for client-side processing
-messages/{en,ar}.json  All UI copy and FAQ content
-strapi/                Optional blog CMS (see below)
-scripts/               Build-time generators + server provisioning
-tests/                 Vitest suites
-```
-
-Stack: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind ·
-next-intl · Zustand · Vitest.
-
-## Quick start
-
-Requires Node 20+.
+Needs Node 22 (`.nvmrc`).
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-That's enough for every browser-side tool. Open http://localhost:3000 for
-English or http://localhost:3000/ar for Arabic.
+Open http://localhost:3000, or add /fr, /es or /ar for the other languages.
+Every browser tool works with nothing else installed.
 
-Copy `.env.example` to `.env.local` if you want to configure the optional
-integrations — none are required for local development, and the app degrades
-gracefully without them.
+The server tools shell out to native programs. On Debian or Ubuntu,
+`scripts/provision-server.sh` installs them: qpdf, Ghostscript, poppler,
+LibreOffice, ocrmypdf, Tesseract with Arabic and French data, a JRE, veraPDF,
+and the Python packages for PDF to Word and PDF to Excel. On macOS most of
+these are in Homebrew. A missing program only breaks the route that needs it.
 
-### Enabling the server-side tools
-
-The conversion, OCR, and compression routes shell out to native binaries. On
-Debian/Ubuntu:
-
-```bash
-bash scripts/provision-server.sh
-```
-
-That installs qpdf, Ghostscript, poppler-utils, LibreOffice, ocrmypdf,
-Tesseract (with Arabic and French language data), a JRE, and the Python
-packages (`pypdf`, `pdf2docx`, `tabula-py`). It is idempotent and verifies
-every binary at the end. On macOS the equivalents are available via Homebrew.
-
-A missing binary fails that one route; the rest of the app is unaffected, so
-you can develop against a partial install.
-
-### Optional: the blog CMS
-
-`strapi/` is a self-contained Strapi instance backing the blog. It is
-genuinely optional — if no CMS is reachable, blog routes render empty and the
-build still succeeds. To run it:
-
-```bash
-cd strapi && npm install && npm run develop
-```
-
-Then set `STRAPI_URL=http://localhost:1337` in `.env.local`.
+Optional settings (email delivery, analytics, Google Drive import) are listed
+in `.env.example`. None are needed to run the app.
 
 ## Tests
 
 ```bash
-npm test              # vitest
-npx tsc --noEmit      # type check
-npm run lint
+npx tsc --noEmit
+npm test
 ```
 
-## Adding a language
+These are the two gates CI runs, plus `npm audit` for critical advisories.
+The editor tests run real PDFs from `tests/fixtures/edit-pdf/`, including
+Arabic files printed by Chrome and LibreOffice. `npm run lint` is not a gate: the
+codebase has a backlog of old lint errors (see CONTRIBUTING).
 
-1. Copy `messages/en.json` to `messages/<locale>.json` and translate it.
-2. Add the locale to the list in `i18n/` and to `middleware.ts`.
-3. For an RTL language, add it to the RTL set so layout direction flips.
+## Layout
 
-Partial translations are fine — `next-intl` falls back to English per key, and
-the FAQ system uses `t.has()` gating so untranslated sections are omitted
-rather than shown in the wrong language.
+```
+app/[locale]/        pages, one folder per tool, plus guides and comparisons
+app/api/             server routes for the tools that need native programs
+components/          UI; components/workspace and components/edit-pdf are the editor
+lib/edit-pdf/        the editor: reading lines, replacing them, exporting
+lib/pdf-text/        bidi, shaping and glyph placement for new text
+lib/workspace/       the save pipeline shared by every workspace tool
+messages/            UI copy in en, fr, es and ar
+scripts/             provisioning and build-time generators
+tests/               Vitest suites and PDF fixtures
+```
 
-## Contributing
+Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind, next-intl,
+pdf-lib, pdf.js, PDFium via @embedpdf/pdfium, fontkit, bidi-js, Vitest.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Arabic and RTL fixes are the most
-valuable contributions here — if you read Arabic natively and something reads
-awkwardly or renders wrong, that's a bug worth filing even without a patch.
+## Languages
+
+The UI has 2,489 strings in each of English, French, Spanish and Arabic,
+with no missing keys. Arabic gets a real right-to-left layout, not mirrored CSS on an
+English page.
+
+To add a language, copy `messages/en.json` to `messages/<locale>.json`, add
+the locale to `i18n/routing.ts`, and if it is written right to left, to
+`localeDir` in `i18n.ts`. Persian, Urdu and Hebrew translations would be
+welcome.
 
 ## License
 
-**Dual-licensed, deliberately:**
+- **Code:** [GNU AGPL-3.0](LICENSE). Use it, change it, run it. If you run a
+  modified version as a service other people use, you have to offer them your
+  source too.
+- **Content:** [all rights reserved](CONTENT-LICENSE). That covers the UI
+  copy, FAQ answers, guides, comparison pages and their screenshots. It's the
+  part a scraper would lift to put up a clone of the site. If you want to use
+  some of it, open an issue and ask.
 
-- **Code** — [MIT](LICENSE). Fork it, ship it, sell it.
-- **Content** — [all rights reserved](CONTENT-LICENSE). The UI translations,
-  FAQ answers, and marketing copy are not covered by MIT.
+Copyright (c) 2026 ogcalyps.
 
-The reasoning is in [CONTENT-LICENSE](CONTENT-LICENSE): the code is meant to be
-reused, the hand-written bilingual copy isn't meant to be lifted wholesale into
-a duplicate site. Want to use the content? Open an issue and ask.
+## Name and logo
 
-## Security
+"BlendPDF" and the logo are not covered by either licence. A fork is welcome,
+but it needs its own name and logo, and it shouldn't present itself as
+BlendPDF or as affiliated with it.
 
-Found a vulnerability? See [SECURITY.md](SECURITY.md) — please don't open a
-public issue for it.
+## What's not in this repository
+
+The site's private back office (its analytics dashboards and the jobs behind
+them) and the deployment setup stay private. Nothing a visitor's browser
+loads depends on them, and the app runs without them.
+
+Contributions: [CONTRIBUTING.md](CONTRIBUTING.md). Security reports:
+[SECURITY.md](SECURITY.md), please not as a public issue.

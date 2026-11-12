@@ -14,6 +14,9 @@ export function generateCsvTemplate(fieldsDef: BatchFieldDef[], filename: string
     const csv = '\uFEFF' + headers.map(escapeCell).join(',') + '\r\n';
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    // Deliberately not downloadBlob: that fires GA4 file_download, which counts
+    // delivered results. This is a blank input template fetched before any work
+    // happens, so counting it would inflate batch-fill conversions.
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Cloud, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { trackFileUpload } from '@/lib/analytics';
 
 interface GoogleDrivePickerProps {
   onFilesSelected: (files: File[]) => void;
@@ -35,6 +36,10 @@ export function GoogleDrivePicker({
 
   // Load Google API scripts
   useEffect(() => {
+    // The button renders nothing when Drive is off (always, in production), so
+    // load nothing either: these two scripts held tool pages' first paint.
+    if (!isGoogleDriveEnabled) return;
+
     console.log('[GoogleDrive] Environment check:', {
       hasApiKey: !!apiKey,
       apiKeyPrefix: apiKey ? `${apiKey.substring(0, 10)}...` : 'MISSING',
@@ -157,7 +162,7 @@ export function GoogleDrivePicker({
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [apiKey, clientId, t]);
+  }, [apiKey, clientId, isGoogleDriveEnabled, t]);
 
   const handleGoogleDriveClick = useCallback(async () => {
     if (!apiKey || !clientId) {
@@ -296,6 +301,8 @@ export function GoogleDrivePicker({
             })
           );
 
+          // Tracked here rather than in each caller so no Drive path is missed
+          trackFileUpload(downloadedFiles, 'google_drive');
           onFilesSelected(downloadedFiles);
         } catch (err: any) {
           setError(err.message || t('downloadFailed'));

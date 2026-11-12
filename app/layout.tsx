@@ -1,8 +1,10 @@
 import { Inter, Cairo } from "next/font/google";
 import { getLocale } from "next-intl/server";
+import { localeDir } from "@/i18n";
 import "./globals.css";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { PageViewTracker } from "@/components/PageViewTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,7 +29,7 @@ export default async function RootLayout({
   // Resolve the locale server-side so crawlers and no-JS renders see
   // correct lang/dir (previously patched in via client-side script).
   const locale = await getLocale();
-  const dir = locale === 'ar' ? 'rtl' : 'ltr';
+  const dir = localeDir(locale);
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
@@ -43,6 +45,8 @@ export default async function RootLayout({
         <GoogleTagManager gtmId={gtmId} />
         {/* Google Analytics */}
         <GoogleAnalytics gaId={gaId} />
+        {/* First-party page views, for every visitor (lib/page-view.ts) */}
+        <PageViewTracker />
         {children}
       </body>
     </html>

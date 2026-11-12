@@ -6,7 +6,10 @@ import { randomUUID } from 'crypto';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { contentDisposition } from '@/lib/pdf-processor';
+import { inspectPdf } from '@/lib/pdf-validation';
 
 const execFileAsync = promisify(execFile);
 
@@ -168,16 +171,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Quick validation check by trying to see if it's a PDF structure
-    if (buffer.length < 5 || buffer.toString('utf8', 0, 5) !== '%PDF-') {
-      return NextResponse.json(
-        { error: "This file doesn't appear to be a valid PDF.", requestId },
-        { status: 400 }
-      );
+    // Shared front door. The magic-bytes check this replaced let a file that
+    // starts with %PDF- and is broken after that through to qpdf, which failed
+    // as a 500 instead of a 400.
+    const inspection = await inspectPdf(buffer);
+    if (!inspection.ok) {
+      const { errorCode, message, detail } = inspection.rejection;
+      logger.warn('[protect-pdf] Request rejected', { errorCode, ...detail }, requestId);
+      return NextResponse.json({ error: message, errorCode, requestId }, { status: 400 });
     }
 
     const fileSizeMB = (buffer.length / 1024 / 1024).toFixed(2);
-    logger.info('Protect PDF started', { fileSize: `${fileSizeMB}MB`, fileName: file.name }, requestId);
+    logger.info('Protect PDF started', { ...fileLogMeta(file) }, requestId);
 
     const protectedPdf = await protectPdfWithPassword(buffer, password, requestId);
 
@@ -190,7 +195,13 @@ export async function POST(request: NextRequest) {
     return new NextResponse(Buffer.from(protectedPdf), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${file.name.replace('.pdf', '_protected.pdf')}"`,
+        // Raw interpolation here was the Arabic-filename 500: a non-ASCII value
+        // makes the Response constructor throw ("Cannot convert argument to a
+        // ByteString"). contentDisposition emits an ASCII fallback plus RFC 5987.
+        'Content-Disposition': contentDisposition(
+          file.name.replace(/\.pdf$/i, '_protected.pdf'),
+          'protected.pdf'
+        ),
         'X-Request-ID': requestId,
       },
     });
@@ -206,10 +217,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    logger.error('Protect PDF failed', { error: error.message }, requestId);
+    logger.error('Protect PDF failed', { error: error?.message, stack: error?.stack }, requestId);
+    // Fixed copy only — the thrown message is internal detail (logged above).
     return NextResponse.json(
       {
-        error: error.message || 'Failed to protect PDF. Please try again.',
+        error: 'Failed to protect the PDF. Please try again.',
+        errorCode: 'PROCESSING_FAILED',
         requestId,
       },
       { status: 500 }

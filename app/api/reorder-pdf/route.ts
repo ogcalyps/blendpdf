@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { inspectPdf } from '@/lib/pdf-validation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -70,22 +71,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid page order format', requestId }, { status: 400 });
     }
 
-    // Load source PDF (ignoreEncryption so we can inspect it, then reject encrypted files cleanly)
+    // Shared front door: rejects non-PDFs, structurally broken files (which used
+    // to surface as a 500 carrying the raw pdf-lib message) and encrypted files.
     const arrayBuffer = await file.arrayBuffer();
-    const srcDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-
-    if (srcDoc.isEncrypted) {
-      return NextResponse.json(
-        {
-          error: 'This PDF is password-protected. Please use the Unlock PDF tool to remove the password first, then try again.',
-          errorCode: 'ENCRYPTED_PDF',
-          requestId,
-        },
-        { status: 400 }
-      );
+    const inspection = await inspectPdf(Buffer.from(arrayBuffer));
+    if (!inspection.ok) {
+      const { errorCode, message, detail } = inspection.rejection;
+      console.warn(`[${requestId}] Rejected: ${errorCode}`, detail ?? {});
+      return NextResponse.json({ error: message, errorCode, requestId }, { status: 400 });
     }
 
-    const totalPages = srcDoc.getPageCount();
+    const srcDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+    const totalPages = inspection.value.pageCount;
     for (const pageNum of pageOrder) {
       if (!Number.isInteger(pageNum) || pageNum < 1 || pageNum > totalPages) {
         return NextResponse.json(
@@ -116,8 +113,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error(`[${requestId}] Error reordering PDF:`, error);
+    // Fixed copy only: the thrown message is internal detail (it is logged above).
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to reorder PDF', requestId },
+      { error: 'Failed to reorder the PDF. Please try again.', errorCode: 'PROCESSING_FAILED', requestId },
       { status: 500 }
     );
   }

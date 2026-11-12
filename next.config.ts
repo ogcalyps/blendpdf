@@ -10,6 +10,20 @@ const nextConfig: NextConfig = {
   // Don't advertise the framework in response headers
   poweredByHeader: false,
 
+  // The app never uses next/image, so turn the optimizer off: /_next/image then
+  // 404s instead of exposing the endpoint behind GHSA-2xp9-vwfh-vxw4 and its SSRF siblings
+  images: { unoptimized: true },
+
+  // English lives at the root. next-intl's middleware strips a typed /en prefix
+  // with a temporary 307, which keeps /en/... copies in Google's index; these
+  // run before the middleware and say it permanently (308).
+  async redirects() {
+    return [
+      { source: '/en', destination: '/', permanent: true },
+      { source: '/en/:path*', destination: '/:path*', permanent: true },
+    ];
+  },
+
   async headers() {
     return [
       {
@@ -21,6 +35,25 @@ const nextConfig: NextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+      {
+        // Back-office job endpoints: never indexed, never cached
+        source: '/api/internal/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex' },
+          { key: 'Cache-Control', value: 'no-store' },
+        ],
+      },
+      // Back office: never indexed, cached, framed or leaked in a Referer.
+      // Listed after '/(.*)' so these values win where both set a header.
+      ...['/admin/:path*', '/api/admin/:path*'].map((source) => ({
+        source,
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+        ],
+      })),
     ];
   },
 

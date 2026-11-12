@@ -48,6 +48,13 @@ export async function getPdfJs() {
       // Set workerSrc to empty string before requiring pdfjs
       // This prevents pdfjs from trying to load a worker
       process.env.PDFJS_DISABLE_WORKER = '1';
+
+      // pdf.js paints gradients (shading patterns) with `new DOMMatrix()`,
+      // which Node lacks, so /api/pdf-to-images failed on any page with a
+      // gradient. node-canvas, which the pages are drawn on, ships one.
+      if (typeof globalThis.DOMMatrix === 'undefined') {
+        (globalThis as any).DOMMatrix = require('canvas').DOMMatrix;
+      }
     }
 
     // Use require for older version (CommonJS) - add type assertion
@@ -84,16 +91,43 @@ export async function getPdfJs() {
  * Make a filename safe for use in a Content-Disposition header.
  * HTTP header values must be ASCII; non-Latin filenames (e.g. Arabic) would
  * make NextResponse throw and turn the whole request into a 500.
+ *
+ * This is only the ASCII *fallback* half of the contract — pair it with an
+ * RFC 5987 `filename*=UTF-8''<encoded>` parameter so browsers still get the
+ * user's real name. Stripping alone turns "مستند-عربي.pdf" into "-.pdf".
+ *
  * @param name - Proposed filename (may contain non-ASCII characters)
  * @param fallback - Filename to use if nothing usable remains after sanitizing
  * @returns ASCII-only filename safe to embed in a quoted header value
  */
 export function toHeaderSafeFilename(name: string, fallback: string): string {
-  const safe = name.replace(/[^\x20-\x7E]/g, '').replace(/["\\]/g, '').trim();
-  if (!safe || safe.startsWith('.')) {
+  const stripped = name.replace(/[^\x20-\x7E]/g, '').replace(/["\\]/g, '').trim();
+  const ext = stripped.match(/\.[^.]*$/)?.[0] ?? '';
+  // Stripping a non-Latin name leaves the punctuation that surrounded it —
+  // "مستند-عربي_protected.pdf" becomes "-_protected.pdf". Trim those edges so
+  // the fallback reads like a filename rather than like a bug.
+  const stem = stripped
+    .slice(0, stripped.length - ext.length)
+    .replace(/^[^A-Za-z0-9]+/, '')
+    .replace(/[^A-Za-z0-9]+$/, '');
+  if (!stem) {
     return fallback;
   }
-  return safe;
+  return stem + ext;
+}
+
+/**
+ * Build a complete Content-Disposition value that survives a non-ASCII name.
+ *
+ * Emits both halves: a sanitized ASCII `filename=` for old clients and an
+ * RFC 5987 `filename*=` carrying the real UTF-8 name, which every current
+ * browser prefers. Use this instead of interpolating a filename directly —
+ * a raw non-ASCII value makes the Response constructor throw, which is how
+ * an Arabic upload turned into a 500.
+ */
+export function contentDisposition(name: string, fallback: string): string {
+  const ascii = toHeaderSafeFilename(name, fallback);
+  return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(name)}`;
 }
 
 /**

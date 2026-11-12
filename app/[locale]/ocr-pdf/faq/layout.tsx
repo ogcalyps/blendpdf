@@ -7,10 +7,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
   return {
     title: 'OCR PDF FAQ - Frequently Asked Questions | BlendPDF',
-    description: 'Frequently asked questions about making scanned PDFs searchable with OCR online. Learn about Arabic, English, and French OCR, accuracy, file limits, and privacy.',
+    description: 'Frequently asked questions about making scanned PDFs searchable with OCR online. Learn about Arabic, English, French, and Spanish OCR, accuracy, file limits, and privacy.',
     openGraph: {
       title: 'OCR PDF FAQ - Frequently Asked Questions | BlendPDF',
-      description: 'Frequently asked questions about making scanned PDFs searchable with OCR online. Learn about Arabic, English, and French OCR, accuracy, file limits, and privacy.',
+      description: 'Frequently asked questions about making scanned PDFs searchable with OCR online. Learn about Arabic, English, French, and Spanish OCR, accuracy, file limits, and privacy.',
       url: enUrl,
       siteName: 'BlendPDF',
       type: 'website',

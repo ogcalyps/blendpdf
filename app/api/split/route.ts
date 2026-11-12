@@ -4,6 +4,7 @@ import JSZip from 'jszip';
 import { splitPDF } from '@/lib/pdf-processor';
 import { parsePageRanges } from '@/lib/utils';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { inspectPdf } from '@/lib/pdf-validation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -66,20 +67,18 @@ export async function POST(request: NextRequest) {
     const buffer = await file.arrayBuffer();
     console.log(`[${requestId}] Splitting PDF: ${(buffer.byteLength / 1024 / 1024).toFixed(2)}MB, ranges: ${ranges}, mode: ${mode}`);
 
-    const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
-
-    if (pdf.isEncrypted) {
-      return NextResponse.json(
-        {
-          error: 'This PDF is password-protected. Please use the Unlock PDF tool to remove the password first, then try again.',
-          errorCode: 'ENCRYPTED_PDF',
-          requestId,
-        },
-        { status: 400 }
-      );
+    // Shared front door: a file that starts with %PDF- but is broken after that
+    // used to reach getPageCount() unguarded and come back as a 500 carrying the
+    // raw pdf-lib message.
+    const inspection = await inspectPdf(Buffer.from(buffer));
+    if (!inspection.ok) {
+      const { errorCode, message, detail } = inspection.rejection;
+      console.warn(`[${requestId}] Rejected: ${errorCode}`, detail ?? {});
+      return NextResponse.json({ error: message, errorCode, requestId }, { status: 400 });
     }
 
-    const pageCount = pdf.getPageCount();
+    const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+    const pageCount = inspection.value.pageCount;
     const pageIndices = parsePageRanges(ranges, pageCount);
 
     if (pageIndices.length === 0) {
@@ -170,15 +169,24 @@ export async function POST(request: NextRequest) {
       } else if (error.message.includes('corrupt') || error.message.includes('invalid')) {
         errorMessage = 'The PDF file is corrupted or invalid. Please check your file and try again.';
         statusCode = 400;
-      } else if (error.message.includes('out of range') || error.message.includes('Page index')) {
-        errorMessage = error.message; // Already user-friendly
+      } else if (
+        error.message.includes('out of range') ||
+        error.message.includes('Page index') ||
+        // parsePageRanges throws this for a range past the end of the document;
+        // it is bad input, not a server fault, and it used to 500.
+        error.message.includes('exceeds maximum pages')
+      ) {
+        // parsePageRanges writes these three messages for the user ("Page 5
+        // exceeds maximum pages (3)"); rewriting them generically would drop
+        // the only detail that helps.
+        errorMessage = error.message; // leak-guard: authored — from parsePageRanges, not an engine
         statusCode = 400;
       } else if (error.message.includes('memory') || error.message.includes('out of memory')) {
         errorMessage = 'File is too large to split. Please try with a smaller file.';
         statusCode = 413;
-      } else {
-        errorMessage = error.message;
       }
+      // No `else { errorMessage = error.message }`: an unrecognised failure is
+      // internal detail and is already logged above.
     }
     
     return NextResponse.json(

@@ -17,7 +17,7 @@ export default function PdfToTextFAQ() {
     },
     {
       question: 'Why is no text extracted from my scanned PDF?',
-      answer: 'Scanned PDFs are images of pages and have no text layer, so there is nothing for a text extractor to read. Those documents need OCR (optical character recognition). Use the BlendPDF OCR tool at /ocr-pdf, which recognizes Arabic, English, and French, then extract the text.'
+      answer: 'Scanned PDFs are images of pages and have no text layer, so there is nothing for a text extractor to read. Those documents need OCR (optical character recognition). Use the BlendPDF OCR tool at /ocr-pdf, which recognizes Arabic, English, French, and Spanish, then extract the text.'
     },
     {
       question: 'Can I copy the text instead of downloading it?',
@@ -165,7 +165,7 @@ export default function PdfToTextFAQ() {
                 </p>
                 <p>
                   <strong>The Solution: OCR</strong><br />
-                  Turning an image of text back into real characters requires OCR (optical character recognition). BlendPDF has a dedicated OCR tool at <a href="/ocr-pdf" className="text-blue-600 hover:text-blue-800">/ocr-pdf</a> that recognizes Arabic, English, and French. Run your scanned document through OCR to get a searchable PDF, and from there the text can be extracted, copied, and reused. Arabic OCR support is a first-class feature, which is rare among free tools.
+                  Turning an image of text back into real characters requires OCR (optical character recognition). BlendPDF has a dedicated OCR tool at <a href="/ocr-pdf" className="text-blue-600 hover:text-blue-800">/ocr-pdf</a> that recognizes Arabic, English, French, and Spanish. Run your scanned document through OCR to get a searchable PDF, and from there the text can be extracted, copied, and reused. Arabic OCR support is a first-class feature, which is rare among free tools.
                 </p>
                 <p>
                   <strong>How to Tell Which Kind of PDF You Have</strong><br />
@@ -244,7 +244,7 @@ export default function PdfToTextFAQ() {
                 </p>
                 <p>
                   <strong>Scanned Arabic Documents</strong><br />
-                  Scanned Arabic PDFs have no text layer at all, so use the OCR tool first. BlendPDF's OCR supports Arabic alongside English and French, making it a practical pipeline: OCR the scan, then extract, copy, or download the recognized text.
+                  Scanned Arabic PDFs have no text layer at all, so use the OCR tool first. BlendPDF's OCR supports Arabic alongside English, French, and Spanish, making it a practical pipeline: OCR the scan, then extract, copy, or download the recognized text.
                 </p>
               </div>
             </section>
@@ -437,7 +437,7 @@ export default function PdfToTextFAQ() {
                 </p>
                 <p>
                   <strong>"No text was found in this PDF"</strong><br />
-                  This means the document has no text layer — it's a scanned or image-only PDF. The fix is OCR: run the file through the BlendPDF <a href="/ocr-pdf" className="text-blue-600 hover:text-blue-800">OCR tool</a> (Arabic, English, and French are supported), then extract text from the OCR'd result. If only some pages come back empty, those specific pages are scans inside an otherwise digital document.
+                  This means the document has no text layer — it's a scanned or image-only PDF. The fix is OCR: run the file through the BlendPDF <a href="/ocr-pdf" className="text-blue-600 hover:text-blue-800">OCR tool</a> (Arabic, English, French, and Spanish are supported), then extract text from the OCR'd result. If only some pages come back empty, those specific pages are scans inside an otherwise digital document.
                 </p>
                 <p>
                   <strong>Password-Protected or Corrupted Files</strong><br />

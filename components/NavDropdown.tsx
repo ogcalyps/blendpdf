@@ -84,7 +84,7 @@ export function NavDropdown({ title, items }: NavDropdownProps) {
         onClick={() => setIsOpen((open) => !open)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 ${
+        className={`px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap ${
           isActive
             ? 'text-primary bg-orange-50'
             : 'text-gray-700 hover:text-primary hover:bg-orange-50'

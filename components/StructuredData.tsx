@@ -1,5 +1,7 @@
 'use client';
 
+import { CONTENT_UPDATED } from '@/lib/content-updated';
+
 interface StructuredDataProps {
   locale?: string;
 }
@@ -13,13 +15,15 @@ export function StructuredData({ locale = 'en' }: StructuredDataProps) {
     name: 'BlendPDF',
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
-    description: locale === 'ar' 
-      ? 'أدوات PDF مجانية على الإنترنت. دمج، ضغط، تقسيم ملفات PDF.'
-      : 'Free online PDF tools. Merge, compress, split PDFs.',
+    description: {
+      ar: 'أدوات PDF مجانية على الإنترنت. دمج، ضغط، تقسيم ملفات PDF.',
+      fr: 'Outils PDF gratuits en ligne. Fusionner, compresser, diviser des PDF.',
+      es: 'Herramientas PDF gratuitas en línea. Unir, comprimir y dividir archivos PDF.',
+    }[locale] ?? 'Free online PDF tools. Merge, compress, split PDFs.',
+    // Profiles that confirm who BlendPDF is, for search engines and AI assistants.
     sameAs: [
-      // Add your social media links
-      // 'https://twitter.com/blendpdf',
-      // 'https://facebook.com/blendpdf',
+      'https://www.trustpilot.com/review/blendpdf.com',
+      'https://chromewebstore.google.com/detail/open-in-blendpdf-%E2%80%94-pdf-to/jbbdcpldbfagoegkmjohpemggmbamklb',
     ],
   };
   
@@ -38,19 +42,22 @@ export function StructuredData({ locale = 'en' }: StructuredDataProps) {
     name: 'BlendPDF',
     applicationCategory: 'UtilityApplication',
     operatingSystem: 'Web',
+    dateModified: CONTENT_UPDATED.toISOString().slice(0, 10),
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
     },
-    description: locale === 'ar'
-      ? 'أدوات PDF مجانية على الإنترنت. دمج، ضغط، تقسيم ملفات PDF بدون تسجيل.'
-      : 'Free online PDF tools. Merge, compress, split PDFs without sign-up.',
-    featureList: [
-      locale === 'ar' ? 'دمج ملفات PDF' : 'Merge PDFs',
-      locale === 'ar' ? 'ضغط PDF' : 'Compress PDF',
-      locale === 'ar' ? 'تقسيم PDF' : 'Split PDF',
-    ],
+    description: {
+      ar: 'أدوات PDF مجانية على الإنترنت. دمج، ضغط، تقسيم ملفات PDF بدون تسجيل.',
+      fr: 'Outils PDF gratuits en ligne. Fusionner, compresser, diviser des PDF sans inscription.',
+      es: 'Herramientas PDF gratuitas en línea. Unir, comprimir y dividir archivos PDF sin registrarse.',
+    }[locale] ?? 'Free online PDF tools. Merge, compress, split PDFs without sign-up.',
+    featureList: {
+      ar: ['دمج ملفات PDF', 'ضغط PDF', 'تقسيم PDF'],
+      fr: ['Fusionner des PDF', 'Compresser un PDF', 'Diviser un PDF'],
+      es: ['Unir PDF', 'Comprimir PDF', 'Dividir PDF'],
+    }[locale] ?? ['Merge PDFs', 'Compress PDF', 'Split PDF'],
   };
   
   return (

@@ -23,7 +23,7 @@ export default function PDFToExcelFAQ() {
     },
     {
       question: 'Is it safe to upload financial documents?',
-      answer: 'Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We use Google Analytics for aggregate, anonymous usage measurement only.'
+      answer: 'Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents.'
     },
     {
       question: 'What happens if my PDF has multiple tables?',

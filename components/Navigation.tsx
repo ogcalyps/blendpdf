@@ -16,7 +16,8 @@ export function Navigation() {
 
   return (
     <nav className="bg-white/80 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+      {/* Four languages fit at 1024 px only with the narrower padding below xl */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 xl:px-8">
         <div className="flex justify-between items-center h-16 min-w-0">
           {/* Logo (left) */}
           <Link href="/" className="no-underline flex-shrink-0 min-w-0">
@@ -32,15 +33,9 @@ export function Navigation() {
             <NavDropdown title={t('nav.edit')} items={getEditTools(t)} />
             <Link
               href="/forms"
-              className="px-3 py-2 text-gray-700 hover:text-primary font-medium transition-colors rounded-lg hover:bg-orange-50"
+              className="px-3 py-2 text-gray-700 hover:text-primary font-medium transition-colors rounded-lg hover:bg-orange-50 whitespace-nowrap"
             >
               {t('nav.formTemplates')}
-            </Link>
-            <Link
-              href="/blog"
-              className="px-3 py-2 text-gray-700 hover:text-primary font-medium transition-colors rounded-lg hover:bg-orange-50"
-            >
-              {t('nav.blog')}
             </Link>
           </div>
 

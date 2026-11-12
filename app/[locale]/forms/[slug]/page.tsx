@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { formDefinitions, w9Template, ndaTemplate, i9Template, leaseTemplate, patientIntakeTemplate } from '@/lib/form-templates-data';
 import { bilingualFormDefinitions, ndaBilingualTemplate, employmentBilingualTemplate, leaseBilingualTemplate } from '@/lib/form-templates-bilingual-data';
 import { BatchFillUploader } from '@/components/forms/BatchFillUploader';
@@ -123,6 +123,8 @@ export async function generateMetadata({ params, searchParams }: any): Promise<M
                 canonical: isAr ? arUrl : enUrl,
                 languages: { en: enUrl, ar: arUrl },
             },
+            // No copy in other languages: /fr or /es shows the English page, so keep it out of the index
+            ...(locale !== 'en' && locale !== 'ar' ? { robots: { index: false, follow: true } } : {}),
         };
     }
 
@@ -133,8 +135,8 @@ export async function generateMetadata({ params, searchParams }: any): Promise<M
             // The forms library is English-only content: canonicalize every locale to the EN URL
             canonical: `https://blendpdf.com/forms/${slug}`
         },
-        // English-only content served under /ar would read as thin duplicates to Google: noindex it
-        ...(locale === 'ar' ? { robots: { index: false, follow: true } } : {}),
+        // English-only content served under /ar, /fr or /es would read as thin duplicates to Google: noindex it
+        ...(locale !== 'en' ? { robots: { index: false, follow: true } } : {}),
     };
 }
 
@@ -216,7 +218,7 @@ export default async function FormDetailPage({ params, searchParams }: any) {
 
                 {/* Top Header & Breadcrumbs */}
                 <div className="mb-8">
-                    <Link href={`/${locale}/forms`} className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4 inline-block">
+                    <Link href="/forms" className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4 inline-block">
                         &larr; Back to Forms Library
                     </Link>
                     <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
@@ -230,14 +232,14 @@ export default async function FormDetailPage({ params, searchParams }: any) {
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 mb-8">
                     <Link
-                        href={`/${locale}/forms/${slug}?mode=single`}
+                        href={`/forms/${slug}`}
                         replace
                         className={`px-6 py-4 font-semibold text-lg border-b-2 transition-colors ${mode === 'single' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
                     >
                         Single Fill
                     </Link>
                     <Link
-                        href={`/${locale}/forms/${slug}?mode=batch`}
+                        href={`/forms/${slug}?mode=batch`}
                         replace
                         className={`px-6 py-4 font-semibold text-lg border-b-2 transition-colors ${mode === 'batch' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
                     >
@@ -305,11 +307,11 @@ export default async function FormDetailPage({ params, searchParams }: any) {
                 <div className="border border-gray-200 rounded-3xl p-8 bg-white shadow-sm">
                     <h2 className="text-xl font-bold mb-4 text-gray-900">You might also need:</h2>
                     <div className="flex flex-wrap gap-4">
+                        {/* Every other template, so each one is a link away from all the rest */}
                         {Object.entries(slugMap)
                             .filter(([s]) => s !== slug)
-                            .slice(0, 3)
                             .map(([s, c]) => (
-                                <Link key={s} href={`/${locale}/forms/${s}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                                <Link key={s} href={`/forms/${s}`} className="text-blue-600 hover:text-blue-800 font-medium">
                                     {c.name} template
                                 </Link>
                             ))}

@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'استخرج النص من ملفات PDF وانسخه مجاناً داخل متصفحك مباشرة. ملفك لا يغادر جهازك أبداً. بدون رفع، بدون تسجيل، ونتائج فورية.',
       keywords: 'تحويل pdf إلى نص، استخراج النص من pdf، نسخ النص من pdf، pdf إلى txt، محول pdf إلى نص مجاناً',
     },
+    fr: {
+      title: 'Convertir un PDF en texte - extraire le texte d’un PDF gratuitement | BlendPDF',
+      description:
+        'Extrayez et copiez gratuitement le texte d’un PDF, directement dans votre navigateur. Votre fichier ne quitte pas votre appareil : aucun envoi, aucune inscription, résultat immédiat.',
+      keywords:
+        'pdf en texte, extraire texte pdf, copier texte pdf, pdf en txt, extracteur texte pdf, convertir pdf en texte gratuit',
+    },
+    es: {
+      title: 'PDF a texto gratis: extraer y copiar el texto de un PDF | BlendPDF',
+      description:
+        'Extraiga y copie gratis el texto de un PDF, directamente en su navegador. Su archivo no sale de su dispositivo: sin subir nada, sin registro y al instante.',
+      keywords:
+        'pdf a texto, extraer texto de un pdf, copiar texto de un pdf, pdf a txt, sacar el texto de un pdf, convertir pdf a texto online gratis',
+    },
   };
 
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/pdf-to-text`,
-        'ar': `${baseUrl}/ar/pdf-to-text`,
-        'x-default': `${baseUrl}/pdf-to-text`,
-      },
+      languages: languageAlternates(baseUrl, '/pdf-to-text'),
     },
   };
 }
@@ -55,5 +67,5 @@ export default function PdfToTextLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="pdfToText">{children}</PageMessages>;
 }

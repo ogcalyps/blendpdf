@@ -7,6 +7,7 @@ import { ndaTemplate, formDefinitions } from '@/lib/form-templates-data';
 import { Loader2, ArrowRight, ArrowLeft, Shield, Users, Calendar, PenTool, CheckCircle2, Download } from 'lucide-react';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 const STEPS = [
@@ -18,6 +19,7 @@ const STEPS = [
 ];
 
 export function NDAForm() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('nda_form', {
         ndaType: 'Mutual',
         disclosingPartyName: '',
@@ -109,6 +111,7 @@ export function NDAForm() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'NDA_Completed.pdf');
+        markSuccess();
         clearPersistedData();
         setCurrentStep(1);
         setPreviewFile(null);
@@ -388,6 +391,7 @@ export function NDAForm() {
                     </button>
                 )}
             </div>
+            {reviewAsk}
         </div>
     );
 }

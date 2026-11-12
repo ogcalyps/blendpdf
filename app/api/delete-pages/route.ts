@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deletePages } from '@/lib/pdf-processor';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { inspectPdf, pdfRejectionResponse } from '@/lib/pdf-validation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -68,6 +69,12 @@ export async function POST(request: NextRequest) {
 
     const arrayBuffer = await file.arrayBuffer();
 
+    const inspection = await inspectPdf(Buffer.from(arrayBuffer));
+    if (!inspection.ok) {
+      console.warn(`[${requestId}] Rejected: ${inspection.rejection.errorCode}`, inspection.rejection.detail ?? {});
+      return pdfRejectionResponse(inspection.rejection, requestId);
+    }
+
     const pdfBytes = await deletePages(arrayBuffer, pagesToDelete);
 
     return new NextResponse(Buffer.from(pdfBytes), {
@@ -80,7 +87,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error(`[${requestId}] Error deleting pages:`, error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to delete pages', requestId },
+      { error: 'Failed to delete those pages. Please try again.', errorCode: 'DELETE_PAGES_FAILED', requestId },
       { status: 500 }
     );
   }

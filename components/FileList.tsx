@@ -8,7 +8,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useFileStore } from '@/store/use-file-store';
 import { PDFCard } from './PDFCard';
 import { AddMoreCard } from './AddMoreCard';
-import { useDropzone } from 'react-dropzone';
+import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { validateFile, formatFileSize } from '@/lib/utils';
 import { X } from 'lucide-react';
 import type { UploadedFile } from '@/types';
@@ -131,7 +131,7 @@ export function FileList({
     }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useTrackedDropzone({
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],

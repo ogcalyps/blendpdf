@@ -6,6 +6,7 @@ import { fillPdfForm } from '@/lib/pdf-generation';
 import { Loader2, ArrowRight, ArrowLeft, Users, Home, Banknote, Scale, PenTool, CheckCircle2, Download } from 'lucide-react';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 interface BilingualOptionLabel {
@@ -69,6 +70,7 @@ const REQUIRED_FIELDS: Record<string, boolean> = {
 };
 
 export function LeaseBilingualForm() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('lease-bilingual', INITIAL_DATA, {
         // Never persist signature data to localStorage
         excludeKeys: ['landlordSignature', 'tenantSignature']
@@ -172,6 +174,7 @@ export function LeaseBilingualForm() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'Bilingual_Lease_Agreement_Completed.pdf');
+        markSuccess();
         clearPersistedData();
         setCurrentStep(1);
         setPreviewFile(null);
@@ -407,6 +410,7 @@ export function LeaseBilingualForm() {
                     </button>
                 )}
             </div>
+            {reviewAsk}
         </div>
     );
 }

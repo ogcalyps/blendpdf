@@ -29,6 +29,12 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
+  // The back office is English-only and outside next-intl's routing: never rewrite or prefix it.
+  const { pathname } = request.nextUrl;
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return NextResponse.next();
+  }
+
   // Handle the internationalization middleware
   return intlMiddleware(request);
 }

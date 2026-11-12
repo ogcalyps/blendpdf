@@ -47,7 +47,7 @@ export default function WatermarkPDFFAQ() {
     },
     {
       question: 'Is it safe to watermark confidential documents online?',
-      answer: 'Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share document contents, and no account is needed. We collect only aggregate, anonymous usage analytics via Google Analytics — never your documents.'
+      answer: 'Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share document contents, and no account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents.'
     },
     {
       question: 'Can I watermark a password-protected PDF?',

@@ -1,129 +1,54 @@
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useCallback, useState } from 'react';
+import type { FileDeliveryModalProps } from '@/components/FileDeliveryModal';
+import type { DeliveryOutcome } from '@/hooks/useFileDelivery';
 
-/** Files above this size must be downloaded directly — emailing them as base64 JSON is not viable. */
-export const MAX_EMAIL_FILE_SIZE = 15 * 1024 * 1024; // 15MB
-
-/**
- * Convert a Blob to base64 using chunked conversion (0x8000-byte slices).
- * Avoids the O(n^2) string concatenation of byte-by-byte reduce, which
- * freezes the tab on large files.
- */
-export async function blobToBase64(blob: Blob): Promise<string> {
-  const bytes = new Uint8Array(await blob.arrayBuffer());
-  const CHUNK_SIZE = 0x8000;
-  const chunks: string[] = [];
-  for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
-    chunks.push(String.fromCharCode(...Array.from(bytes.subarray(i, i + CHUNK_SIZE))));
-  }
-  return btoa(chunks.join(''));
-}
+export { MAX_EMAIL_FILE_SIZE, blobToBase64 } from '@/lib/send-file-by-email';
 
 interface UseDeliveryChoiceOptions {
   fileBlob: Blob | null;
   filename: string;
-  onDownload: () => void;
+  /** Saves the file under the name from the panel (the visitor may have changed it). */
+  onDownload: (filename: string) => void;
+  /** Clears the page's result; runs only after the file went out by email. */
   onReset?: () => void;
+  /**
+   * For pages that never show the result themselves: after Close or Escape, keep a
+   * small "Your file is ready" bar up so the file isn't lost (a re-run can mean a
+   * server round trip).
+   */
+  offerReopen?: boolean;
 }
 
-export function useDeliveryChoice({ fileBlob, filename, onDownload, onReset }: UseDeliveryChoiceOptions) {
-  const t = useTranslations('emailDelivery');
-  const [showEmailCapture, setShowEmailCapture] = useState(false);
-  const [showDeliveryChoice, setShowDeliveryChoice] = useState(false);
-  const [capturedEmail, setCapturedEmail] = useState<string>('');
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
-  const [successType, setSuccessType] = useState<'email' | 'download' | null>(null);
+/**
+ * Opens the single "Your file is ready" step (FileDeliveryModal) for a tool page:
+ *   const { openDelivery, deliveryModalProps } = useDeliveryChoice({ ... });
+ *   <FileDeliveryModal {...deliveryModalProps} />
+ */
+export function useDeliveryChoice({ fileBlob, filename, onDownload, onReset, offerReopen = false }: UseDeliveryChoiceOptions) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [parked, setParked] = useState(false);
 
-  // Skip path: user declined to share an email — download directly, no email involved
-  const handleSkipEmail = () => {
-    setShowEmailCapture(false);
-    setShowDeliveryChoice(false);
-    onDownload();
+  const openDelivery = useCallback(() => {
+    setParked(false);
+    setIsOpen(true);
+  }, []);
+
+  const onClose = (outcome: DeliveryOutcome | null) => {
+    setIsOpen(false);
+    setParked(offerReopen && outcome === null);
+    // A downloader may want the file again, so only an emailed result clears the page
+    if (outcome === 'email') onReset?.();
   };
 
-  const handleEmailCaptured = (email: string) => {
-    if (!email) {
-      // Legacy callers signal a skip with an empty email
-      handleSkipEmail();
-      return;
-    }
-    setCapturedEmail(email);
-    setShowEmailCapture(false);
-    setShowDeliveryChoice(true);
+  const deliveryModalProps: FileDeliveryModalProps = {
+    isOpen,
+    fileBlob,
+    filename,
+    onDownload,
+    onClose,
+    parked,
+    onReopen: openDelivery,
   };
 
-  const handleSendViaEmail = async () => {
-    if (!fileBlob || !capturedEmail) return;
-
-    // Refuse email delivery for large files — direct download is the only sane path
-    if (fileBlob.size > MAX_EMAIL_FILE_SIZE) {
-      alert(t('tooLarge'));
-      return;
-    }
-
-    setIsSendingEmail(true);
-
-    try {
-      const base64 = await blobToBase64(fileBlob);
-
-      const response = await fetch('/api/send-file-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: capturedEmail,
-          filename,
-          fileData: base64,
-          fileType: fileBlob.type || 'application/pdf',
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || t('sendFailed'));
-      }
-
-      setIsSendingEmail(false);
-      setSuccessType('email');
-
-      setTimeout(() => {
-        setSuccessType(null);
-        setShowDeliveryChoice(false);
-        if (onReset) onReset();
-      }, 3000);
-    } catch (error: any) {
-      setIsSendingEmail(false);
-      alert(error.message || t('sendFailed'));
-    }
-  };
-
-  const handleDownloadDirectly = () => {
-    onDownload();
-    setSuccessType('download');
-    setTimeout(() => {
-      setSuccessType(null);
-      setShowDeliveryChoice(false);
-    }, 3000);
-  };
-
-  const triggerEmailCapture = () => {
-    setShowEmailCapture(true);
-  };
-
-  const closeDeliveryChoice = () => {
-    setShowDeliveryChoice(false);
-  };
-
-  return {
-    showEmailCapture,
-    showDeliveryChoice,
-    capturedEmail,
-    isSendingEmail,
-    successType,
-    handleEmailCaptured,
-    handleSendViaEmail,
-    handleDownloadDirectly,
-    handleSkipEmail,
-    closeDeliveryChoice,
-    triggerEmailCapture,
-  };
+  return { openDelivery, deliveryModalProps };
 }

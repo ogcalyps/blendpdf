@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
         }
       } catch (embedError) {
         logger.warn('Failed to embed image', {
-          fileName: imageFile.name,
+          ...fileLogMeta(imageFile),
           error: embedError instanceof Error ? embedError.message : 'Unknown error',
         }, requestId);
         skippedFiles.push(imageFile.name || `image_${i}`);
@@ -163,7 +164,7 @@ export async function POST(request: NextRequest) {
       error: error instanceof Error ? error.message : 'Unknown error',
     }, requestId);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to convert images', requestId },
+      { error: 'Failed to convert those images to a PDF. Please try again.', errorCode: 'CONVERSION_FAILED', requestId },
       { status: 500 }
     );
   }

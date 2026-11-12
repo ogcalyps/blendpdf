@@ -1,7 +1,6 @@
 {
   "nav": {
     "logo": "BlendPDF",
-    "blog": "Blog",
     "organize": "Organize",
     "convert": "Convert",
     "optimize": "Optimize",
@@ -76,6 +75,10 @@
         "title": "Sign PDF",
         "description": "Electronic signatures"
       },
+      "editPdf": {
+        "title": "Edit PDF",
+        "description": "Add text, images, signatures and shapes"
+      },
       "batchFill": {
         "title": "Batch Fill Forms",
         "description": "Fill many forms from a spreadsheet"
@@ -115,11 +118,16 @@
       "ocrPdf": {
         "title": "OCR PDF",
         "description": "Make scanned PDFs searchable"
+      },
+      "pdfToPdfa": {
+        "title": "PDF to PDF/A",
+        "description": "Archive-ready PDF, checked by veraPDF"
       }
     },
     "formTemplates": "Form Templates",
     "toggleMenu": "Toggle menu",
-    "menuItems": "{title} menu items"
+    "menuItems": "{title} menu items",
+    "language": "Language"
   },
   "hero": {
     "title": "Free PDF tools that work in every language",
@@ -128,7 +136,16 @@
     "uploadSubtitle": "or click to browse",
     "chooseFile": "Choose File",
     "fileInfo": "Max 50MB • Files deleted within 1 hour",
-    "cta": "Browse all tools"
+    "cta": "Browse all tools",
+    "mostUsed": "Most used",
+    "start": {
+      "title": "Drop a PDF to start",
+      "subtitle": "Edit, crop, split, sign or convert it, all in one place.",
+      "choose": "Choose a file",
+      "formats": "Also takes Word, PowerPoint, Excel and image files.",
+      "unsupported": "That file type isn't supported. Use a PDF, Word, PowerPoint, Excel or image file.",
+      "oneFile": "Start with one file here. To combine several PDFs, use <link>Merge PDF</link>."
+    }
   },
   "technical": {
     "title": "Handles complex scripts correctly",
@@ -156,7 +173,6 @@
   },
   "footer": {
     "builtBy": "Built by",
-    "blog": "Blog",
     "contact": "Contact",
     "madeIn": "Made in Barcelona",
     "privacy": "Privacy Policy",
@@ -165,20 +181,10 @@
     "legal": "Legal",
     "reviews": "Reviews",
     "copyright": "© 2026 BlendPDF — Free online PDF tools.",
-    "readReviews": "Read reviews on Trustpilot"
-  },
-  "blog": {
-    "title": "Blog",
-    "subtitle": "Tips, guides, and updates about PDF tools and productivity.",
-    "backToHome": "Back to home",
-    "minRead": "min read",
-    "loadMore": "Load more",
-    "noPosts": "No posts yet. Check back soon!",
-    "meta": {
-      "title": "Blog | BlendPDF – PDF Tips & Guides",
-      "description": "Read our blog for tips on merging, compressing, and converting PDFs. Free guides and product updates from BlendPDF."
-    },
-    "breadcrumb": "Breadcrumb"
+    "readReviews": "Read reviews on Trustpilot",
+    "compare": "BlendPDF vs other editors",
+    "uploadLimits": "PDF upload limits by portal",
+    "guides": "How-to guides"
   },
   "privacy": {
     "title": "Privacy Policy | BlendPDF",
@@ -187,11 +193,15 @@
     "intro": "BlendPDF (\"we\", \"our\") respects your privacy. This policy describes what data we collect when you use our PDF tools and how we use it.",
     "dataWeCollect": {
       "title": "Data we collect",
-      "body": "When you use our site we may collect: (1) Files you upload—processed in memory and deleted within 1 hour; (2) Usage data—e.g. device type, IP, pages visited; (3) If you use Google Drive: access to files you select, only to run the tool you chose; (4) Email address—if you choose to subscribe, we collect your email to send updates, tips, and Trustpilot review requests. You can unsubscribe at any time. We do not sell your data."
+      "body": "When you use our site we may collect: (1) Files you upload—processed in memory and deleted within 1 hour; (2) Usage data—e.g. device type, IP, pages visited; (3) If you use Google Drive: access to files you select, only to run the tool you chose; (4) Email address—if you choose to subscribe, we collect your email to send updates, tips, and Trustpilot review requests. You can unsubscribe at any time; (5) If you ask us to email you a file, we also pass your email address (never the file) to Trustpilot, which may send you an email asking for a review. We do not sell your data."
     },
     "cookies": {
       "title": "Cookies and storage",
-      "body": "We use essential cookies and local storage for session state (e.g. language preference, tool state). We may use analytics cookies to improve the service. You can control cookies via your browser."
+      "body": "We use essential cookies and local storage for session state (e.g. language preference, tool state). Google Analytics cookies are set only if you choose Accept on the cookie banner. You can control cookies via your browser."
+    },
+    "runCounter": {
+      "title": "Anonymous usage counts",
+      "body": "So we can see how people use BlendPDF and where it gets in their way, our pages send our server short anonymous messages about what happens on them: the page you opened, the site that sent you here, your type of device (phone, tablet or computer), your choice on the cookie banner, the tool you picked, whether a file was opened, saved, downloaded or emailed, and whether the tool worked. They carry no file, file name, text you typed, cookie or stored ID. A random code kept in the page's memory links the messages from one tab, and it disappears when you refresh or close the page. Like every request to our site, they appear in our server logs with your IP address for a limited time (see Retention and deletion), and what we keep from those logs is daily totals. They are sent whatever you choose on the cookie banner: that choice only turns Google Analytics cookies on or off."
     },
     "googleDrive": {
       "title": "Google Drive",
@@ -217,7 +227,7 @@
     "intro": "By using BlendPDF (\"the service\") you agree to these terms. If you do not agree, do not use the service.",
     "useOfService": {
       "title": "Use of the service",
-      "body": "BlendPDF provides online PDF tools (merge, compress, convert, etc.) for personal and lawful use. You must not use the service for illegal purposes, to infringe others' rights, or to upload malicious content. We may suspend or terminate access for abuse."
+      "body": "BlendPDF provides online PDF tools (merge, compress, convert, etc.) for any lawful use, personal or professional, including at work, in a business, an association or a public administration. You must not use the service for illegal purposes, to infringe others' rights, or to upload malicious content. We may suspend or terminate access for abuse."
     },
     "disclaimer": {
       "title": "Disclaimer",
@@ -239,45 +249,46 @@
   "processing": {
     "uploading": "Uploading...",
     "processing": "Processing...",
-    "downloading": "Downloading...",
-    "preparingDownload": "Preparing your file...",
-    "success": "Success!",
     "error": "Error",
-    "download": "Download",
-    "fileDownloaded": "File downloaded",
-    "downloadComplete": "Download Complete!",
-    "readyToDownload": "Your file is ready! Click download to save it.",
     "close": "Close",
-    "retry": "Retry",
-    "emailMeCopy": "Email me a copy"
+    "retry": "Retry"
   },
-  "emailCapture": {
+  "fileDelivery": {
     "title": "Your file is ready",
-    "description": "Enter your email to get the file in your inbox — or download it directly.",
-    "emailLabel": "Email address",
+    "download": "Download",
+    "share": "Send on WhatsApp or another app",
+    "nameLabel": "File name",
+    "orEmail": "Or we can email it to you",
     "emailPlaceholder": "name@example.com",
-    "consent": "I agree to receive emails. I can unsubscribe at any time.",
-    "submit": "Continue",
-    "submitting": "Processing...",
-    "success": "Thank you!",
-    "successMessage": "Your download will start shortly.",
-    "invalidEmail": "Please enter a valid email address",
-    "submitError": "Something went wrong. Please try again.",
-    "privacyNote": "We respect your privacy. Unsubscribe anytime.",
-    "skipDownload": "No thanks, just download my file",
-    "close": "Close"
+    "consent": "I agree to receive emails from BlendPDF. I can unsubscribe at any time.",
+    "send": "Send",
+    "sending": "Sending…",
+    "invalidEmail": "Enter a valid email address.",
+    "sentTitle": "We sent your file",
+    "sentTo": "It's on its way to {email}.",
+    "spamHint": "Check your inbox. If it isn't there, look in your spam folder.",
+    "failed": "We couldn't email your file, but you can download it above.",
+    "tooLarge": "This file is too big to email, but you can download it directly.",
+    "downloadedTitle": "Download complete",
+    "downloadedBody": "The file is on your device.",
+    "nextPerson": "Fill it again for someone else",
+    "nextPersonHint": "Your text boxes stay in place, emptied. Signatures are removed.",
+    "close": "Close",
+    "reopen": "Download or email"
   },
-  "deliveryChoice": {
-    "title": "How would you like to receive your file?",
-    "description": "We can send it to {email} or you can download it directly.",
-    "sendViaEmail": "Send to My Email",
-    "downloadDirectly": "Download Now",
-    "sending": "Sending...",
-    "note": "The file will be sent to your email inbox. Check your spam folder if you don't see it.",
-    "successTitle": "Email Sent Successfully!",
-    "successDescription": "The file has been sent to {email}. Please check your inbox.",
-    "downloadSuccessTitle": "Download Started!",
-    "downloadSuccessDescription": "Your file is being downloaded. Check your downloads folder."
+  "keepWorking": {
+    "title": "Keep working on this file",
+    "hint": "Opens the tool with this file already loaded.",
+    "allTools": "All tools ({count})",
+    "fewerTools": "Fewer tools"
+  },
+  "reviewPrompt": {
+    "title": "How did BlendPDF work for you?",
+    "body": "Good or bad, an honest review on Trustpilot helps other people decide.",
+    "cta": "Write a review on Trustpilot",
+    "alreadyReviewed": "I already left a review",
+    "done": "Done",
+    "opensInNewTab": "(opens in a new tab)"
   },
   "fileList": {
     "title": "Uploaded Files",
@@ -305,6 +316,9 @@
   "compressPdf": {
     "title": "Compress PDF Files Online",
     "description": "Reduce PDF file size dramatically while maintaining quality. Free and fast.",
+    "answer": "Upload a PDF, pick a quality level or a size limit like 1MB, and download the smaller file. Typed text stays sharp, because only pictures and scans are shrunk. Free, no sign-up, no watermark, up to 50MB.",
+    "howToTitle": "How to compress a PDF",
+    "toSize": "Need it under a set size?",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
@@ -411,6 +425,8 @@
   "protectPdf": {
     "title": "Protect PDF with Password Online",
     "description": "Add password protection to your PDF files. Secure your documents with encryption. Free and no sign-up.",
+    "answer": "Upload a PDF, type a password, and download a copy that only opens with it, encrypted with AES-256. Free, no sign-up, no watermark, up to 50MB.",
+    "howToTitle": "How to password-protect a PDF",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
@@ -584,7 +600,7 @@
       },
       "safeUploadDocument": {
         "question": "Is it safe to upload my document?",
-        "answer": "Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share document contents, and no account is needed. We collect only aggregate, anonymous usage analytics via Google Analytics — never your documents."
+        "answer": "Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share document contents, and no account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "addPageNumbersPassword": {
         "question": "Can I add page numbers to a password-protected PDF?",
@@ -611,6 +627,7 @@
   "watermarkPdf": {
     "title": "Add Watermark to PDF Online",
     "description": "Add text or image watermarks to your PDF files. Brand your documents with custom watermarks. Free and no sign-up.",
+    "idCopyLink": "Sending a copy of your ID? Mark who it’s for",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
@@ -702,7 +719,7 @@
       },
       "safeWatermarkConfidential": {
         "question": "Is it safe to watermark confidential documents online?",
-        "answer": "Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share document contents, and no account is needed. We collect only aggregate, anonymous usage analytics via Google Analytics — never your documents."
+        "answer": "Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share document contents, and no account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "watermarkPasswordProtected": {
         "question": "Can I watermark a password-protected PDF?",
@@ -754,6 +771,10 @@
     "uploadedFile": "Uploaded File",
     "chooseFile": "Choose File",
     "singleFile": "Max 50MB • Single file",
+    "noRestrictionsTitle": "Nothing to remove",
+    "noRestrictionsNotice": "This PDF has no printing, copying, or editing locks, so there was nothing to remove — your file comes back unchanged.",
+    "noRestrictionsHint": "If it asks for a password when you open it, switch to “Unlock with Password” instead.",
+    "downloadUnchanged": "Download PDF (unchanged)",
     "faq": {
       "restrictions": {
         "question": "Can I remove PDF restrictions without a password?",
@@ -900,7 +921,7 @@
       },
       "safeUploadFinancial": {
         "question": "Is it safe to upload financial documents?",
-        "answer": "Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We use Google Analytics for aggregate, anonymous usage measurement only."
+        "answer": "Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "tablesFoundError": {
         "question": "Why do I get a \"No tables found\" error?",
@@ -942,7 +963,7 @@
   },
   "signPdf": {
     "title": "Sign PDF Online - Add Electronic Signature",
-    "description": "Draw, type, or upload your signature and drag it anywhere on any page. Free, no sign-up — and your PDF never leaves your browser.",
+    "description": "Draw, type, or upload your signature and drag it anywhere on any page. Free, no sign-up — and your PDF stays in your browser unless you choose otherwise.",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
@@ -961,6 +982,7 @@
     "addSignature": "Add signature",
     "placeSignature": "Place on this page",
     "placeHint": "Drag a signature to move it, use the corner handle to resize it, and the ✕ to remove it.",
+    "needText": "Need to add text or a date as well? Use Edit PDF.",
     "pageOf": "Page {current} of {total}",
     "prevPage": "Previous page",
     "nextPage": "Next page",
@@ -971,8 +993,8 @@
     "resizeSignature": "Resize signature",
     "clearAll": "Remove all signatures",
     "whyLocal": {
-      "title": "Your file never leaves your device",
-      "description": "Signing happens entirely in your browser. Your PDF and your signature are never uploaded to a server — everything is processed locally on your own device."
+      "title": "Your file stays on your device unless you choose otherwise",
+      "description": "Signing happens entirely in your browser. Your PDF and your signature are never uploaded to a server unless you pick an option that needs our server, like converting to Word."
     },
     "signPdf": "Sign PDF",
     "signing": "Signing...",
@@ -984,7 +1006,7 @@
     "faq": {
       "howItWorks": {
         "question": "How does PDF signing work?",
-        "answer": "Draw, type, or upload a signature, then drag it exactly where you want it on the page — you can place as many signatures as you need across different pages. The signatures are embedded directly into the PDF, and everything runs in your browser: the file is never uploaded."
+        "answer": "Draw, type, or upload a signature, then drag it exactly where you want it on the page — you can place as many signatures as you need across different pages. The signatures are embedded directly into the PDF, and signing runs in your browser: the file is only uploaded if you pick an option that needs our server, like converting to Word."
       },
       "textVsImage": {
         "question": "How can I create my signature?",
@@ -1032,7 +1054,7 @@
       },
       "safeSignDocuments": {
         "question": "Is it safe to sign documents online?",
-        "answer": "Yes. Signing happens entirely in your browser — your PDF and your signature are never uploaded to a server, so nothing needs to be deleted afterward because nothing ever leaves your device. We only collect aggregate anonymous usage analytics."
+        "answer": "Yes. Signing happens entirely in your browser — your PDF and your signature are never uploaded to a server unless you pick an option that needs our server, like converting to Word, and then the file is deleted within an hour. We only collect aggregate anonymous usage analytics."
       },
       "signPasswordProtected": {
         "question": "Can I sign a password-protected PDF?",
@@ -1060,6 +1082,8 @@
   "repairPdf": {
     "title": "Repair PDF Online - Fix Corrupted Files",
     "description": "Fix corrupted or damaged PDF files. Recover broken PDFs and restore file integrity. Free and no sign-up.",
+    "answer": "Upload a PDF that won't open or shows errors, and download a rebuilt copy. Every page that can still be read is kept, but data that is gone can't be brought back. Free, no sign-up, up to 50MB.",
+    "howToTitle": "How to repair a corrupted PDF",
     "steps": {
       "upload": {
         "title": "Upload your corrupted PDF",
@@ -1126,7 +1150,7 @@
       },
       "safeUploadCorrupted": {
         "question": "Is it safe to upload a corrupted PDF?",
-        "answer": "Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share the contents of your documents, and no account is needed. We use Google Analytics for aggregate, anonymous usage measurement only — never your document contents."
+        "answer": "Yes. Files travel over an encrypted HTTPS connection and are deleted from our servers within one hour, most immediately after processing. We never read, store, or share the contents of your documents, and no account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "fileSizeLimits": {
         "question": "What are the file size limits?",
@@ -1414,7 +1438,7 @@
       },
       "rotate": {
         "title": "Rotate pages as needed",
-        "description": "Click rotation buttons on each page or rotate all at once"
+        "description": "Select the pages to turn, or select all, then turn them left or right"
       },
       "download": {
         "title": "Download rotated PDF",
@@ -1595,6 +1619,8 @@
   "mergePdf": {
     "title": "Merge PDF Files Online",
     "description": "Combine multiple PDFs into one document. Free and no sign-up.",
+    "answer": "Add up to 20 PDFs, drag them into the order you want, and download them as one file. Free, no sign-up, no watermark. Each file can be up to 50MB, with 100MB in total.",
+    "howToTitle": "How to merge PDF files",
     "steps": {
       "upload": {
         "title": "Upload 2 or more PDF files",
@@ -1638,7 +1664,7 @@
       },
       "safeMergePdfs": {
         "question": "Is it safe to merge PDFs online?",
-        "answer": "Yes, BlendPDF is safe to use. All uploads are encrypted with SSL/TLS. Files are automatically deleted within one hour, most immediately after processing. No account or personal information is required, and we never read, store, or share the contents of your documents. We use Google Analytics for aggregate, anonymous usage measurement only, never your document contents."
+        "answer": "Yes, BlendPDF is safe to use. All uploads are encrypted with SSL/TLS. Files are automatically deleted within one hour, most immediately after processing. No account or personal information is required, and we never read, store, or share the contents of your documents. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "fileSizeLimits": {
         "question": "What are the file size limits for merging PDFs?",
@@ -1699,12 +1725,12 @@
         "description": "Select the PDF file you want to split"
       },
       "select": {
-        "title": "Select Pages",
-        "description": "Click on page thumbnails to select which pages to extract"
+        "title": "Choose how to split",
+        "description": "Every page becomes its own PDF unless you pick another way: a PDF every few pages, or your own page ranges."
       },
       "download": {
         "title": "Download Result",
-        "description": "Get your split PDF file instantly, no sign-up needed"
+        "description": "Get your files at once, no sign-up needed. Several PDFs come in one ZIP."
       }
     },
     "dropPdfHere": "Drop PDF here",
@@ -1809,7 +1835,22 @@
       "title": "Form Templates",
       "description": "Fill and download free customizable business and legal templates."
     },
-    "new": "NEW"
+    "new": "NEW",
+    "arabicFiles": {
+      "title": "Made for Arabic and other right-to-left files",
+      "ocr": {
+        "title": "Text from scanned pages",
+        "description": "Got a scanned PDF? We pull the text out, Arabic included, so you can copy and search it."
+      },
+      "edit": {
+        "title": "Edit Arabic text inside the PDF",
+        "description": "Fix a name, date or number in place without retyping the page. Arabic letters stay joined."
+      },
+      "compress": {
+        "title": "Shrink it to the size you need",
+        "description": "A university or government portal wants it under 200 KB? Pick the size and we'll make the file fit."
+      }
+    }
   },
   "relatedTools": {
     "title": "Related Tools"
@@ -1882,7 +1923,7 @@
       },
       "safeConvertPdf": {
         "question": "Is it safe to convert my PDF online?",
-        "answer": "Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We use Google Analytics for aggregate, anonymous usage measurement only."
+        "answer": "Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "receiveImages": {
         "question": "How do I receive the images?",
@@ -1921,6 +1962,8 @@
   "pdfToWord": {
     "title": "PDF to Word - Free Converter",
     "description": "Convert PDF files to editable Word documents (DOCX). Preserves text, formatting, and layout. Works with all languages including Arabic and Hebrew.",
+    "answer": "Upload a PDF and download an editable Word file (DOCX), usually within a minute. Free, no sign-up, no watermark, for PDFs up to 50MB and 500 pages. Scanned pages need OCR first so their text can be edited.",
+    "howToTitle": "How to convert a PDF to Word",
     "steps": {
       "upload": {
         "title": "Upload PDF",
@@ -1943,6 +1986,12 @@
     "convertToWord": "Convert to Word",
     "converting": "Converting...",
     "failedToConvert": "Failed to convert PDF. Please try again.",
+    "conversionFailed": "We couldn't convert this PDF to Word — its layout is too complex for the converter.",
+    "conversionFailedHint": "Some PDFs — heavily designed pages, scans, or very dense tables — defeat the converter. You can still get the words out with our PDF to Text tool, or split the file and convert the parts separately.",
+    "pdfToTextCta": "Extract the text instead",
+    "splitPdfCta": "Split the PDF first",
+    "tooLongToConvert": "This PDF takes too long to convert to Word in one go. Split it into smaller files and convert them one at a time.",
+    "openSplitPdf": "Open the Split PDF tool",
     "faq": {
       "format": {
         "question": "What format will I get?",
@@ -1958,7 +2007,7 @@
       },
       "limits": {
         "question": "What are the file size limits?",
-        "answer": "You can convert PDFs up to 50MB in size. There's no limit on the number of pages, but larger files may take longer to process."
+        "answer": "You can convert PDFs up to 50MB and 500 pages. Larger files take longer, and a conversion that runs past about two minutes is stopped. If that happens, split the PDF and convert it in parts."
       },
       "convertPdfWord": {
         "question": "How to convert PDF to Word online",
@@ -1966,7 +2015,7 @@
       },
       "blendpdfSPdf": {
         "question": "Is BlendPDF's PDF to Word converter really free?",
-        "answer": "Yes. There is no watermark on the output, no page limit, no daily quota that pushes you to a paid plan, and no sign-up. The only practical limits are technical ones: 50MB per file and a processing window of about two minutes."
+        "answer": "Yes. There is no watermark on the output, no daily quota that pushes you to a paid plan, and no sign-up. The only limits are technical ones: 50MB and 500 pages per file, and a processing window of about two minutes."
       },
       "accountEmailAddress": {
         "question": "Do I need an account or email address to download my file?",
@@ -1974,7 +2023,7 @@
       },
       "safeConvertPdf": {
         "question": "Is it safe to convert my PDF online?",
-        "answer": "Uploads are encrypted in transit, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We use Google Analytics for aggregate, anonymous usage measurement only."
+        "answer": "Uploads are encrypted in transit, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "accurateConversion": {
         "question": "How accurate is the conversion?",
@@ -2086,7 +2135,7 @@
       },
       "safeUploadDocument": {
         "question": "Is it safe to upload my document?",
-        "answer": "Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We use Google Analytics for aggregate, anonymous usage measurement only."
+        "answer": "Files are uploaded over an encrypted connection, document contents are never read, stored, or shared, and files are deleted from our servers within one hour, most immediately after processing. No account is needed. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents."
       },
       "pdfLookSlightly": {
         "question": "Why does my PDF look slightly different from the Word file?",
@@ -2110,7 +2159,7 @@
       },
       "editPdfAfterward": {
         "question": "Can I edit the PDF afterward, or convert it back to Word?",
-        "answer": "PDFs are not meant for heavy editing, so keep your original Word file as the master copy. If you no longer have it, the BlendPDF PDF to Word tool converts the PDF back to an editable DOCX, faithfully for typical documents though not always identically."
+        "answer": "Yes. Edit PDF lets you add text in Arabic or English, images, signatures and highlights, and fix the pages, and its Edit text tool (beta) can change a line that's already there, all right in your browser. For bigger changes to the wording, edit your original Word file and convert it again, or turn the PDF back into a DOCX with PDF to Word."
       },
       "insteadWordS": {
         "question": "Why use this instead of Word's built-in Save as PDF?",
@@ -2154,7 +2203,9 @@
       "gregorianOption": "Today's date (Gregorian)",
       "hijriOption": "Today's date (Hijri)",
       "help": "Tip: map a field to \"Today's date\" (Gregorian or Hijri) in the dropdown, or type {today} or {hijri} inside any spreadsheet cell — the token is replaced with today's date when the PDFs are generated."
-    }
+    },
+    "failedToExtractFields": "Couldn't read the form fields in this PDF. Please try a different file.",
+    "failedToGenerate": "Couldn't generate the filled PDFs. Please check your spreadsheet and try again."
   },
   "errors": {
     "encryptedPdf": "This PDF is password-protected. Please use the Unlock PDF tool to remove the password first, then try again.",
@@ -2164,11 +2215,9 @@
     "unlockPdfCta": "Open the Unlock PDF tool",
     "failedToReadPdf": "Failed to read the PDF. Please make sure it's a valid PDF file.",
     "unexpectedServerResponse": "Server returned unexpected response. Please try again.",
-    "emptyServerResponse": "Received empty file from server. Please try again."
-  },
-  "emailDelivery": {
-    "tooLarge": "This file is too large to email — please download it directly.",
-    "sendFailed": "Failed to send the email. Please try again or download your file directly."
+    "emptyServerResponse": "Received empty file from server. Please try again.",
+    "rateLimited": "Too many conversions in a short time. Please wait a few minutes and try again.",
+    "conversionUnavailable": "This converter is temporarily unavailable. Please try again in a few minutes."
   },
   "upload": {
     "tooManyFiles": "Too many files — you can upload up to {max} files at once.",
@@ -2191,10 +2240,12 @@
   "cropPdf": {
     "title": "Crop PDF Pages Online",
     "description": "Drag to select the area you want to keep and trim PDF margins visually. Free, no sign-up — everything happens in your browser.",
+    "answer": "Open a PDF, drag a box around the part you want to keep, apply it to one page or all of them, and download. Free, no sign-up, no watermark.",
+    "howToTitle": "How to crop a PDF",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
-        "description": "Select the PDF file you want to crop — it never leaves your device"
+        "description": "Select the PDF file you want to crop — it opens right in your browser"
       },
       "crop": {
         "title": "Draw your crop area",
@@ -2240,7 +2291,7 @@
       },
       "privacy": {
         "question": "Is my PDF uploaded to a server?",
-        "answer": "No. This tool runs 100% in your browser — your file is opened and cropped locally on your device and is never uploaded anywhere. It's free and requires no sign-up."
+        "answer": "No. Cropping runs in your browser — your file is opened and cropped locally on your device. It's only uploaded if you pick an option that needs our server, like converting to Word, and then it's deleted within an hour. It's free and requires no sign-up."
       },
       "cropPdfPages": {
         "question": "How to crop PDF pages online",
@@ -2281,6 +2332,34 @@
       "croppingFailsProduces": {
         "question": "What if cropping fails or produces errors?",
         "answer": "Common causes are files over 50MB, corrupted PDFs, or password-protected files. Verify the file opens in a PDF viewer, check the size, unlock encrypted files first, and try refreshing the page and cropping again."
+      }
+    },
+    "guide": {
+      "howTo": {
+        "title": "How to trim a PDF, step by step",
+        "items": {
+          "trim": {
+            "question": "How do I trim a PDF?",
+            "answer": "Open the PDF in the box above and drag a box around the part of the page you want to keep. Under <b>Apply to</b>, pick the pages, then download. The white margins and edges outside the box no longer show. If you want to trim whole pages off, use <link>Delete Pages</link>. If you want a smaller file, use <link2>Compress PDF</link2>."
+          },
+          "multiple": {
+            "question": "How do I crop multiple PDF pages at once?",
+            "answer": "Draw the box on one page, then under <b>Apply to</b> choose <b>All pages</b>, or <b>Selected pages</b> to crop only the pages you picked. When pages differ in size, the box covers the same share of each page, for example the middle 80%, so nothing gets cut in the wrong place."
+          },
+          "scan": {
+            "question": "How do I crop a scanned page or a photo of a document?",
+            "answer": "Drag the box right to the edges of the paper so the table, the shadow and the background go. The page then reads better when you print it or upload it to an online form. If your photo is still a JPG or PNG, turn it into a PDF with <link>Images to PDF</link> first, then crop it here."
+          }
+        }
+      },
+      "limits": {
+        "title": "What cropping doesn't do",
+        "items": {
+          "hidden": "<b>Delete what you cut off.</b> The edges are hidden, not removed, so anyone with a PDF editor can show them again. Don't use cropping to hide a private detail.",
+          "size": "<b>Make the file smaller.</b> The hidden parts stay in the file, so the size stays about the same. To reduce it, use <link>Compress PDF</link>.",
+          "auto": "<b>Find the margins for you.</b> There is no automatic trim yet: you draw the box yourself, once for all pages.",
+          "locked": "<b>Open password-protected PDFs.</b> If you know the password, remove it first with <link>Unlock PDF</link>, then crop the copy."
+        }
       }
     }
   },
@@ -2387,7 +2466,9 @@
   },
   "extractImages": {
     "title": "Extract Images from PDF",
-    "description": "Pull the pictures out of any PDF and save them as PNG files. Free, no sign-up, and 100% in your browser — your file never leaves your device.",
+    "description": "Pull the pictures out of any PDF and save them as PNG files. Free, no sign-up, and done in your browser — your file stays on your device unless you choose otherwise.",
+    "answer": "Open a PDF and get every picture inside it as PNG files at their original quality, all in one ZIP. Free, no sign-up, no watermark.",
+    "howToTitle": "How to extract images from a PDF",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
@@ -2395,11 +2476,11 @@
       },
       "extract": {
         "title": "We find the embedded images",
-        "description": "Every page is scanned for embedded pictures, duplicates are removed, and thumbnails appear as we go"
+        "description": "Every page is scanned for embedded pictures and duplicates are removed"
       },
       "download": {
         "title": "Download your images",
-        "description": "Pick the images you want and download them as PNG files — one file directly, or several as a ZIP"
+        "description": "The images download as PNG files — one directly, or several in a ZIP"
       }
     },
     "howItWorks": "How it works",
@@ -2428,7 +2509,7 @@
       },
       "inBrowser": {
         "question": "Is my PDF uploaded to your servers?",
-        "answer": "No. This tool runs 100% in your browser — your PDF is opened and processed locally on your device and never uploaded anywhere. That's also why it's fast: there's no upload or download wait."
+        "answer": "No. Getting the images out runs in your browser — your PDF is opened and processed locally on your device, which is also why it's fast: there's no upload or download wait. It's only uploaded if you pick an option that needs our server, like converting to Word, and then it's deleted within an hour."
       },
       "duplicates": {
         "question": "Why do I see fewer images than the PDF appears to contain?",
@@ -2440,11 +2521,11 @@
       },
       "extractImagesPdf": {
         "question": "How to extract images from a PDF online",
-        "answer": "Upload your PDF (up to 50MB) and BlendPDF automatically scans every page for embedded pictures, showing thumbnails as it goes. Select the images you want and download one directly as PNG or several bundled in a ZIP. Everything runs in your browser."
+        "answer": "Open your PDF (up to 50MB) in the box above and click Get the pictures. BlendPDF scans every page and hands you a ZIP with each picture as a PNG file; if the PDF holds a single picture, you get that PNG on its own. Everything runs in your browser."
       },
       "chooseWhichImages": {
         "question": "Can I choose which images to download?",
-        "answer": "Yes. Every found image appears as a selectable thumbnail showing its dimensions and the page it first appears on. Use Select all / Deselect all or toggle images individually — one selected image downloads directly as PNG, multiple download as a ZIP."
+        "answer": "Not inside the tool: you get every picture in one ZIP. Each file is named with its number and its size in pixels, for example image_004_1600x1200.png, so the one you want is easy to spot. To get only the pictures from certain pages, keep those pages first with Extract Pages, then open the new file here."
       },
       "pageImageLimits": {
         "question": "Are there page or image limits?",
@@ -2468,7 +2549,7 @@
       },
       "extractImagesMobile": {
         "question": "Can I extract images on mobile devices?",
-        "answer": "Yes. The thumbnail grid is touch-friendly on phones and tablets — tap to select images, then download a single PNG or a ZIP straight to your device. Processing happens locally on the phone."
+        "answer": "Yes. Open the PDF on your phone or tablet, tap Get the pictures and the ZIP (or the single PNG) saves to your device. Most phones open ZIP files in their Files app. The work happens on the phone itself."
       },
       "extractingImagesFree": {
         "question": "Is extracting images free?",
@@ -2478,11 +2559,45 @@
         "question": "What if extraction fails or produces errors?",
         "answer": "Check that the file is a valid PDF under 50MB and not password-protected. If pages contain only vector graphics you'll get a \"no images found\" result rather than an error — try the PDF to Images tool instead. Refreshing and retrying resolves most one-off failures."
       }
+    },
+    "guide": {
+      "howTo": {
+        "title": "Getting pictures out of a PDF, step by step",
+        "items": {
+          "allAtOnce": {
+            "question": "How do I extract all images from a PDF at once?",
+            "answer": "Open the PDF in the box above and click Get the pictures. Every page is scanned and you get one ZIP holding each picture as its own PNG file. A logo repeated on every page comes out once, and specks smaller than 16 pixels are skipped. If the PDF holds only one picture, you get that PNG directly, with no ZIP."
+          },
+          "onePage": {
+            "question": "How do I extract a picture from one page of a PDF?",
+            "answer": "Keep just that page first: open the PDF in <link>Extract Pages</link>, pick the page and save it as a new PDF. Then open the new file here and click Get the pictures, and you get only the pictures on that page. Each file name gives the size in pixels, for example image_002_1600x1200.png, so the one you want is easy to spot."
+          },
+          "quality": {
+            "question": "How do I extract images from a PDF in high quality?",
+            "answer": "You don't need a setting for it. Each picture comes out at the exact size it is stored at in the PDF, with no resizing and no recompression: a 3000×2000 photo gives a 3000×2000 PNG. If a picture looks small or blurry, that is how it was saved in the PDF, often because the file was compressed before. No tool can bring back detail that isn't in the file."
+          },
+          "scanned": {
+            "question": "How do I get photos out of a scanned PDF?",
+            "answer": "A scanner saves each page as one big picture, so the photos on it aren't separate images. You get one PNG per page: open it in your phone's or computer's photo editor and crop the photo you want. To turn every page into a JPG or PNG in one go, use <link>PDF to Images</link>."
+          }
+        }
+      },
+      "limits": {
+        "title": "What it can't do yet",
+        "items": {
+          "vector": "<b>Pull out charts, logos and drawings made of lines.</b> Many of them are drawn as shapes, not stored as pictures, so there is nothing to extract. <link>PDF to Images</link> saves the whole page as a picture instead.",
+          "jpeg": "<b>Give you the original JPEG files.</b> Every picture is saved as PNG. The quality is the same, but the files can be bigger than the originals.",
+          "remove": "<b>Remove the images from your PDF.</b> This tool copies the pictures out and leaves the PDF as it was. To hide a picture inside the PDF, cover it with a white box in the <link>PDF editor</link>. What's under the box stays in the file.",
+          "large": "<b>Go past page 200 or 500 pictures in one go.</b> Scanning stops there to keep your browser responsive, and you'll see a notice. <link>Split the PDF</link> and extract each part."
+        }
+      }
     }
   },
   "extractPages": {
     "title": "Extract Pages from PDF",
-    "description": "Save certain pages of a PDF as a new file. Free, no sign-up — your file never leaves your device.",
+    "description": "Save certain pages of a PDF as a new file. Free, no sign-up — your file stays on your device unless you choose otherwise.",
+    "answer": "Open a PDF, type the pages you want, like 1-3, 5, and download them as a new PDF or as one file per page. Free, no sign-up, no watermark.",
+    "howToTitle": "How to extract pages from a PDF",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
@@ -2490,7 +2605,7 @@
       },
       "extract": {
         "title": "Choose your pages",
-        "description": "Type page numbers or ranges like 1-3, 5, 8-10 and pick one PDF or one file per page"
+        "description": "Select the pages you want, or type numbers and ranges like 1-3, 5, 8-10, then save them as one PDF or one file per page"
       },
       "download": {
         "title": "Download the extracted pages",
@@ -2532,11 +2647,11 @@
       },
       "privacy": {
         "question": "Is my file uploaded to a server?",
-        "answer": "No. This tool runs 100% in your browser — the PDF is read and the new files are created on your own device. Your file never leaves your computer."
+        "answer": "No. Extracting runs in your browser — the PDF is read and the new files are created on your own device. Your file only leaves your computer if you pick an option that needs our server, like converting to Word, and then it's deleted within an hour."
       },
       "extractPagesPdf": {
         "question": "How to extract pages from a PDF online",
-        "answer": "Upload your PDF (up to 50MB), type the pages you want using numbers and ranges like \"1-3, 5, 8-10\", choose a single PDF or one file per page, then click Extract. Everything runs in your browser — the file is never uploaded."
+        "answer": "Upload your PDF (up to 50MB), type the pages you want using numbers and ranges like \"1-3, 5, 8-10\", choose a single PDF or one file per page, then click Extract. It runs in your browser — the file is only uploaded if you pick an option that needs our server, like converting to Word."
       },
       "chooseSinglePdf": {
         "question": "Should I choose \"Single PDF\" or \"One file per page (ZIP)\"?",
@@ -2582,7 +2697,9 @@
   },
   "flattenPdf": {
     "title": "Flatten PDF Online",
-    "description": "Make form fields non-editable so filled answers can't be changed. Free, no sign-up — your file never leaves your device.",
+    "description": "Make form fields non-editable so filled answers can't be changed. Free, no sign-up — your file stays on your device unless you choose otherwise.",
+    "answer": "Open a filled-in PDF form and download a copy where the answers are part of the page, so nobody can change them. Free, no sign-up, no watermark.",
+    "howToTitle": "How to flatten a PDF",
     "steps": {
       "upload": {
         "title": "Upload your PDF file",
@@ -2631,7 +2748,7 @@
       },
       "privacy": {
         "question": "Is my file uploaded to a server?",
-        "answer": "No. This tool runs 100% in your browser — the PDF is read, flattened, and saved on your own device. Your file never leaves your computer."
+        "answer": "No. Flattening runs in your browser — the PDF is read, flattened, and saved on your own device. Your file only leaves your computer if you pick an option that needs our server, like converting to Word, and then it's deleted within an hour."
       },
       "whichFormField": {
         "question": "Which form field types can be flattened?",
@@ -2674,20 +2791,20 @@
   "pdfToText": {
     "title": "PDF to Text Converter",
     "description": "Extract text from any PDF and copy or download it as a .txt file. Free, no sign-up, and processed entirely in your browser.",
-    "privacyBadge": "100% in your browser — your file never leaves your device",
+    "privacyBadge": "Runs in your browser — your file stays on your device unless you choose otherwise",
     "localProcessingNote": "Max 50MB • Processed locally in your browser — nothing is uploaded",
     "steps": {
       "upload": {
         "title": "Select your PDF file",
-        "description": "Choose the PDF you want to extract text from — it stays on your device"
+        "description": "Choose the PDF you want to extract text from — it opens right in your browser"
       },
       "extract": {
         "title": "Text is extracted instantly",
         "description": "Your browser reads every page and builds a plain-text version with live progress"
       },
       "download": {
-        "title": "Copy or download the text",
-        "description": "Copy the text to your clipboard or download it as a .txt file — no sign-up needed"
+        "title": "Download the text",
+        "description": "Save it as a .txt file in one click — no sign-up needed"
       }
     },
     "howItWorks": "How it works",
@@ -2704,21 +2821,21 @@
     "failedToExtract": "Failed to extract text from the PDF. Please try again.",
     "failedToCopy": "Could not copy to the clipboard. Please select the text manually and copy it.",
     "whyLocal": {
-      "title": "Your file never leaves your device",
-      "description": "This tool runs entirely in your browser. Your PDF is never uploaded to a server — the text is extracted locally on your own device."
+      "title": "Your file stays on your device unless you choose otherwise",
+      "description": "This tool runs in your browser. The text is extracted locally on your own device, and your PDF is never uploaded to a server unless you pick an option that needs our server, like converting to Word."
     },
     "faq": {
       "inBrowser": {
         "question": "Is my PDF uploaded to a server?",
-        "answer": "No. This tool runs 100% in your browser — your file never leaves your device. The text is extracted locally, which also makes it fast and private."
+        "answer": "No. The text is extracted locally in your browser, which also makes it fast and private. Your file only leaves your device if you pick an option that needs our server, like converting to Word, and then it's deleted within an hour."
       },
       "scannedPdfs": {
         "question": "Why is no text extracted from my scanned PDF?",
-        "answer": "Scanned PDFs are images of pages and have no text layer, so there is no text to extract. That requires OCR (optical character recognition) — use our OCR PDF tool to add a searchable text layer (Arabic, English, and French supported), then extract the text here. This tool works with PDFs that contain real, selectable text."
+        "answer": "Scanned PDFs are images of pages and have no text layer, so there is no text to extract. That requires OCR (optical character recognition) — use our OCR PDF tool to add a searchable text layer (Arabic, English, French, and Spanish supported), then extract the text here. This tool works with PDFs that contain real, selectable text."
       },
       "copyText": {
         "question": "How do I copy text from a PDF?",
-        "answer": "Upload your PDF, wait a moment while the text is extracted, then click \"Copy to clipboard\". You can also download everything as a .txt file, or select just a part of the preview and copy it."
+        "answer": "Drop your PDF and click \"Get the text\". You get a .txt file with all the text, page by page, which you can open in any text editor and copy from. It all happens in your browser."
       },
       "formatting": {
         "question": "Will the layout and formatting be preserved?",
@@ -2730,19 +2847,19 @@
       },
       "extractTextPdf": {
         "question": "How to extract text from a PDF online",
-        "answer": "Upload your PDF and the text is extracted automatically, page by page, directly in your browser. A live preview shows the result with character and word counts. Click \"Copy to clipboard\" or \"Download as .txt\" to save the text. Nothing is uploaded to a server."
+        "answer": "Drop your PDF and click \"Get the text\". The text is read page by page, directly in your browser, and saved as a .txt file named after your PDF. Nothing is uploaded to a server unless you pick an option that needs our server, like converting to Word."
       },
       "copyTextInstead": {
         "question": "Can I copy the text instead of downloading it?",
-        "answer": "Yes. After extraction, click \"Copy to clipboard\" to copy the full text at once, or select just a portion of the preview and copy it manually. You can also download everything as a .txt file named after your PDF."
+        "answer": "Not straight to the clipboard. \"Get the text\" gives you a .txt file with the full text; open it in any text editor or notes app and copy what you need."
       },
       "extractArabicText": {
         "question": "Does it extract Arabic text?",
-        "answer": "Yes, Arabic text is extracted when the PDF contains a proper Unicode text layer, and the preview automatically switches to right-to-left display. Some Arabic PDFs store text in non-standard ways, so results can vary; scanned Arabic documents should go through the OCR tool first."
+        "answer": "Yes, Arabic text is extracted in reading order when the PDF contains a proper Unicode text layer. Some Arabic PDFs store text in non-standard ways, so results can vary; scanned Arabic documents should go through the OCR tool first."
       },
       "pageSeparators": {
         "question": "What are the page separators?",
-        "answer": "The \"Insert page separators\" option adds a \"--- Page N ---\" marker between pages in the output, so you can tell where each page starts. Untick the checkbox to get one continuous text without markers. The preview updates instantly either way."
+        "answer": "Under \"More save options\", \"Mark where each page starts\" adds a \"--- Page N ---\" marker between pages, so you can tell where each page starts. It is on by default; untick it to get one continuous text without markers."
       },
       "fileSizeLimits": {
         "question": "What are the file size limits?",
@@ -2766,7 +2883,7 @@
       },
       "fileExtraction": {
         "question": "What happens to my file after extraction?",
-        "answer": "Nothing is uploaded, so there is nothing to delete server-side. Your PDF is read locally in your browser's memory and released when you close or reload the page. The file and the extracted text stay entirely on your device."
+        "answer": "Your PDF is read locally in your browser's memory and released when you close or reload the page, and the extracted text stays on your device. Nothing is uploaded unless you pick an option that needs our server, like converting to Word; a file sent there is deleted within an hour."
       },
       "extractionFailsText": {
         "question": "What if extraction fails or the text looks wrong?",
@@ -2777,6 +2894,8 @@
   "powerpointToPdf": {
     "title": "PowerPoint to PDF - Free Converter",
     "description": "Convert PowerPoint presentations (PPT, PPTX, ODP) to PDF. Each slide becomes a PDF page with fonts, images, and layout preserved. Free, no sign-up needed.",
+    "answer": "Upload a PPT, PPTX or ODP file and download a PDF with one page per slide, keeping the layout, fonts and images. Free, no sign-up, no watermark, up to 50MB.",
+    "howToTitle": "How to convert PowerPoint to PDF",
     "steps": {
       "upload": {
         "title": "Upload Presentation",
@@ -2878,12 +2997,14 @@
   "removeMetadata": {
     "title": "Remove PDF Metadata",
     "description": "Remove hidden author names, software traces and timestamps from your PDF before sharing it. Free, no sign-up, and processed entirely in your browser.",
-    "privacyBadge": "100% in your browser — your file never leaves your device",
+    "answer": "Open a PDF to see its hidden author name, software and dates, remove them in one click, and download the clean copy. Free, no sign-up, no watermark.",
+    "howToTitle": "How to remove metadata from a PDF",
+    "privacyBadge": "Runs in your browser — your file stays on your device unless you choose otherwise",
     "localProcessingNote": "Max 50MB • Processed locally in your browser — nothing is uploaded",
     "steps": {
       "upload": {
         "title": "Select your PDF file",
-        "description": "Choose the PDF you want to clean — it stays on your device"
+        "description": "Choose the PDF you want to clean — it opens right in your browser"
       },
       "remove": {
         "title": "Review and remove metadata",
@@ -2921,8 +3042,8 @@
     "downloadClean": "Download clean PDF",
     "failedToRemove": "Failed to remove metadata from the PDF. Please try again.",
     "whyLocal": {
-      "title": "Your file never leaves your device",
-      "description": "This tool runs entirely in your browser. Your PDF is never uploaded to a server — the metadata is inspected and removed locally on your own device."
+      "title": "Your file stays on your device unless you choose otherwise",
+      "description": "This tool runs in your browser. The metadata is inspected and removed locally on your own device, and your PDF is never uploaded to a server unless you pick an option that needs our server, like converting to Word."
     },
     "faq": {
       "whatIsMetadata": {
@@ -2935,7 +3056,7 @@
       },
       "inBrowser": {
         "question": "Is my PDF uploaded to a server?",
-        "answer": "No. This tool runs 100% in your browser — your file never leaves your device. That matters here more than anywhere: you are cleaning a document for privacy, so it should not travel over the internet at all."
+        "answer": "No. Removing metadata runs in your browser, so your file stays on your device. That matters here more than anywhere: you are cleaning a document for privacy, so it should not travel over the internet at all. It only does if you pick an option that needs our server, like converting to Word, and then it's deleted within an hour."
       },
       "whyRemove": {
         "question": "Why should I remove metadata before sharing a PDF?",
@@ -2991,7 +3112,7 @@
   },
   "ocrPdf": {
     "title": "OCR PDF — Make Scanned PDFs Searchable",
-    "description": "Add a selectable, searchable text layer to scanned PDFs. First-class Arabic OCR, plus English and French. Free, no sign-up.",
+    "description": "Add a selectable, searchable text layer to scanned PDFs. First-class Arabic OCR, plus English, French, and Spanish. Free, no sign-up.",
     "selectFile": "Select PDF file",
     "supportedFormats": "PDF files up to 50MB and 50 pages",
     "uploadedFile": "Uploaded File",
@@ -3004,7 +3125,8 @@
     "languages": {
       "arabic": "Arabic",
       "english": "English",
-      "french": "French"
+      "french": "French",
+      "spanish": "Spanish"
     },
     "redoMode": "Re-OCR pages that already have text",
     "redoModeHint": "Use this if the file already has a text layer but it is wrong or garbled. Existing text will be replaced.",
@@ -3016,7 +3138,7 @@
       },
       "ocr": {
         "title": "Pick the language and run OCR",
-        "description": "Choose Arabic, English, or French (or a mix), then let the OCR engine recognize the text on every scanned page."
+        "description": "Choose Arabic, English, French, or Spanish (or a mix), then let the OCR engine recognize the text on every scanned page."
       },
       "download": {
         "title": "Download the searchable PDF",
@@ -3027,9 +3149,12 @@
     "howItWorksDesc": "OCR (optical character recognition) reads the pixels of each scanned page and converts what it sees into real text. We place that text as an invisible layer exactly on top of the original scan, so the document looks identical but becomes searchable and copyable. Pages that already contain text are skipped by default so nothing is overwritten.",
     "errors": {
       "pageLimit": "This PDF has more than 50 pages. To keep OCR reliable for everyone, please split the file first (try our Split PDF tool) and OCR the parts separately.",
-      "alreadyHasText": "Every page in this PDF already has a text layer, so there is nothing to OCR. If the existing text is wrong or garbled, enable \"Re-OCR pages that already have text\" and try again.",
+      "alreadyHasText": "Every page in this PDF already has a text layer, so there is nothing to OCR. If the existing text is wrong or garbled, turn on \"Read the text again, even where there is some\" and try again.",
       "engineUnavailable": "OCR is temporarily unavailable. Please try again in a few minutes.",
-      "busy": "The OCR service is handling other documents right now. Please try again in a minute."
+      "busy": "The OCR service is handling other documents right now. Please try again in a minute.",
+      "pageLimitBeforeUpload": "This PDF has {pages} pages, and OCR handles {max} at a time so it stays reliable for everyone. Split the file first, then OCR the parts separately.",
+      "splitPdfCta": "Split this PDF",
+      "timeout": "This scan takes too long to read in one go. Split it into smaller parts, about 10 pages each, and OCR them one at a time."
     },
     "faq": {
       "whatIsOcr": {
@@ -3058,11 +3183,11 @@
       },
       "scannedPdfSearchable": {
         "question": "How to make a scanned PDF searchable",
-        "answer": "Upload your scanned PDF, tick the recognition languages it contains (Arabic, English, or French), and click the OCR button. Processing takes roughly 1-2 seconds per page, then the searchable PDF downloads with an invisible text layer added over each scan."
+        "answer": "Upload your scanned PDF, tick the recognition languages it contains (Arabic, English, French, or Spanish), and click the OCR button. Processing takes roughly 1-2 seconds per page, then the searchable PDF downloads with an invisible text layer added over each scan."
       },
       "whichLanguagesSupported": {
         "question": "Which languages are supported?",
-        "answer": "Three languages are supported: Arabic, English, and French. You can select any combination for mixed-language documents, such as Arabic contracts with English clauses. At least one language must be selected before running OCR."
+        "answer": "Four languages are supported: Arabic, English, French, and Spanish. You can select any combination for mixed-language documents, such as Arabic contracts with English clauses. At least one language must be selected before running OCR."
       },
       "ocrChangePdf": {
         "question": "Does OCR change how my PDF looks?",
@@ -3099,6 +3224,911 @@
       "ocrFailsProduces": {
         "question": "What if OCR fails or produces errors?",
         "answer": "The tool reports specific problems: files over 50MB or 50 pages, password-protected PDFs, pages that already have text, or a busy server. Each message says what to do — split, unlock, enable re-OCR, or retry in a minute."
+      }
+    },
+    "failedToRead": "Failed to read PDF. Please make sure it's a valid PDF file."
+  },
+  "signaturePad": {
+    "signHere": "Sign here",
+    "clear": "Clear",
+    "modes": {
+      "draw": "Draw",
+      "upload": "Upload",
+      "type": "Type"
+    },
+    "drawHere": "Draw your signature here",
+    "uploadPrompt": "Choose a photo or scan of your signature or stamp",
+    "uploadFormats": "PNG, JPG or WebP",
+    "uploadError": "That image couldn't be used. Try a PNG or JPG under 20 MB.",
+    "uploadedAlt": "Your signature or stamp",
+    "replaceImage": "Replace image",
+    "typePlaceholder": "Type your full name",
+    "styleLabel": "Signature style",
+    "styles": {
+      "elegant": "Elegant",
+      "classic": "Classic",
+      "modern": "Modern",
+      "script": "Script"
+    },
+    "previewEmpty": "Your signature will show here"
+  },
+  "editPdf": {
+    "title": "Edit PDF in Arabic or English",
+    "description": "Add text, images, signatures, drawings and highlights to any PDF, change a line of its text (beta), and rotate, reorder or delete pages. Free, no sign-up, right in your browser.",
+    "answer": "Open your PDF, add text, a signature, an image or a drawing where you need it, and download it. You can write in Arabic or English and change a line of the existing text (beta). Free, no sign-up, no watermark.",
+    "howToTitle": "How to edit a PDF",
+    "chooseFile": "Choose PDF",
+    "singleFile": "One PDF, up to 50 MB",
+    "opening": "Opening your PDF…",
+    "steps": {
+      "upload": {
+        "title": "Open your PDF",
+        "description": "Drop a PDF here or choose one from your device."
+      },
+      "edit": {
+        "title": "Add what you need",
+        "description": "Type, draw, highlight, add an image or your signature, and fix the pages."
+      },
+      "save": {
+        "title": "Save it",
+        "description": "Download the edited PDF or have it emailed to you."
+      }
+    },
+    "whyLocal": {
+      "title": "Your file stays on your device unless you choose otherwise",
+      "description": "Editing happens in your browser. Your PDF is never uploaded, unless you pick an option that needs our server, like converting to Word, or choose to get the result by email."
+    },
+    "faq": {
+      "arabicText": {
+        "question": "Does Arabic text come out right?",
+        "answer": "Yes. Letters join, numbers and brackets stay in order, and Arabic and English can share a line. It is saved as real text, not a picture, so most of it can be selected and searched."
+      },
+      "existingText": {
+        "question": "Can I change text that is already in the PDF?",
+        "answer": "Yes, one line at a time, with Edit existing text (beta). Click a line, check or retype it, and when you save, the old words are taken out of the page, not just covered, and yours are written in their place. The line keeps its own font when that font has every letter you type. If it doesn't, we use the closest font we have and tell you. Scanned pages and some pages with shadows or see-through effects can't be changed this way, so use Hide (white box) there. It only hides what's underneath; it stays in the file."
+      },
+      "private": {
+        "question": "Is my PDF uploaded anywhere?",
+        "answer": "No. Everything happens in your browser and the file stays on your device. It only reaches our server if you pick an option that needs it, like converting to Word, or choose to get the result by email."
+      },
+      "forms": {
+        "question": "What happens to fillable form fields?",
+        "answer": "When you save, the fields and what's typed in them become part of the page, so your additions sit on top. The saved PDF can't be filled in again."
+      },
+      "free": {
+        "question": "Is it free? Is there a watermark?",
+        "answer": "Yes, it's free, and that includes Edit existing text. There's no account to create and no watermark on your file, unless you add one yourself."
+      },
+      "phone": {
+        "question": "Does it work on a phone?",
+        "answer": "Yes. It runs in the browser on phones and tablets, so there's nothing to install, and you can draw your signature with your finger."
+      },
+      "password": {
+        "question": "Can I edit a PDF that has a password?",
+        "answer": "Yes, if you know the password. Type it when you're asked and the PDF opens in the editor. If it only has restrictions that stop editing, you can remove them in one step."
+      }
+    },
+    "guide": {
+      "features": {
+        "title": "What you can do in this PDF editor",
+        "lead": "BlendPDF's PDF editor is free and runs in your browser, with no account and no watermark. Write on any page in Arabic or English, change a line of the text that's already there, sign, fix the pages, then save it as a PDF or in another format.",
+        "items": {
+          "text": {
+            "title": "Add text",
+            "body": "Click anywhere and type in Arabic, English or both on one line. Choose from six colors and make it bigger or smaller. It's saved as real text, so most of it can be selected and searched."
+          },
+          "existing": {
+            "title": "Change the existing text (beta)",
+            "body": "Click a line that's already in the PDF and retype it. The old words are taken out of the page, not just covered, and the line keeps its own font when that font has every letter you type."
+          },
+          "sign": {
+            "title": "Sign it",
+            "body": "Draw, type or upload your signature, then place it anywhere on the page and resize it."
+          },
+          "image": {
+            "title": "Add an image",
+            "body": "Put a logo, a stamp or a photo on the page. JPG and PNG images up to 20 MB work."
+          },
+          "draw": {
+            "title": "Draw and highlight",
+            "body": "Draw freehand with a mouse or a finger, add rectangles, ovals, lines and arrows, or highlight what matters."
+          },
+          "cover": {
+            "title": "Hide with a white box",
+            "body": "Cover something so it no longer shows. What's underneath is still in the file, so don't rely on it for anything that has to be gone for good."
+          },
+          "date": {
+            "title": "Today's date, Gregorian or Hijri",
+            "body": "Add today's date in one click, in either calendar."
+          },
+          "pages": {
+            "title": "Fix the pages",
+            "body": "Turn pages, move them earlier or later, delete them, or add a blank page wherever you need one."
+          },
+          "save": {
+            "title": "Save it your way",
+            "body": "Download a PDF, or save it as Word, Excel, images or text. You can also make it smaller, add a password, or get it by email."
+          }
+        }
+      },
+      "howTo": {
+        "title": "Common edits, step by step",
+        "items": {
+          "addText": {
+            "question": "How do I add text to a PDF?",
+            "answer": "Open the PDF and choose Text. Click where the words should go and type. The small bar above the box changes its color and size, and you can drag the box to move it. Choose Save PDF when you're done."
+          },
+          "changeText": {
+            "question": "How do I change words that are already in the PDF?",
+            "answer": "Choose Edit existing text and click the line. Type it the way it should read, then save. If a line can't be changed, for example on a scanned page, the editor says why, and you can cover it with Hide (white box) and type over it with Text."
+          },
+          "sign": {
+            "question": "How do I sign a PDF?",
+            "answer": "Open Insert and choose Signature. Draw, type or upload it, choose Place it on the page, then drag it where it belongs. If the document asks for a date, add Today's date beside it."
+          },
+          "pages": {
+            "question": "How do I delete, move or rotate pages?",
+            "answer": "Open Pages. Every page has buttons to turn it, move it earlier or later, delete it, or add a blank page after it."
+          }
+        }
+      },
+      "limits": {
+        "title": "What it can't do yet",
+        "items": {
+          "paragraphs": "<b>Rewrite a whole paragraph.</b> Edit existing text changes one line at a time, and words don't flow onto the next line. For a bigger rewrite, <link>convert the PDF to Word</link>, edit it there, and save it as a PDF again.",
+          "scanned": "<b>Change the words on a scanned page.</b> They're part of a picture. The editor can <link>make the text searchable</link> so you can select and copy it, but to change it, cover it with Hide (white box) and type on top.",
+          "effects": "<b>Change text set at an angle, or on pages with shadows or see-through effects.</b> Use Hide (white box) and Text there too."
+        }
+      },
+      "compare": "We tested other online PDF editors with Arabic text. <link>See what each one saved</link>."
+    },
+    "tools": {
+      "select": "Select",
+      "text": "Text",
+      "replace": "Edit existing text",
+      "replaceTitle": "Edit existing text (beta)",
+      "beta": "Beta",
+      "draw": "Draw",
+      "shapes": "Shapes",
+      "rectangle": "Rectangle",
+      "ellipse": "Ellipse",
+      "line": "Line",
+      "arrow": "Arrow",
+      "highlight": "Highlight",
+      "cover": "Hide (white box)",
+      "insert": "Insert",
+      "image": "Image",
+      "signature": "Signature",
+      "date": "Today's date",
+      "dateHijri": "Today's Hijri date"
+    },
+    "toolbar": "Tools",
+    "undo": "Undo",
+    "redo": "Redo",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "save": "Save PDF",
+    "saving": "Saving…",
+    "disabled": {
+      "undo": "Nothing to undo yet",
+      "redo": "Nothing to redo",
+      "save": "Add something or change a page first",
+      "deletePage": "A PDF needs at least one page",
+      "moveEarlier": "This is already the first page",
+      "moveLater": "This is already the last page",
+      "place": "Draw, type or upload your signature first",
+      "smaller": "This is already the smallest size",
+      "bigger": "This is already the largest size",
+      "zoomOut": "Already zoomed out as far as it goes",
+      "zoomIn": "Already zoomed in as far as it goes",
+      "replace": "Edit text couldn't load. Check your connection, then reload the page.",
+      "replaceBrowser": "Edit text needs a newer browser.",
+      "rotateReplaced": "A page with changed lines can't be turned. Use Keep the original on them first."
+    },
+    "hint": {
+      "text": "Click or tap where the text should go",
+      "draw": "Draw with your mouse or finger. Choose Select when you're done.",
+      "drag": "Drag across the page to place it"
+    },
+    "replace": {
+      "hint": "Beta: click or tap a line of text to change it.",
+      "loading": "Getting Edit text ready…",
+      "none": "There's no text to change here. Click right on the words.",
+      "invisible": "This text is part of a scanned picture, so it can't be changed.",
+      "slanted": "Text set at an angle can't be changed yet.",
+      "turned": "Turn the page so this line reads normally, then click it.",
+      "pageEffects": "Changing text on this page would also change how other parts of it look, such as shadows or see-through effects.",
+      "joined": "This line is joined to the text beside it, so it can't be changed on its own.",
+      "unreadable": "Edit text can't open this PDF.",
+      "useCover": "Use Hide (white box) and Text instead.",
+      "field": "New text for this line",
+      "placeholder": "Type the new text",
+      "note": "When you save, the old line is taken out of the page, not just covered, and your text goes in its place.",
+      "unsure": "We couldn't read this line reliably, so type it the way it should read.",
+      "closestMatch": "Closest match: {font}. The original font doesn't have some of these letters.",
+      "closestMatchFont": "Closest match: {font}. The original font can't be used for new text.",
+      "keepOriginal": "Keep the original",
+      "changedLine": "Changed line",
+      "keys": "Use the up and down arrow keys to choose a line, then press Enter to change it.",
+      "removed": "{count, plural, one {One line was changed, and its old text was} other {# lines were changed, and their old text was}} taken out, not just covered.",
+      "saveRefused": "On page {page}, the old text couldn't be taken out without changing other things, so nothing was saved. Keep the original there, or use Hide (white box) and Text.",
+      "saveFailed": "Edit text didn't work on this file, so nothing was saved. Keep the original lines and try again.",
+      "saveUnavailable": "Edit text couldn't load, so nothing was saved. Check your connection and try again."
+    },
+    "mini": {
+      "color": "Color",
+      "smaller": "Smaller",
+      "bigger": "Bigger",
+      "edit": "Edit text",
+      "delete": "Delete"
+    },
+    "colors": {
+      "black": "Black",
+      "blue": "Blue",
+      "red": "Red",
+      "green": "Green",
+      "orange": "Orange",
+      "white": "White"
+    },
+    "coverNote": "Hides it on the page. What's underneath is still in the file.",
+    "textPlaceholder": "Type here",
+    "textAsImage": "Some characters here can't be saved as text, so this box will be saved as a picture.",
+    "resize": "Resize",
+    "pages": {
+      "title": "Pages",
+      "pageOf": "Page {current} of {total}",
+      "prev": "Previous page",
+      "next": "Next page",
+      "rotate": "Rotate page",
+      "delete": "Delete page",
+      "moveEarlier": "Move page earlier",
+      "moveLater": "Move page later",
+      "addBlank": "Add a blank page after this one",
+      "thumb": "Go to page {number}"
+    },
+    "signatureDialog": {
+      "title": "Add your signature or stamp",
+      "place": "Place it on the page",
+      "saved": "Saved on this device",
+      "useSaved": "Place this one",
+      "forget": "Remove from this device",
+      "keep": "Keep it on this device for next time"
+    },
+    "openError": "This PDF couldn't be opened. It may be damaged.",
+    "chooseAnother": "Choose another PDF",
+    "discardConfirm": "Start over with another PDF? Your changes to this one will be lost.",
+    "saveError": "Saving didn't work. Your changes are still here, so you can try again.",
+    "imageError": "That image couldn't be added. Try a JPG or PNG under 20 MB.",
+    "warnings": {
+      "annotations": "{count, plural, one {One addition overlaps} other {# additions overlap}} a comment or stamp, which other PDF apps show on top.",
+      "textAsImage": "{count, plural, one {One text box was} other {# text boxes were}} saved as a picture.",
+      "form": "Some form fields couldn't be merged into the page, so they may show on top of your additions."
+    }
+  },
+  "workspace": {
+    "drop": {
+      "several": "Up to 20 PDFs, 50 MB each",
+      "one": "One PDF, up to 50 MB"
+    },
+    "primary": {
+      "edit": "Save PDF",
+      "sign": "Save signed PDF",
+      "crop": "Crop PDF",
+      "rotate": "Save rotated PDF",
+      "delete": "{count, plural, one {Delete # page} other {Delete # pages}}",
+      "reorder": "Save new order",
+      "extract": "Extract pages",
+      "split": "Split PDF",
+      "merge": "Merge PDFs",
+      "watermark": "Add watermark",
+      "numbers": "Add page numbers",
+      "compress": "Compress PDF",
+      "protect": "Lock PDF",
+      "unlock": "Download unlocked PDF",
+      "repair": "Repair PDF",
+      "ocr": "Make text searchable",
+      "flatten": "Flatten PDF",
+      "metadata": "Remove metadata",
+      "word": "Convert to Word",
+      "excel": "Convert to Excel",
+      "images": "Convert to images",
+      "text": "Get the text",
+      "imagesInside": "Get the pictures",
+      "converted": "Save PDF",
+      "pdfa": "Convert to PDF/A"
+    },
+    "moreOptions": "More save options",
+    "needs": {
+      "change": "Change something or pick a save option first",
+      "objects": "Add your signature or something else first",
+      "crop": "Drag across a page to choose what to keep first",
+      "turn": "Turn a page first",
+      "order": "Move a page first",
+      "selection": "Select pages first",
+      "secondFile": "Add another PDF to merge",
+      "watermark": "Type the watermark text or choose an image first",
+      "pageNumbers": "Choose how to number the pages first",
+      "password": "Type a password first",
+      "notAll": "Leave at least one page",
+      "nothingToUnlock": "This PDF has nothing to unlock. Change something first to save a copy."
+    },
+    "pages": {
+      "select": "Select page {number}",
+      "selected": "{count, plural, one {# page selected} other {# pages selected}}",
+      "selectAll": "Select all",
+      "clear": "Clear",
+      "turnLeft": "Turn left",
+      "turnRight": "Turn right",
+      "delete": "Delete",
+      "open": "Open page {number}",
+      "grid": "All pages",
+      "single": "One page",
+      "dragHint": "Drag a page to move it",
+      "skippedTurn": "Pages with changed lines weren't turned.",
+      "tickHint": "Click or tap pages to select them, or type their numbers",
+      "turnHint": "Select the pages to turn, then use Turn left or Turn right"
+    },
+    "crop": {
+      "tool": "Crop",
+      "hint": "Drag across the page to choose what to keep",
+      "applyTo": "Apply to",
+      "thisPage": "This page",
+      "selected": "Selected pages",
+      "all": "All pages",
+      "remove": "Remove crop",
+      "note": "Cropping hides the edges. What's outside stays in the file.",
+      "tooSmall": "That's too small to keep. Drag a bigger area.",
+      "tooSmallOn": "That's too small to keep on page {number}. Drag a bigger area."
+    },
+    "insert": {
+      "pdf": "Add another PDF",
+      "adding": "Adding pages…",
+      "added": "{count, plural, one {Added # page} other {Added # pages}}.",
+      "skipped": "Left out: {names}. Unlock or repair them first, then add them.",
+      "tooBig": "That would go over 100 MB. Save this one first, then add the rest.",
+      "tooMany": "You can add up to 20 PDFs.",
+      "blocked": "Insert pages before changing lines, or keep the original lines first."
+    },
+    "watermark": {
+      "title": "Watermark",
+      "text": "Text",
+      "image": "Image",
+      "defaultText": "DRAFT",
+      "chooseImage": "Choose an image",
+      "position": "Position",
+      "center": "Center",
+      "diagonal": "Diagonal",
+      "tiled": "Tiled",
+      "opacity": "See-through",
+      "size": "Size",
+      "remove": "Remove watermark"
+    },
+    "numbers": {
+      "title": "Page numbers",
+      "position": "Position",
+      "topLeft": "Top left",
+      "topCenter": "Top center",
+      "topRight": "Top right",
+      "bottomLeft": "Bottom left",
+      "bottomCenter": "Bottom center",
+      "bottomRight": "Bottom right",
+      "format": "Format",
+      "page": "Page {n}",
+      "pageOf": "Page {n} of {total}",
+      "start": "Start at",
+      "size": "Size",
+      "remove": "Remove page numbers"
+    },
+    "letterhead": {
+      "title": "Letterhead",
+      "left": "Top left",
+      "right": "Top right",
+      "leftExample": "Nour Center\nRabat",
+      "rightExample": "مركز نور\nالرباط",
+      "footer": "Bottom of the page",
+      "footerExample": "Address · Phone · Email",
+      "logo": "Logo",
+      "chooseLogo": "Choose a logo",
+      "changeLogo": "Change logo",
+      "removeLogo": "Remove logo",
+      "pages": "Pages",
+      "allPages": "Every page",
+      "firstPage": "First page only",
+      "remove": "Remove letterhead",
+      "kept": "Kept on this device for next time. To use it on another device or share it, save it as a file.",
+      "saveFile": "Save as a file",
+      "openFile": "Open a letterhead file",
+      "badFile": "That file isn’t a BlendPDF letterhead."
+    },
+    "changes": {
+      "title": "Your changes",
+      "none": "No changes yet",
+      "deleted": "{count, plural, one {# page deleted} other {# pages deleted}}",
+      "turned": "{count, plural, one {# page turned} other {# pages turned}}",
+      "moved": "Pages moved",
+      "blank": "{count, plural, one {# blank page added} other {# blank pages added}}",
+      "inserted": "{count, plural, one {# page added from another PDF} other {# pages added from other PDFs}}",
+      "cropped": "{count, plural, one {# page cropped} other {# pages cropped}}",
+      "watermark": "Watermark",
+      "pageNumbers": "Page numbers",
+      "objects": "{count, plural, one {# addition} other {# additions}}",
+      "lines": "{count, plural, one {# changed line} other {# changed lines}}",
+      "remove": "Remove",
+      "turnBack": "Turn back",
+      "undoHint": "Use Undo to take back the rest.",
+      "letterhead": "Letterhead"
+    },
+    "save": {
+      "title": "Save",
+      "getAs": "Get it as",
+      "pdf": "PDF",
+      "word": "Word (.docx)",
+      "excel": "Excel (.xlsx)",
+      "images": "Images",
+      "text": "Text (.txt)",
+      "imagesInside": "The pictures in it",
+      "jpg": "JPG",
+      "png": "PNG",
+      "separators": "Mark where each page starts",
+      "pages": "Pages",
+      "allPages": "All pages",
+      "selectedPages": "{count, plural, =0 {Selected pages} one {The selected page} other {The # selected pages}}",
+      "files": "Files",
+      "oneFile": "One file",
+      "everyBefore": "A PDF every",
+      "everyAfter": "{count, plural, one {page} other {pages}}",
+      "runs": "A PDF for each group of selected pages next to each other",
+      "alsoSelected": "Also save the selected pages as their own PDF",
+      "options": "Options",
+      "compress": "Make it smaller",
+      "levelHigh": "Best quality",
+      "levelMedium": "Balanced",
+      "levelLow": "Smallest file",
+      "password": "Add a password",
+      "passwordField": "Password",
+      "metadata": "Remove hidden info (author, dates, app name)",
+      "flatten": "Flatten form fields",
+      "button": "Save",
+      "onlyPdf": "Only when you save as PDF",
+      "needsSelection": "Select pages first",
+      "runsNeedAll": "Only when you save all pages",
+      "protectSplit": "A password can go on one or two files, not on a split",
+      "everyN": "Pick a number from 1 to {max}",
+      "stepExport": "Applying your changes…",
+      "stepConvert": "Converting…",
+      "stepCompress": "Making it smaller…",
+      "stepCut": "Making the files…",
+      "stepMetadata": "Removing hidden info…",
+      "stepProtect": "Adding the password…",
+      "stepZip": "Putting the files in a ZIP…",
+      "smaller": "{percent}% smaller",
+      "notSmaller": "This PDF was already as small as we can make it.",
+      "compatibility": "Converted in compatibility mode, so the layout may differ a little.",
+      "errors": {
+        "tooBig": "Our server takes files up to 50 MB. Save fewer pages or make it smaller first.",
+        "wordPages": "Word conversion takes up to 500 pages. Save fewer pages, then convert.",
+        "imagePages": "Image conversion takes up to 100 pages. Save fewer pages, then convert.",
+        "busy": "Too many files in a short time. Wait a few minutes and try again.",
+        "server": "That step didn't work on our server. Your changes are still here, so you can try again.",
+        "noText": "There's no text to get from this PDF. If it's a scan, make the text searchable first.",
+        "noImages": "There are no pictures in this PDF.",
+        "noTables": "We couldn't find a table in this PDF. If it's a scan, make the text searchable first. Otherwise, convert it to text instead."
+      },
+      "sizeLimit": "Enter a size between 0.1 and 50 MB.",
+      "underLimit": "{size} now, under your {limit} MB limit.",
+      "overLimit": "The smallest we could make it is {size}, still over {limit} MB. Remove some pages or split the file, then try again.",
+      "alreadyUnderLimit": "Already under {limit} MB ({size}), so we left it as it was.",
+      "pdfaPass": "Checked with {validator}: this file meets {level}.",
+      "pdfaFail": "veraPDF found problems with {level} (rules {rules}), so a strict check may refuse this file. Try another level.",
+      "pdfaUnchecked": "Made as {level}, but the veraPDF check didn't run this time. Convert again to get it checked.",
+      "pdfaFlattened": "{count, plural, one {Page {pages} was saved as a picture} other {# pages ({pages}) were saved as pictures}} because PDF/A-1 doesn't allow transparency, so that text can no longer be selected or searched. PDF/A-2b keeps it: choose it if the place you're sending the file accepts it."
+    },
+    "fix": {
+      "working": "Working on it…",
+      "lockedTitle": "This PDF has a password",
+      "lockedBody": "Type its password to open it here.",
+      "passwordField": "Password",
+      "unlock": "Unlock and open",
+      "wrongPassword": "That password didn't work. Try again.",
+      "restrictedTitle": "This PDF has restrictions",
+      "restrictedBody": "It can't be changed until they're removed.",
+      "removeRestrictions": "Remove restrictions",
+      "brokenTitle": "This PDF couldn't be opened",
+      "brokenBody": "It may be damaged. We can try to repair it.",
+      "repair": "Try to repair it",
+      "repairFailed": "We couldn't repair this PDF.",
+      "scannedTitle": "This looks like a scan",
+      "scannedBody": "Its text can't be selected or searched yet. We can read the text so you can.",
+      "languages": "Languages in it",
+      "ocr": "Make text searchable",
+      "notNow": "Not now",
+      "redo": "Read the text again, even where there is some",
+      "ocrReplaced": "Keep the original on changed lines first.",
+      "restartConfirm": "This changes the pages, so your changes so far will be lost. Go ahead?",
+      "notLocked": "This PDF has no password or restrictions.",
+      "opensFine": "This PDF opens fine.",
+      "repairAnyway": "Repair anyway",
+      "failed": "That didn't work. Try again in a minute.",
+      "rebuildReplaced": "This rebuilds the file. Keep the original on changed lines first.",
+      "damagedTitle": "This PDF has errors",
+      "firstUnlockBody": "To do this, we remove them first, then carry on.",
+      "firstRepairBody": "To do this, we repair it first, then carry on.",
+      "ocrTitle": "Make the text searchable",
+      "ocrBody": "We read the words on every page so they can be selected, searched and copied."
+    },
+    "inline": {
+      "compress": "Compression",
+      "imageType": "Image format"
+    },
+    "range": {
+      "label": "Pages",
+      "placeholder": "1-3, 5, 8-10",
+      "apply": "Select",
+      "empty": "Type page numbers, like 1-3, 5.",
+      "format": "Can't read “{part}”. Use page numbers like 1-3, 5.",
+      "reversed": "Write “{part}” from the lower page to the higher, like 2-5.",
+      "outOfRange": "{count, plural, one {This PDF has only # page.} other {This PDF has only # pages.}}"
+    },
+    "export": {
+      "title": "Save your file",
+      "subtitle": "Pick what you want to get. You'll see the file name before you save.",
+      "getWhat": "What do you want to get?",
+      "format": {
+        "pdf": "PDF",
+        "pdfHint": "Your PDF with every change",
+        "word": "Word",
+        "wordHint": "Editable document, .docx",
+        "excel": "Excel",
+        "excelHint": "Tables as spreadsheet cells, .xlsx",
+        "images": "Images",
+        "imagesHint": "One picture per page, JPG or PNG",
+        "text": "Text",
+        "textHint": "Just the words, .txt",
+        "imagesInside": "Pictures inside",
+        "imagesInsideHint": "Every photo or graphic in the PDF",
+        "pdfa": "PDF/A",
+        "pdfaHint": "For archives and thesis deposits, checked by veraPDF"
+      },
+      "whichPages": "Which pages?",
+      "allPages": "{count, plural, one {The one page} other {All # pages}}",
+      "selectedPages": "{count, plural, =0 {Only the selected pages} one {Only the selected page} other {Only the # selected pages}}",
+      "selectFirst": "Select pages first: tick them in the page strip",
+      "howManyFiles": "How many files?",
+      "onePdf": "One PDF",
+      "perPage": "One PDF per page",
+      "everyBefore": "One PDF every",
+      "everyAfter": "{count, plural, one {page} other {pages}}",
+      "runs": "One PDF per range of selected pages",
+      "notWithPassword": "Not with a password. Turn the password off first.",
+      "passwordNeedsOne": "Only when you choose One PDF",
+      "extras": "Extras",
+      "levelMediumHint": "Good for email",
+      "levelHighHint": "Keeps images sharp",
+      "levelLowHint": "Smallest size, images get softer",
+      "password": "Lock with a password",
+      "metadata": "Remove author, dates and app name",
+      "flatten": "Make form answers permanent (fields can't be edited after)",
+      "youGet": "You'll get",
+      "get": {
+        "pdf": "<name>{filename}</name>, a PDF with {count, plural, one {page {list}} other {pages {list}}}",
+        "pdfs": "<name>{filename}</name>, a ZIP with {files} PDFs (pages {list})",
+        "pdfAlso": "<name>{filename}</name>, a ZIP with 2 PDFs: the whole file, and the selected {count, plural, one {page ({list}) on its own} other {pages ({list}) on their own}}",
+        "word": "<name>{filename}</name>, a Word document",
+        "excel": "<name>{filename}</name>, an Excel spreadsheet",
+        "image": "<name>{filename}</name>, an image of your page",
+        "images": "<name>{filename}</name>, a ZIP with {count} {type} images, one per page",
+        "text": "<name>{filename}</name>, a text file",
+        "imagesInside": "<name>{filename}</name>, a ZIP of every picture in the PDF. If there's only one, you get the picture itself.",
+        "pdfa": "<name>{filename}</name>, a {level} file checked by veraPDF"
+      },
+      "example": {
+        "files": "{files, plural, one {# PDF} other {# PDFs}}: {count, plural, one {page {list}} other {pages {list}}}",
+        "also": "2 PDFs: the whole file, and {count, plural, one {page {list} on its own} other {pages {list} on their own}}"
+      },
+      "button": {
+        "pdf": "Download PDF",
+        "pdfs": "Download {count} PDFs (ZIP)",
+        "word": "Convert to Word",
+        "excel": "Convert to Excel",
+        "images": "{count, plural, one {Convert to an image} other {Convert to # images (ZIP)}}",
+        "text": "Get the text",
+        "imagesInside": "Get the pictures",
+        "pdfa": "Convert to PDF/A"
+      }
+    },
+    "toolbar": {
+      "clear": "Clear selection",
+      "noSelection": "No pages are selected yet",
+      "deleteSelected": "Delete selected",
+      "addBlank": "Add a blank page",
+      "fileTools": "Page and file tools",
+      "merge": "Merge",
+      "mergeHint": "Add another PDF to the end",
+      "split": "Split",
+      "rotate": "Rotate",
+      "deletePages": "Delete pages",
+      "sign": "Sign",
+      "watermark": "Watermark",
+      "numbers": "Page numbers",
+      "compress": "Compress",
+      "convert": "Convert",
+      "protect": "Protect"
+    },
+    "task": {
+      "edit": "Add text, your signature, shapes or pictures, and change pages.",
+      "sign": "Add your signature, then save the signed PDF.",
+      "crop": "Drag across a page to choose what to keep on every page.",
+      "rotate": "Turns the pages you select left or right.",
+      "delete": "Removes the pages you select from your PDF.",
+      "reorder": "Drag pages into the order you want.",
+      "extract": "Saves the pages you pick as a new PDF.",
+      "split": "Splits your PDF into separate files.",
+      "merge": "Joins your PDFs into one, in the order shown.",
+      "watermark": "Puts text or an image across every page.",
+      "numbers": "Numbers every page of your PDF.",
+      "compress": "Makes your PDF smaller.",
+      "protect": "Locks your PDF so it needs a password to open.",
+      "unlock": "Removes the password and restrictions from your PDF.",
+      "repair": "Tries to fix a PDF with errors so it opens everywhere.",
+      "ocr": "Reads the text in a scan so you can select and search it.",
+      "flatten": "Makes form answers part of the page, so they can't be changed.",
+      "metadata": "Removes hidden info such as the author, dates and app name.",
+      "word": "Turns your PDF into an editable Word document.",
+      "excel": "Turns the tables in your PDF into an Excel workbook.",
+      "images": "Turns each page into a picture.",
+      "text": "Gets all the text out of your PDF as a .txt file.",
+      "imagesInside": "Saves the pictures inside your PDF.",
+      "converted": "Your PDF is ready. Download it, or add text, a signature or pages first.",
+      "pages": "{count, plural, one {# page} other {# pages}}",
+      "kb": "{n} KB",
+      "mb": "{n} MB",
+      "pdfa": "Turns your PDF into PDF/A for archiving, then checks it with veraPDF."
+    },
+    "all": {
+      "button": "All tools",
+      "title": "All tools",
+      "groups": {
+        "pages": "Pages",
+        "add": "Add to pages",
+        "text": "Change existing text",
+        "file": "Get a different file",
+        "fix": "Fix the file"
+      },
+      "items": {
+        "turn": {
+          "name": "Turn pages",
+          "line": "Rotate pages left or right."
+        },
+        "delete": {
+          "name": "Delete pages",
+          "line": "Pick pages and remove them."
+        },
+        "reorder": {
+          "name": "Reorder pages",
+          "line": "Drag pages into a new order."
+        },
+        "addPdf": {
+          "name": "Add another PDF",
+          "line": "Put its pages into this one."
+        },
+        "addBlank": {
+          "name": "Add a blank page",
+          "line": "After the page you're on."
+        },
+        "crop": {
+          "name": "Crop",
+          "line": "Hide the edges of pages."
+        },
+        "text": {
+          "name": "Text",
+          "line": "Type anywhere on a page."
+        },
+        "signature": {
+          "name": "Signature",
+          "line": "Draw, type or upload it."
+        },
+        "image": {
+          "name": "Image",
+          "line": "A JPG, PNG or WebP picture."
+        },
+        "date": {
+          "name": "Today's date",
+          "line": "Added as text you can move."
+        },
+        "dateHijri": {
+          "name": "Hijri date",
+          "line": "Today's date in the Hijri calendar."
+        },
+        "watermark": {
+          "name": "Watermark",
+          "line": "Text or an image on every page."
+        },
+        "numbers": {
+          "name": "Page numbers",
+          "line": "A number on every page."
+        },
+        "letterhead": {
+          "name": "Letterhead",
+          "line": "Your name and logo at the top of the page, your details at the bottom."
+        },
+        "draw": {
+          "name": "Draw",
+          "line": "Freehand, with a mouse or finger."
+        },
+        "shapes": {
+          "name": "Shapes",
+          "line": "Rectangle, ellipse, line or arrow."
+        },
+        "highlight": {
+          "name": "Highlight",
+          "line": "Mark part of a page in color."
+        },
+        "cover": {
+          "name": "Hide (white box)",
+          "line": "Covers what's under it on the page."
+        },
+        "replace": {
+          "name": "Edit existing text",
+          "line": "Change the words already in the PDF."
+        },
+        "split": {
+          "name": "Split or extract pages",
+          "line": "Several PDFs, or only some pages."
+        },
+        "word": {
+          "name": "Word",
+          "line": "An editable .docx document."
+        },
+        "excel": {
+          "name": "Excel",
+          "line": "Tables as an .xlsx workbook."
+        },
+        "images": {
+          "name": "Images",
+          "line": "Each page as a JPG or PNG."
+        },
+        "plainText": {
+          "name": "Text",
+          "line": "All the words, as a .txt file."
+        },
+        "imagesInside": {
+          "name": "Pictures inside",
+          "line": "The pictures in the PDF, as PNG files."
+        },
+        "compress": {
+          "name": "Make it smaller",
+          "line": "A lighter PDF, easier to send."
+        },
+        "password": {
+          "name": "Lock with a password",
+          "line": "Needed to open the PDF."
+        },
+        "metadata": {
+          "name": "Remove author and dates",
+          "line": "Clears hidden info from the file."
+        },
+        "flatten": {
+          "name": "Make form answers permanent",
+          "line": "Filled-in fields can't be changed."
+        },
+        "ocr": {
+          "name": "Make scanned text searchable",
+          "line": "So you can select and search it."
+        },
+        "repair": {
+          "name": "Repair",
+          "line": "For a PDF that shows errors."
+        },
+        "pdfa": {
+          "name": "PDF/A",
+          "line": "For archives and thesis deposits."
+        }
+      },
+      "deleteHint": "Select the pages to delete, then use Delete selected"
+    },
+    "card": {
+      "split": {
+        "title": "How do you want to split?",
+        "perPage": "One PDF per page",
+        "everyBefore": "One PDF every",
+        "everyAfter": "{count, plural, one {page} other {pages}}",
+        "ranges": "One PDF per range of selected pages",
+        "selected": "Selected pages into one PDF"
+      },
+      "extract": {
+        "title": "Which pages?",
+        "together": "Selected pages into one PDF",
+        "each": "Each selected page as its own PDF"
+      },
+      "protect": {
+        "title": "Choose a password",
+        "hint": "You'll need it to open the PDF. We can't recover it if it's lost."
+      },
+      "compress": {
+        "title": "How much smaller?",
+        "medium": "Smaller, still sharp to read and print.",
+        "high": "A little smaller, looks the same.",
+        "low": "Much smaller, pictures get softer.",
+        "limit": "Under a size limit",
+        "limitBefore": "Under",
+        "limitUnit": "MB",
+        "limitLabel": "Size limit in MB",
+        "limitHint": "For upload forms that refuse big files."
+      },
+      "result": {
+        "pdf": "You'll get {name}.",
+        "pdfs": "You'll get {name}, a ZIP with {count, plural, one {# PDF} other {# PDFs}}.",
+        "word": "You'll get {name}, a Word document.",
+        "excel": "You'll get {name}, an Excel workbook.",
+        "text": "You'll get {name}, a text file.",
+        "image": "You'll get {name}, a picture of the page.",
+        "images": "You'll get {name}, a ZIP with {count, plural, one {# picture} other {# pictures}}, one per page.",
+        "imagesInside": "You'll get {name}, a ZIP of the pictures inside. A single picture comes on its own.",
+        "pdfa": "You'll get {name}, a {level} file checked by veraPDF."
+      },
+      "pdfa": {
+        "title": "Which PDF/A?",
+        "hint2b": "What most universities and archives ask for.",
+        "hint1b": "For older rules that name PDF/A-1. Pages with transparency become pictures.",
+        "hint3b": "Only if you were asked for PDF/A-3."
+      }
+    }
+  },
+  "pdfToPdfa": {
+    "title": "PDF to PDF/A Converter",
+    "description": "Convert PDF to PDF/A-1b, 2b or 3b for archiving or a thesis deposit, checked with veraPDF. Free, no sign-up.",
+    "answer": "Turn any PDF into PDF/A-1b, 2b or 3b for archiving or a thesis deposit. Every file is checked with veraPDF, and you see the result before you download. Free, no sign-up, up to 50MB.",
+    "howToTitle": "How to convert a PDF to PDF/A",
+    "steps": {
+      "upload": {
+        "title": "Upload your PDF",
+        "description": "Exported from Word, LaTeX, Google Docs or any other app"
+      },
+      "convert": {
+        "title": "Pick the PDF/A level",
+        "description": "PDF/A-2b, unless your university or archive names another"
+      },
+      "download": {
+        "title": "Download the checked file",
+        "description": "veraPDF's verdict is shown next to the download"
+      }
+    },
+    "faq": {
+      "whatIsPdfa": {
+        "question": "What is PDF/A?",
+        "answer": "PDF/A is the version of PDF made for long-term archiving (ISO 19005). Everything needed to show the file is inside it: the fonts are embedded and the colours are defined, so it will look the same in twenty years on any computer. Universities, courts and public archives ask for it."
+      },
+      "whichLevel": {
+        "question": "Which PDF/A level should I choose?",
+        "answer": "The one your university or archive names. If they don't say, choose PDF/A-2b: it is the most widely accepted. PDF/A-1b is for older rules that ask for PDF/A-1 by name: it doesn't allow transparency, so pages that use it are saved as pictures, and we tell you which ones. PDF/A-3b is only for when you were asked for PDF/A-3. The \"b\" means the file looks exactly right. The \"a\" levels also need an accessible tag structure, which this tool doesn't make."
+      },
+      "veraPdf": {
+        "question": "How do I know the file really is PDF/A?",
+        "answer": "Every file is checked with veraPDF, the open-source validator from the PDF Association and the Open Preservation Foundation, which many universities use themselves. Its verdict is shown next to the download. If it finds a problem, we tell you which rule failed instead of calling the file valid."
+      },
+      "thesis": {
+        "question": "Can I use it for my thesis or dissertation?",
+        "answer": "Yes. Export your thesis to PDF from Word, LaTeX, Google Docs or Pages, upload it here and choose the level your graduate school asks for. Google Docs can't export PDF/A, and LaTeX needs extra packages for it, so this is the quickest route for many students."
+      },
+      "whatChanges": {
+        "question": "What changes in my file?",
+        "answer": "It looks the same. Fonts are embedded, colours are set to standard RGB and the archiving information is added. Fillable form fields become part of the page: what you typed stays, but it can't be edited anymore. A password can't be kept, because PDF/A doesn't allow encryption."
+      },
+      "scanned": {
+        "question": "Does it work with scanned PDFs?",
+        "answer": "Yes. The pages stay pictures, exactly as they were scanned. To make the text searchable too, run OCR PDF first, then convert the result to PDF/A."
+      },
+      "signed": {
+        "question": "Can I convert a digitally signed PDF?",
+        "answer": "No. The conversion rewrites the file, which would break the signature. Convert the unsigned version, then sign the PDF/A."
+      },
+      "arabic": {
+        "question": "Does it keep Arabic and other right-to-left text?",
+        "answer": "Yes. Arabic text keeps its fonts and joined letters, and stays selectable and searchable in the PDF/A file."
+      },
+      "freePrivacy": {
+        "question": "Is it free, and what happens to my file?",
+        "answer": "It's free, with no sign-up, for PDFs up to 50MB. The conversion runs on our server and the file is deleted within an hour."
       }
     }
   }

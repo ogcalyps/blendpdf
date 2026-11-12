@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { toHeaderSafeFilename } from '@/lib/pdf-processor';
+import { inspectPdf, pdfRejectionResponse } from '@/lib/pdf-validation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -66,18 +67,14 @@ export async function POST(request: NextRequest) {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
 
-    if (pdfDoc.isEncrypted) {
-      return NextResponse.json(
-        {
-          error: 'This PDF is password-protected. Please use the Unlock PDF tool to remove the password first, then try again.',
-          errorCode: 'ENCRYPTED_PDF',
-          requestId,
-        },
-        { status: 400 }
-      );
+    const inspection = await inspectPdf(Buffer.from(arrayBuffer));
+    if (!inspection.ok) {
+      console.warn(`[${requestId}] Rejected: ${inspection.rejection.errorCode}`, inspection.rejection.detail ?? {});
+      return pdfRejectionResponse(inspection.rejection, requestId);
     }
+
+    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
 
     const pages = pdfDoc.getPages();
     const totalPages = pages.length;
@@ -141,11 +138,12 @@ export async function POST(request: NextRequest) {
         'X-Request-ID': requestId,
       },
     });
-  } catch (error: any) {
-    console.error('Error adding page numbers:', error);
+  } catch (error) {
+    console.error(`[${requestId}] Error adding page numbers:`, error);
     return NextResponse.json(
       {
-        error: error.message || 'Failed to add page numbers. Please try again.',
+        error: 'Failed to add page numbers. Please try again.',
+        errorCode: 'PAGE_NUMBERS_FAILED',
         requestId,
       },
       { status: 500 }

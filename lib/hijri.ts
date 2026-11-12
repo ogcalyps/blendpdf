@@ -100,13 +100,17 @@ export function todayHijri(locale: string = 'en'): string {
     return gregorianToHijri(new Date(), locale).formatted;
 }
 
+/** Latin-script site languages whose dates read in their own words. */
+const GREGORIAN_LOCALES: Record<string, string> = { fr: 'fr-FR', es: 'es-ES' };
+
 /**
  * A Gregorian date formatted for insertion into a PDF form field:
- * "10 August 2026" (en) / "١٠ أغسطس ٢٠٢٦" (ar).
+ * "10 August 2026" (en) / "10 août 2026" (fr) / "10 de agosto de 2026" (es)
+ * / "١٠ أغسطس ٢٠٢٦" (ar).
  */
 export function formatGregorianDate(date: Date, locale: string = 'en'): string {
     const arabic = isArabicLocale(locale);
-    return new Intl.DateTimeFormat(arabic ? 'ar' : 'en-GB', {
+    return new Intl.DateTimeFormat(arabic ? 'ar' : (GREGORIAN_LOCALES[locale] ?? 'en-GB'), {
         numberingSystem: arabic ? 'arab' : 'latn',
         year: 'numeric',
         month: 'long',

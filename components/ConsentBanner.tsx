@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-
-const STORAGE_KEY = 'blendpdf-consent';
+import { CONSENT_STORAGE_KEY as STORAGE_KEY, recordConsentChoice } from '@/lib/consent';
+import { trackEvent } from '@/lib/analytics';
 
 /**
  * Minimal analytics-consent banner (Consent Mode v2).
  * GA loads with analytics_storage denied by default (see GoogleAnalytics.tsx);
  * accepting here upgrades consent, declining records the refusal so the
  * banner doesn't reappear. Only analytics cookies are involved — the site
- * sets no advertising cookies.
+ * sets no advertising cookies. The choice governs GA only: the first-party
+ * counts (lib/analytics.ts sendEvent) carry no cookie or stored ID and
+ * count every visitor, this click included (consent_choice).
  */
 export function ConsentBanner() {
   const t = useTranslations('consent');
@@ -26,14 +28,13 @@ export function ConsentBanner() {
   }, []);
 
   const decide = (granted: boolean) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, granted ? 'granted' : 'denied');
-    } catch {
-      // Ignore storage failures; the choice still applies for this page view.
-    }
+    // Never throws.
+    recordConsentChoice(granted);
     if (granted && typeof window !== 'undefined' && window.gtag) {
       window.gtag('consent', 'update', { analytics_storage: 'granted' });
     }
+    // After the update, so GA gets an Accept with its new consent. The first-party copy is sent either way.
+    trackEvent('consent_choice', { action: granted ? 'accept' : 'decline' });
     setVisible(false);
   };
 

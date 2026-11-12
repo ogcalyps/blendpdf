@@ -53,6 +53,11 @@ export function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
+                <Link href="/guides" className="text-sm text-gray-600 hover:text-primary">
+                  {t('footer.guides')}
+                </Link>
+              </li>
+              <li>
                 <Link href="/forms" className="text-sm text-gray-600 hover:text-primary">
                   {t('nav.formTemplates')}
                 </Link>
@@ -63,24 +68,28 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-sm text-gray-600 hover:text-primary">
-                  {t('footer.blog')}
+                <Link href="/compare" className="text-sm text-gray-600 hover:text-primary">
+                  {t('footer.compare')}
                 </Link>
               </li>
-              {process.env.NEXT_PUBLIC_TRUSTPILOT_BUSINESS_UNIT_ID && (
-                <li>
-                  <a
-                    href={`https://www.trustpilot.com/review/${process.env.NEXT_PUBLIC_TRUSTPILOT_DOMAIN || 'blendpdf.com'}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-primary inline-flex items-center gap-1"
-                    aria-label={t('footer.readReviews')}
-                  >
-                    <Shield className="w-4 h-4" />
-                    <span>{t('footer.reviews')}</span>
-                  </a>
-                </li>
-              )}
+              <li>
+                <Link href="/pdf-upload-limits" className="text-sm text-gray-600 hover:text-primary">
+                  {t('footer.uploadLimits')}
+                </Link>
+              </li>
+              {/* The link needs only the domain; the business unit ID is for the homepage widget */}
+              <li>
+                <a
+                  href={`https://www.trustpilot.com/review/${process.env.NEXT_PUBLIC_TRUSTPILOT_DOMAIN || 'blendpdf.com'}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-gray-600 hover:text-primary inline-flex items-center gap-1"
+                  aria-label={t('footer.readReviews')}
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>{t('footer.reviews')}</span>
+                </a>
+              </li>
             </ul>
           </div>
 

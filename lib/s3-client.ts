@@ -1,6 +1,7 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getAWSCredentials, getS3BucketName } from './aws-config';
+import { logRef, errorLogFields } from './log-redact';
 
 // Initialize S3 client
 // Use IAM role credentials (default) or explicit credentials from environment variables
@@ -82,7 +83,7 @@ export async function generateUploadUrl(fileName: string, contentType: string = 
     },
   });
   
-  console.log(`[generateUploadUrl] Using bucket: ${BUCKET_NAME}, key: ${key}, contentType: ${contentType}`);
+  console.log(`[generateUploadUrl] Using bucket: ${BUCKET_NAME}, key: ${logRef(key)}, contentType: ${contentType}`);
 
   // Generate presigned URL
   // Note: ContentType in PutObjectCommand should automatically be included in signature
@@ -109,7 +110,7 @@ export async function downloadFromS3(key: string): Promise<ArrayBuffer> {
     Key: key,
   });
   
-  console.log(`[downloadFromS3] Using bucket: ${BUCKET_NAME}, key: ${key}`);
+  console.log(`[downloadFromS3] Using bucket: ${BUCKET_NAME}, key: ${logRef(key)}`);
 
   const response = await s3Client.send(command);
   
@@ -149,7 +150,7 @@ export async function deleteFromS3(key: string): Promise<void> {
 
     await s3Client.send(command);
   } catch (error) {
-    console.error(`Failed to delete ${key} from S3:`, error);
+    console.error(`Failed to delete ${logRef(key)} from S3:`, errorLogFields(error));
     // Don't throw - cleanup failures shouldn't break the flow
   }
 }

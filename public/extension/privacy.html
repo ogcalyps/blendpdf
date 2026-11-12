@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!--
+  Privacy policy for the "Open in BlendPDF — PDF tools" Chrome extension.
+
+  Served at https://blendpdf.com/extension/privacy.html — paste that URL into
+  the Chrome Web Store dashboard under Privacy → "Privacy policy URL". The
+  store requires a reachable, public URL; a repo file is not accepted.
+
+  Self-contained by design: no external fonts, scripts, stylesheets or images,
+  so it renders identically wherever it is served and cannot break when
+  something third-party goes away.
+
+  Keep in step with PRIVACY.md in the blendpdf-extension repo — they must say
+  the same thing. If a permission changes in wxt.config.ts, all three change.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open in BlendPDF — Extension Privacy Policy</title>
+<meta name="description" content="The BlendPDF browser extension collects nothing. What runs on your device, what uses the network, what is stored and for how long.">
+<meta name="robots" content="index, follow">
+<style>
+  :root {
+    --brand: #ff6b35; --coral: #ff8b68; --teal: #00c9a7; --dark: #2d2d2d;
+    --page: linear-gradient(135deg, #fff5f2 0%, #ffe9e1 100%);
+    --surface: #fff; --fg: #111827; --body: #374151; --muted: #6b7280;
+    --line: #e5e7eb; --edge: #fed7aa; --tint: #fff7ed;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page); color: var(--body);
+    font: 400 16px/1.7 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 48px 20px 88px;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+
+  .mark { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .mark strong { font-size: 22px; font-weight: 800; color: var(--dark); letter-spacing: -.01em; }
+
+  h1 { font-size: 30px; line-height: 1.25; font-weight: 800; color: var(--fg); margin: 18px 0 6px; letter-spacing: -.02em; }
+  .updated { color: var(--muted); font-size: 14px; margin-bottom: 30px; }
+
+  h2 {
+    font-size: 19px; font-weight: 700; color: var(--fg);
+    margin: 34px 0 10px; padding-top: 22px; border-top: 1px solid var(--edge);
+  }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 14px; padding-inline-start: 22px; }
+  li { margin-bottom: 7px; }
+  a { color: #c2410c; }
+  a:hover { color: var(--brand); }
+  code {
+    background: var(--tint); border: 1px solid var(--edge); color: #9a3412;
+    padding: 1px 6px; border-radius: 5px; font-size: 13.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .lede {
+    background: var(--surface); border-radius: 16px; padding: 20px 22px;
+    box-shadow: 0 1px 2px rgba(45,45,45,.05), 0 8px 24px rgba(255,107,53,.07);
+    margin-bottom: 8px;
+  }
+  .lede p:last-child { margin-bottom: 0; }
+  .lede strong { color: var(--teal); }
+
+  table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 15px; background: var(--surface); border-radius: 12px; overflow: hidden; }
+  th, td { text-align: start; padding: 11px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--tint); font-weight: 700; color: var(--fg); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+  tr:last-child td { border-bottom: 0; }
+
+  footer { margin-top: 42px; padding-top: 20px; border-top: 1px solid var(--edge); color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 560px) {
+    body { padding: 32px 16px 64px; }
+    h1 { font-size: 25px; }
+    table, th, td { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <div class="mark">
+    <svg width="34" height="34" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+      <rect x="15" y="25" width="28" height="36" rx="2" fill="#FF6B35" opacity="0.5"/>
+      <rect x="23" y="20" width="28" height="36" rx="2" fill="#FF8B68"/>
+      <line x1="28" y1="28" x2="46" y2="28" stroke="white" stroke-width="1.5" opacity="0.5"/>
+      <line x1="28" y1="33" x2="46" y2="33" stroke="white" stroke-width="1.5" opacity="0.5"/>
+      <rect x="31" y="15" width="28" height="36" rx="2" fill="#00C9A7"/>
+      <path d="M 57 15 L 57 20 L 59 15 Z" fill="#00B090"/>
+      <line x1="36" y1="23" x2="54" y2="23" stroke="white" stroke-width="1.5" opacity="0.6"/>
+      <line x1="36" y1="28" x2="54" y2="28" stroke="white" stroke-width="1.5" opacity="0.6"/>
+      <line x1="36" y1="33" x2="50" y2="33" stroke="white" stroke-width="1.5" opacity="0.6"/>
+    </svg>
+    <strong>BlendPDF</strong>
+  </div>
+
+  <h1>Privacy Policy — Open in BlendPDF</h1>
+  <p class="updated">Browser extension &middot; Last updated 8 November 2026</p>
+
+  <div class="lede">
+    <p><strong>The extension collects nothing.</strong> No analytics SDK, no telemetry, no error reporting, no account, no identifier of any kind. Nothing you do in the extension is reported to anyone.</p>
+    <p>This policy is deliberately specific, because the extension's main claim is a privacy claim and a vague policy would undermine it.</p>
+  </div>
+
+  <h2>What runs on your device only</h2>
+  <p>These never touch the network:</p>
+  <ul>
+    <li>Reading a PDF's page count, title, size and whether it is password protected</li>
+    <li>Drawing the first-page preview shown next to each file</li>
+    <li>Merging, rotating, deleting pages, extracting a page range</li>
+    <li>Saving the result to your downloads</li>
+  </ul>
+  <p>The PDF is read into memory, processed by bundled copies of <a href="https://pdf-lib.js.org/" rel="noopener">pdf-lib</a> (editing) and <a href="https://mozilla.github.io/pdf.js/" rel="noopener">pdf.js</a> (drawing previews), and written straight back to your disk. Both ship inside the extension; neither fetches anything. You can confirm this yourself: open DevTools on the extension popup, watch the Network tab, and run any local action. There will be no requests.</p>
+
+  <h2>When the extension does use the network</h2>
+  <p>Four cases. The first happens once, when you install; the other three are started by you:</p>
+  <ol>
+    <li><strong>Showing the welcome page, once.</strong> Right after you add the extension, it opens <code>blendpdf.com/extension/welcome</code> in a new tab, in your browser&rsquo;s language. This is an ordinary page visit, logged by the site like any other. Updates never open it again.</li>
+    <li><strong>Downloading a PDF you right-clicked.</strong> The extension fetches that URL so it has the bytes. The request goes to whichever site hosts the PDF — the same request your browser would make if you clicked the link.</li>
+    <li><strong>Opening a BlendPDF tool.</strong> The extension opens a normal tab at blendpdf.com.</li>
+    <li><strong>Sending a file to BlendPDF.</strong> The staged file is placed into the tool page's upload box. From that point the file is handled by BlendPDF under its own <a href="/privacy">privacy policy</a>: files are processed and deleted from BlendPDF's servers within one hour, most immediately after processing. Several BlendPDF tools — merge, split, rotate, reorder, delete pages, page numbers, watermark — run in your browser and do not upload at all.</li>
+  </ol>
+  <p>The extension tells you at the moment of handoff that the file is going to BlendPDF.</p>
+
+  <h2>What is stored, and for how long</h2>
+  <table>
+    <tr><th>Data</th><th>Where</th><th>How long</th></tr>
+    <tr><td>A PDF staged for handoff</td><td>Local IndexedDB, on your machine</td><td>Deleted as soon as the file is delivered, and in all cases within 10 minutes</td></tr>
+    <tr><td>Anything else</td><td>&mdash;</td><td>Nothing else is stored</td></tr>
+  </table>
+  <p>There is no cloud storage, no sync, and no server belonging to this extension. Uninstalling removes the local database.</p>
+
+  <h2>URL parameters</h2>
+  <p>Links the extension opens on blendpdf.com carry <code>utm_source=extension</code> and the tool name (or <code>utm_medium=install</code> and the extension version, for the welcome page), so the site's owner can see how many visits came from the extension. This is a first-party counter on their own site, contains nothing about you or your file, and is disclosed here rather than hidden. The handoff identifier in the URL is a random one-time value that means nothing outside your own browser, and it is removed from the address bar on arrival.</p>
+
+  <h2>Permissions, and why each one exists</h2>
+  <table>
+    <tr><th>Permission</th><th>Why</th></tr>
+    <tr><td><code>contextMenus</code></td><td>Adds the right-click entries on PDF links</td></tr>
+    <tr><td><code>activeTab</code></td><td>Reads the PDF from the tab you invoked the menu on. Granted per click, not standing</td></tr>
+    <tr><td><code>scripting</code></td><td>Runs a single fetch inside that tab, which is the only way to read <code>blob:</code> PDFs a web app generated</td></tr>
+    <tr><td><code>downloads</code></td><td>Saves the merged, rotated or trimmed PDF you produced locally</td></tr>
+    <tr><td><code>unlimitedStorage</code></td><td>Holds the staged file locally, in IndexedDB, between the click and the tab opening — PDFs exceed the default quota. The <code>storage</code> permission is deliberately <strong>not</strong> requested: the extension never calls <code>chrome.storage</code></td></tr>
+    <tr><td><code>host_permissions</code> (blendpdf.com)</td><td>Lets the content script place your file into the tool page</td></tr>
+    <tr><td><code>optional_host_permissions</code></td><td><strong>Not granted at install.</strong> Requested for one specific site, at the moment you use it, and only if the PDF could not be read any other way. You can decline and the tool page still opens</td></tr>
+  </table>
+  <p>The extension does <strong>not</strong> request access to all websites.</p>
+
+  <h2>Third parties</h2>
+  <p>None. No SDKs, no CDNs, no remote code — Manifest V3 forbids remote code and this extension bundles every dependency. The only external service involved is blendpdf.com, and only when you choose to send a file there.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about the extension: open an issue on its repository. Questions about how BlendPDF handles an uploaded file: see the <a href="/privacy">BlendPDF privacy policy</a>.</p>
+
+  <footer>
+    &copy; BlendPDF &middot; <a href="/">blendpdf.com</a>
+  </footer>
+
+</main>
+</body>
+</html>

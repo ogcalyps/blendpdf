@@ -8,16 +8,14 @@ import { RelatedTools } from '../components/RelatedTools';
 import { Navigation } from '@/components/Navigation';
 import { BreadcrumbSchema } from '@/components/BreadcrumbSchema';
 import { HowToSchema } from '@/components/HowToSchema';
-import { useDropzone } from 'react-dropzone';
+import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { UploadCloud, Loader2 } from 'lucide-react';
 import { formatFileSize } from '@/lib/utils';
 import { GoogleDrivePicker } from '@/components/GoogleDrivePicker';
 import { Button } from '@/components/ui/Button';
 import { Footer } from '@/components/Footer';
-import { EmailCaptureModal } from '@/components/EmailCaptureModal';
-import { DeliveryChoiceModal } from '@/components/DeliveryChoiceModal';
-import { useDeliveryChoice } from '@/hooks/useDeliveryChoice';
-import { trackToolStart, trackToolComplete, trackToolError } from '@/lib/analytics';
+import { ToolWorkspace } from '@/components/workspace/ToolWorkspace';
+import { trackToolStart, trackToolComplete, trackToolError, responseError } from '@/lib/analytics';
 import { useToolFaqs } from '@/lib/tool-faqs';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
@@ -56,39 +54,8 @@ export default function PowerPointToPDFPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [convertedBlob, setConvertedBlob] = useState<Blob | null>(null);
-  const [convertedFilename, setConvertedFilename] = useState<string>('converted.pdf');
+  const [converted, setConverted] = useState<File | null>(null);
   const [inlineError, setInlineError] = useState<string | null>(null);
-
-  // Use delivery choice hook for consistent download experience
-  const {
-    showEmailCapture,
-    showDeliveryChoice,
-    capturedEmail,
-    isSendingEmail,
-    successType,
-    handleEmailCaptured,
-    handleSendViaEmail,
-    handleDownloadDirectly,
-    triggerEmailCapture,
-  } = useDeliveryChoice({
-    fileBlob: convertedBlob,
-    filename: convertedFilename,
-    onDownload: () => {
-      if (convertedBlob) {
-        const url = window.URL.createObjectURL(convertedBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = convertedFilename;
-        a.click();
-        window.URL.revokeObjectURL(url);
-        setConvertedBlob(null);
-      }
-    },
-    onReset: () => {
-      setConvertedBlob(null);
-    },
-  });
 
   const steps = [
     {
@@ -140,7 +107,7 @@ export default function PowerPointToPDFPage() {
     []
   );
 
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useTrackedDropzone({
     onDrop,
     accept: {
       'application/vnd.ms-powerpoint': ['.ppt'],
@@ -179,18 +146,16 @@ export default function PowerPointToPDFPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error || errorData?.message || t('powerpointToPdf.failedToConvert'));
+        throw responseError(response, t('powerpointToPdf.failedToConvert'), errorData?.errorCode);
       }
 
       const rawBlob = await response.blob();
       const blob = new Blob([rawBlob], { type: 'application/pdf' });
       const filename = file.name.replace(/\.(pptx?|odp)$/i, '.pdf');
 
-      // Store blob and trigger email capture
-      setConvertedBlob(blob);
-      setConvertedFilename(filename);
+      // Open it in the workspace, which offers the download at once
+      setConverted(new File([blob], filename, { type: 'application/pdf' }));
       trackToolComplete('powerpoint_to_pdf', Date.now() - trackStart);
-      triggerEmailCapture();
     } catch (error) {
       trackToolError('powerpoint_to_pdf', error, Date.now() - trackStart);
       console.error('Error converting PowerPoint to PDF:', error);
@@ -204,7 +169,7 @@ export default function PowerPointToPDFPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <BreadcrumbSchema items={[{ name: 'Home', url: '/' }, { name: 'PowerPoint to PDF', url: '/powerpoint-to-pdf' }]} />
       <HowToSchema
-        name="How to Convert PowerPoint to PDF"
+        name={t('powerpointToPdf.howToTitle')}
         description="Learn how to convert PowerPoint presentations (PPT, PPTX, ODP) to PDF format online for free"
         steps={steps.map(step => ({ title: step.title, description: step.description }))}
       />
@@ -218,171 +183,183 @@ export default function PowerPointToPDFPage() {
               {t('powerpointToPdf.title')}
             </h1>
             <p className="mt-4 text-lg text-gray-600">
-              {t('powerpointToPdf.description')}
+              {t('powerpointToPdf.answer')}
             </p>
           </div>
         </div>
       </section>
 
       {/* Main Section - 2 Column Layout */}
-      <section className="bg-white py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 lg:grid-cols-2">
-            {/* LEFT: Upload Zone / File Preview */}
-            <div>
-              {inlineError && (
-                <div className="mb-4 flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
-                  <p className="text-sm text-red-600">{inlineError}</p>
-                  <button
-                    type="button"
-                    onClick={() => setInlineError(null)}
-                    className="text-red-600 hover:text-red-700 transition-colors"
-                    aria-label={t('common.dismiss')}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-              {!file ? (
-                // Upload zone
-                <div {...getRootProps()} className="cursor-pointer">
-                  <input {...getInputProps()} />
-                  <div
-                    className={`
-                      relative flex min-h-[400px] flex-col items-center justify-center rounded-2xl bg-white p-8 sm:p-16
-                      border-2 border-dashed transition-colors duration-200
-                      ${isDragActive ? 'border-green-500 bg-green-50' : 'border-orange-200 hover:border-primary hover:bg-orange-50'}
-                    `}
-                  >
-                    <div className="flex flex-col items-center gap-4 text-center">
-                      <div className={`rounded-full p-4 ${isDragActive ? 'bg-green-100' : 'bg-orange-100'}`}>
-                        {isUploading || isProcessing ? (
-                          <Loader2 className={`h-12 w-12 ${isUploading ? 'text-primary' : 'text-primary'} animate-spin`} />
-                        ) : (
-                          <UploadCloud className={`h-12 w-12 ${isDragActive ? 'text-green-600' : 'text-primary'}`} />
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h2 className="text-2xl font-semibold text-gray-900">
-                          {isProcessing ? t('common.processing') : isUploading ? t('common.uploading') : t('common.dropFileHere')}
-                        </h2>
-                        <p className="text-gray-700">
-                          {isProcessing
-                            ? t('common.pleaseWait')
-                            : isUploading
-                              ? t('common.processingFile')
-                              : t('common.orClickToBrowse')
-                          }
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        size="md"
-                        className="mt-2 pointer-events-none"
-                        disabled={isUploading || isProcessing}
-                      >
-                        {isProcessing ? t('common.processing') : isUploading ? t('common.uploading') : t('powerpointToPdf.selectFile')}
-                      </Button>
-
-                      {/* Google Drive Integration */}
-                      <div className="mt-4">
-                        <GoogleDrivePicker
-                          onFilesSelected={async (files) => {
-                            if (files.length === 0) return;
-                            const uploadedFile = files[0];
-                            const error = validatePowerPointFile(uploadedFile, MAX_FILE_SIZE);
-                            if (error) {
-                              let translatedError = error;
-                              if (error.includes('File must be a PowerPoint presentation')) {
-                                translatedError = t('powerpointToPdf.errors.invalidFileType');
-                              } else if (error.includes('File size exceeds')) {
-                                translatedError = t('powerpointToPdf.errors.fileTooLarge');
-                              } else if (error.includes('File is empty')) {
-                                translatedError = t('powerpointToPdf.errors.emptyFile');
-                              }
-                              setInlineError(translatedError);
-                              return;
-                            }
-                            setInlineError(null);
-                            setIsUploading(true);
-                            await new Promise(resolve => setTimeout(resolve, 300));
-                            setFile(uploadedFile);
-                            setIsUploading(false);
-                          }}
-                          disabled={isProcessing}
-                          multiple={false}
-                          accept={['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.ms-powerpoint']}
-                        />
-                      </div>
-
-                      <p className="mt-4 text-sm text-gray-500">
-                        {t('powerpointToPdf.supportedFormats')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                // File preview
-                <div className="bg-white rounded-2xl border-2 border-orange-100 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">{t('powerpointToPdf.uploadedFile')}</h3>
+      {converted ? (
+        <ToolWorkspace
+          mode="converted"
+          initialFile={converted}
+          deliverOnOpen
+          onClose={() => {
+            setConverted(null);
+            setFile(null);
+          }}
+        />
+      ) : (
+        <section className="bg-white py-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-8 lg:grid-cols-2">
+              {/* LEFT: Upload Zone / File Preview */}
+              <div>
+                {inlineError && (
+                  <div className="mb-4 flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+                    <p className="text-sm text-red-600">{inlineError}</p>
                     <button
-                      onClick={handleRemoveFile}
-                      className="p-1 text-red-600 hover:text-red-700 transition-colors"
-                      aria-label={t('common.removeFile')}
+                      type="button"
+                      onClick={() => setInlineError(null)}
+                      className="text-red-600 hover:text-red-700 transition-colors"
+                      aria-label={t('common.dismiss')}
                     >
-                      <X className="w-5 h-5" />
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
+                )}
+                {!file ? (
+                  // Upload zone
+                  <div {...getRootProps()} className="cursor-pointer">
+                    <input {...getInputProps()} />
+                    <div
+                      className={`
+                        relative flex min-h-[400px] flex-col items-center justify-center rounded-2xl bg-white p-8 sm:p-16
+                        border-2 border-dashed transition-colors duration-200
+                        ${isDragActive ? 'border-green-500 bg-green-50' : 'border-orange-200 hover:border-primary hover:bg-orange-50'}
+                      `}
+                    >
+                      <div className="flex flex-col items-center gap-4 text-center">
+                        <div className={`rounded-full p-4 ${isDragActive ? 'bg-green-100' : 'bg-orange-100'}`}>
+                          {isUploading || isProcessing ? (
+                            <Loader2 className={`h-12 w-12 ${isUploading ? 'text-primary' : 'text-primary'} animate-spin`} />
+                          ) : (
+                            <UploadCloud className={`h-12 w-12 ${isDragActive ? 'text-green-600' : 'text-primary'}`} />
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <h2 className="text-2xl font-semibold text-gray-900">
+                            {isProcessing ? t('common.processing') : isUploading ? t('common.uploading') : t('common.dropFileHere')}
+                          </h2>
+                          <p className="text-gray-700">
+                            {isProcessing
+                              ? t('common.pleaseWait')
+                              : isUploading
+                                ? t('common.processingFile')
+                                : t('common.orClickToBrowse')
+                            }
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          size="md"
+                          className="mt-2 pointer-events-none"
+                          disabled={isUploading || isProcessing}
+                        >
+                          {isProcessing ? t('common.processing') : isUploading ? t('common.uploading') : t('powerpointToPdf.selectFile')}
+                        </Button>
 
-                  {/* File card */}
-                  <div className="bg-orange-50 rounded-xl p-4 mb-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Presentation className="w-8 h-8 text-primary" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 truncate" title={file.name}>
-                          {file.name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {t('powerpointToPdf.fileSize')} {formatFileSize(file.size, locale)}
+                        {/* Google Drive Integration */}
+                        <div className="mt-4">
+                          <GoogleDrivePicker
+                            onFilesSelected={async (files) => {
+                              if (files.length === 0) return;
+                              const uploadedFile = files[0];
+                              const error = validatePowerPointFile(uploadedFile, MAX_FILE_SIZE);
+                              if (error) {
+                                let translatedError = error;
+                                if (error.includes('File must be a PowerPoint presentation')) {
+                                  translatedError = t('powerpointToPdf.errors.invalidFileType');
+                                } else if (error.includes('File size exceeds')) {
+                                  translatedError = t('powerpointToPdf.errors.fileTooLarge');
+                                } else if (error.includes('File is empty')) {
+                                  translatedError = t('powerpointToPdf.errors.emptyFile');
+                                }
+                                setInlineError(translatedError);
+                                return;
+                              }
+                              setInlineError(null);
+                              setIsUploading(true);
+                              await new Promise(resolve => setTimeout(resolve, 300));
+                              setFile(uploadedFile);
+                              setIsUploading(false);
+                            }}
+                            disabled={isProcessing}
+                            multiple={false}
+                            accept={['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.ms-powerpoint']}
+                          />
+                        </div>
+
+                        <p className="mt-4 text-sm text-gray-500">
+                          {t('powerpointToPdf.supportedFormats')}
                         </p>
                       </div>
                     </div>
                   </div>
-
-                  {/* Convert button */}
-                  <Button
-                    onClick={handleConvert}
-                    size="lg"
-                    className="w-full"
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? t('common.processing') : t('powerpointToPdf.convertButton')}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* RIGHT: Instructions Panel */}
-            <div className="bg-white rounded-2xl border-2 border-orange-100 p-6">
-              <h3 className="text-lg font-bold text-dark mb-4">{t('powerpointToPdf.howItWorks')}</h3>
-              <div className="space-y-4">
-                {steps.map((step, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="flex-shrink-0 rounded-full bg-orange-100 p-3 text-primary">
-                      {step.icon}
+                ) : (
+                  // File preview
+                  <div className="bg-white rounded-2xl border-2 border-orange-100 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-gray-900">{t('powerpointToPdf.uploadedFile')}</h3>
+                      <button
+                        onClick={handleRemoveFile}
+                        className="p-1 text-red-600 hover:text-red-700 transition-colors"
+                        aria-label={t('common.removeFile')}
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
                     </div>
-                    <div>
-                      <h4 className="text-md font-semibold text-gray-900">{step.title}</h4>
-                      <p className="text-sm text-gray-600">{step.description}</p>
+
+                    {/* File card */}
+                    <div className="bg-orange-50 rounded-xl p-4 mb-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Presentation className="w-8 h-8 text-primary" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate" title={file.name}>
+                            {file.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {t('powerpointToPdf.fileSize')} {formatFileSize(file.size, locale)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Convert button */}
+                    <Button
+                      onClick={handleConvert}
+                      size="lg"
+                      className="w-full"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? t('common.processing') : t('powerpointToPdf.convertButton')}
+                    </Button>
                   </div>
-                ))}
+                )}
+              </div>
+
+              {/* RIGHT: Instructions Panel */}
+              <div className="bg-white rounded-2xl border-2 border-orange-100 p-6">
+                <h3 className="text-lg font-bold text-dark mb-4">{t('powerpointToPdf.howToTitle')}</h3>
+                <div className="space-y-4">
+                  {steps.map((step, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="flex-shrink-0 rounded-full bg-orange-100 p-3 text-primary">
+                        {step.icon}
+                      </div>
+                      <div>
+                        <h4 className="text-md font-semibold text-gray-900">{step.title}</h4>
+                        <p className="text-sm text-gray-600">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Why BlendPDF Section */}
       <section className="bg-white py-12">
@@ -417,25 +394,6 @@ export default function PowerPointToPDFPage() {
 
       {/* Footer */}
       <Footer />
-
-      {/* Email Capture Modal */}
-      <EmailCaptureModal
-        isOpen={showEmailCapture}
-        onEmailSubmitted={() => { }} // Not used when using delivery choice flow
-        onEmailCaptured={handleEmailCaptured}
-      />
-
-      {/* Delivery Choice Modal */}
-      <DeliveryChoiceModal
-        isOpen={showDeliveryChoice}
-        email={capturedEmail}
-        filename={convertedFilename}
-        fileBlob={convertedBlob}
-        onSendViaEmail={handleSendViaEmail}
-        onDownloadDirectly={handleDownloadDirectly}
-        isSending={isSendingEmail}
-        successType={successType}
-      />
     </div>
   );
 }

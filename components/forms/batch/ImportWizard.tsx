@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useTrackedDropzone } from '@/hooks/useTrackedDropzone';
 import { FileSpreadsheet, Upload, X } from 'lucide-react';
 import { parseSpreadsheetFile } from '@/lib/csv-parsing';
 import {
@@ -54,7 +54,7 @@ export function ImportWizard({ columns, onImport }: ImportWizardProps) {
         [columns]
     );
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    const { getRootProps, getInputProps, isDragActive } = useTrackedDropzone({
         onDrop,
         accept: {
             'text/csv': ['.csv'],
@@ -63,6 +63,7 @@ export function ImportWizard({ columns, onImport }: ImportWizardProps) {
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
         },
         multiple: false,
+        uploadRole: 'spreadsheet',
     });
 
     const setColumnTarget = (colIndex: number, target: string) => {

@@ -6,9 +6,14 @@ import { randomUUID } from 'crypto';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { inspectPdf, pdfRejectionResponse } from '@/lib/pdf-validation';
+import { runProcess } from '@/lib/run-process';
 
 const execAsync = promisify(exec);
+
+const PDF_TO_EXCEL_TIMEOUT_MS = 120_000;
 
 async function checkTabulaPy(requestId: string): Promise<boolean> {
   try {
@@ -81,18 +86,25 @@ except Exception as e:
     const pathParts = pathEnv.split(':').filter((p) => p);
     const updatedPath = [...new Set([...commonPaths, ...pathParts])].join(':');
 
-    const { stdout, stderr } = await execAsync(`python3 "${pythonScriptPath}"`, {
-      timeout: 120000,
-      maxBuffer: 50 * 1024 * 1024,
+    // No shell, own process group: tabula-py runs java underneath, and both
+    // must be dead before the finally below deletes the files they write
+    // (see lib/run-process.ts).
+    const { stdout, stderr, exitCode, signal, timedOut } = await runProcess('python3', [pythonScriptPath], {
+      timeoutMs: PDF_TO_EXCEL_TIMEOUT_MS,
       env: { ...process.env, PATH: updatedPath },
     });
 
-    if (stderr && !stdout.includes('SUCCESS')) {
+    if (timedOut) {
+      logger.warn(`[pdf-to-excel] Timed out; process group killed`, { timeoutMs: PDF_TO_EXCEL_TIMEOUT_MS }, requestId);
+      throw Object.assign(new Error(`pdf-to-excel timed out after ${PDF_TO_EXCEL_TIMEOUT_MS / 1000}s`), { errorCode: 'TIMEOUT' });
+    }
+
+    if (exitCode !== 0 || !stdout.includes('SUCCESS')) {
       if (stderr.includes('No tables found')) {
-        throw new Error('No tables found in the PDF. This PDF may not contain extractable table data.');
+        throw Object.assign(new Error('No tables found in the PDF. This PDF may not contain extractable table data.'), { errorCode: 'NO_TABLES' });
       }
-      logger.error(`[pdf-to-excel] Python script error`, { stderr }, requestId);
-      throw new Error(`Failed to convert PDF to Excel: ${stderr}`);
+      logger.error(`[pdf-to-excel] Python script error`, { stderr, exitCode, signal }, requestId);
+      throw new Error(`Failed to convert PDF to Excel: ${stderr || `exit ${exitCode ?? signal}`}`);
     }
 
     const { readFile } = await import('fs/promises');
@@ -101,7 +113,9 @@ except Exception as e:
 
     return excelFile;
   } catch (error: any) {
-    logger.error(`[pdf-to-excel] Error converting PDF`, { error: error.message }, requestId);
+    if (error.errorCode !== 'NO_TABLES') {
+      logger.error(`[pdf-to-excel] Error converting PDF`, { error: error.message, errorCode: error.errorCode }, requestId);
+    }
     throw error;
   } finally {
     try {
@@ -147,8 +161,15 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
+
+    const inspection = await inspectPdf(buffer);
+    if (!inspection.ok) {
+      logger.warn('PDF rejected before conversion', { errorCode: inspection.rejection.errorCode, ...inspection.rejection.detail }, requestId);
+      return pdfRejectionResponse(inspection.rejection, requestId);
+    }
+
     const fileSizeMB = (buffer.length / 1024 / 1024).toFixed(2);
-    logger.info('PDF to Excel conversion started', { fileSize: `${fileSizeMB}MB`, fileName: file.name }, requestId);
+    logger.info('PDF to Excel conversion started', { ...fileLogMeta(file) }, requestId);
 
     const hasTabulaPy = await checkTabulaPy(requestId);
     if (!hasTabulaPy) {
@@ -177,7 +198,19 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    logger.error('PDF to Excel conversion failed', { error: error.message }, requestId);
-    return NextResponse.json({ error: error.message || 'Failed to convert PDF to Excel.', requestId }, { status: 500 });
+    // A PDF without a table (a brochure, a letter) is not a server failure, and
+    // "please try again" would find none either: say so, with a 422.
+    if (error.errorCode === 'NO_TABLES') {
+      logger.info('PDF to Excel: no tables in the PDF', {}, requestId);
+      return NextResponse.json(
+        { error: "We couldn't find a table in this PDF. If it's a scan, make the text searchable first; otherwise convert it to text instead.", errorCode: 'NO_TABLES', requestId },
+        { status: 422 }
+      );
+    }
+    logger.error('PDF to Excel conversion failed', { error: error.message, errorCode: error.errorCode }, requestId);
+    return NextResponse.json(
+      { error: "We couldn't extract tables from this PDF. Please try again.", errorCode: 'CONVERSION_FAILED', requestId },
+      { status: 500 }
+    );
   }
 }

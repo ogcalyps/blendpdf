@@ -7,6 +7,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StructuredData } from "@/components/StructuredData";
 import { LocaleSync } from "@/components/LocaleSync";
 import { ConsentBanner } from "@/components/ConsentBanner";
+import { sharedClientMessages } from "@/lib/i18n/client-messages";
+import { languageAlternates, ogAlternateLocales, ogLocale } from "@/lib/i18n/seo";
 
 // Generate metadata based on locale
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -24,9 +26,19 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       keywords: ["PDF tools", "merge PDF", "compress PDF", "split PDF", "PDF converter", "free PDF tools", "online PDF editor"],
     },
     ar: {
-      title: "BlendPDF - أدوات PDF مجانية | بدون تسجيل",
-      description: "أدوات PDF مجانية على الإنترنت. دمج، ضغط، تقسيم ملفات PDF. يعمل بأي لغة. لا حاجة للتسجيل.",
-      keywords: ["أدوات PDF", "دمج PDF", "ضغط PDF", "تقسيم PDF", "محول PDF", "أدوات PDF مجانية"],
+      title: "أدوات PDF مجانية تدعم العربية: دمج وضغط وتحويل إلى Word | BlendPDF",
+      description: "ادمج ملفات PDF وصغّر حجمها وحوّلها إلى Word مجانًا ودون حساب، واستخرج النص من الملفات العربية الممسوحة ضوئيًا، وعدّل النص العربي داخل الملف دون أن تنفصل حروفه.",
+      keywords: ["أدوات PDF", "أدوات PDF مجانية", "أدوات PDF بالعربي", "دمج PDF", "ضغط PDF", "تحويل PDF إلى Word", "تعديل PDF عربي", "OCR عربي"],
+    },
+    fr: {
+      title: "BlendPDF - Outils PDF gratuits, sans inscription",
+      description: "Outils PDF gratuits en ligne : fusionner, compresser, diviser, convertir et signer vos PDF. Fonctionne dans toutes les langues, sans inscription.",
+      keywords: ["outils PDF", "fusionner PDF", "compresser PDF", "diviser PDF", "convertisseur PDF", "outils PDF gratuits", "modifier un PDF en ligne"],
+    },
+    es: {
+      title: "BlendPDF - Herramientas PDF gratis, sin registrarse",
+      description: "Herramientas PDF online y gratis para unir, comprimir, dividir, convertir, editar y firmar sus PDF. Funcionan en cualquier idioma y no hace falta registrarse.",
+      keywords: ["herramientas PDF", "unir PDF", "comprimir PDF", "dividir PDF", "convertir PDF", "herramientas PDF gratis", "editar PDF online"],
     },
   };
   
@@ -45,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': baseUrl,
-        'ar': `${baseUrl}/ar`,
-        'x-default': baseUrl,
-      },
+      languages: languageAlternates(baseUrl, ''),
     },
     openGraph: {
       title: meta.title,
@@ -57,8 +65,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       siteName: "BlendPDF",
       type: "website",
       url: canonicalUrl,
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
-      alternateLocale: locale === 'ar' ? 'en_US' : 'ar_SA',
+      locale: ogLocale(locale),
+      alternateLocale: ogAlternateLocales(locale),
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
     twitter: {
@@ -103,7 +111,8 @@ export default async function LocaleLayout({
     <>
       <StructuredData locale={locale} />
       <ErrorBoundary>
-        <NextIntlClientProvider messages={messages} locale={locale}>
+        {/* Tool pages add their own namespace (PageMessages in their layout). */}
+        <NextIntlClientProvider messages={sharedClientMessages(messages)} locale={locale}>
           <LocaleSync />
           {children}
           <ConsentBanner />

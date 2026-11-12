@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,6 +17,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: 'قم بتحويل جداول بيانات Excel (XLS، XLSX، ODS، CSV) إلى PDF مجاناً عبر الإنترنت. تنتقل الجداول والأرقام وتنسيق الخلايا إلى ملف PDF نظيف وقابل للطباعة. لا حاجة للتسجيل، وتُحذف الملفات خلال ساعة.',
       keywords: 'excel إلى pdf، xlsx إلى pdf، xls إلى pdf، تحويل excel إلى pdf',
     },
+    fr: {
+      title: 'Convertir Excel en PDF en ligne gratuitement - XLSX en PDF | BlendPDF',
+      description:
+        'Convertissez vos feuilles de calcul Excel (XLS, XLSX, ODS, CSV) en PDF gratuitement. Tableaux, nombres et mise en forme des cellules sont conservés dans un PDF propre, prêt à imprimer. Sans inscription, fichiers supprimés dans l’heure.',
+      keywords:
+        'excel en pdf, xlsx en pdf, xls en pdf, convertir excel en pdf, convertisseur excel pdf, tableur en pdf, csv en pdf, ods en pdf',
+    },
+    es: {
+      title: 'Excel a PDF online gratis: convertir XLSX, XLS y CSV a PDF | BlendPDF',
+      description:
+        'Convierta hojas de Excel (XLS, XLSX, ODS, CSV) a PDF gratis, con sus tablas, números y formato de celdas. Sin registrarse; se borran en menos de 1 hora.',
+      keywords:
+        'excel a pdf, convertir excel a pdf, pasar excel a pdf, xlsx a pdf, xls a pdf, hoja de cálculo a pdf, csv a pdf, ods a pdf, excel a pdf online gratis',
+    },
   };
 
   const meta = metadataByLocale[locale as keyof typeof metadataByLocale] || metadataByLocale.en;
@@ -29,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: meta.description,
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
       images: [{ url: `${baseUrl}/og-image.jpg` }],
     },
@@ -41,11 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': `${baseUrl}/excel-to-pdf`,
-        'ar': `${baseUrl}/ar/excel-to-pdf`,
-        'x-default': `${baseUrl}/excel-to-pdf`,
-      },
+      languages: languageAlternates(baseUrl, '/excel-to-pdf'),
     },
   };
 }
@@ -55,5 +67,5 @@ export default function ExcelToPDFLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <PageMessages namespace="excelToPdf">{children}</PageMessages>;
 }

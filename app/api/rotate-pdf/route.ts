@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument, degrees } from 'pdf-lib';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
+import { inspectPdf, pdfRejectionResponse } from '@/lib/pdf-validation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -66,20 +67,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid rotations format', requestId }, { status: 400 });
     }
 
-    // Load PDF (ignoreEncryption so we can inspect it, then reject encrypted files cleanly)
     const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
 
-    if (pdfDoc.isEncrypted) {
-      return NextResponse.json(
-        {
-          error: 'This PDF is password-protected. Please use the Unlock PDF tool to remove the password first, then try again.',
-          errorCode: 'ENCRYPTED_PDF',
-          requestId,
-        },
-        { status: 400 }
-      );
+    // Covers the encrypted case this route already handled, plus the one it
+    // did not: pdf-lib's load() is lazy, so a structurally broken file only
+    // blew up later at getPages() and surfaced as a raw-message 500.
+    const inspection = await inspectPdf(Buffer.from(arrayBuffer));
+    if (!inspection.ok) {
+      console.warn(`[${requestId}] Rejected: ${inspection.rejection.errorCode}`, inspection.rejection.detail ?? {});
+      return pdfRejectionResponse(inspection.rejection, requestId);
     }
+
+    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
 
     // Apply rotations to each page
     const pages = pdfDoc.getPages();
@@ -108,9 +107,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error(`[${requestId}] Error rotating PDF:`, error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to rotate PDF';
     return NextResponse.json(
-      { error: errorMessage, requestId },
+      { error: 'Failed to rotate this PDF. Please try again.', errorCode: 'ROTATE_FAILED', requestId },
       { status: 500 }
     );
   }

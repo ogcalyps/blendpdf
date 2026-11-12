@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PDFDocument, PDFName, PDFRef, PDFArray, PDFPage } from 'pdf-lib';
 import { rateLimitMiddleware } from '@/lib/rate-limit';
+import { inspectPdf } from '@/lib/pdf-validation';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
@@ -70,6 +71,15 @@ export async function POST(request: Request) {
 
         const arrayBuffer = await file.arrayBuffer();
 
+        const inspection = await inspectPdf(Buffer.from(arrayBuffer));
+        if (!inspection.ok) {
+            console.warn(`[extract-pdf-fields] Rejected: ${inspection.rejection.errorCode}`, inspection.rejection.detail ?? {});
+            return NextResponse.json(
+                { error: inspection.rejection.message, errorCode: inspection.rejection.errorCode }, // leak-guard: authored — PdfRejection.message is our copy, detail is what carries engine text
+                { status: 400 }
+            );
+        }
+
         // Load the PDF
         const pdfDoc = await PDFDocument.load(arrayBuffer);
         const pages = pdfDoc.getPages();
@@ -128,10 +138,10 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ fields: fieldData });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error extracting PDF fields:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to extract PDF fields' },
+            { error: "We couldn't read the form fields in this PDF.", errorCode: 'EXTRACT_FIELDS_FAILED' },
             { status: 500 }
         );
     }

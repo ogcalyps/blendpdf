@@ -112,7 +112,7 @@ function buildPoliciesSection() {
     '- Downloads never require an email address. An optional email-delivery feature exists if you want the result sent to your inbox.',
     '- Limits: 50 MB per file. Merge accepts up to 20 files (100 MB total per merge).',
     '- Uploaded files are deleted from our servers within 1 hour; most are deleted immediately after processing.',
-    '- Privacy: document contents are never read, stored, or shared. The site uses Google Analytics for aggregate, anonymous usage measurement only.',
+    '- Privacy: document contents are never read, stored, or shared. Usage is measured only as anonymous totals, through Google Analytics and a first-party count of tool runs.',
     '- Privacy policy: https://blendpdf.com/privacy - Terms of service: https://blendpdf.com/terms',
   ].join('\n');
 }

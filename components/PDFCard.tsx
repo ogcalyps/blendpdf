@@ -1,7 +1,7 @@
 'use client';
 
 import { X, GripVertical } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatFileSize } from '@/lib/utils';
 import { PDFThumbnail } from '@/components/PDFThumbnail';
 import type { UploadedFile } from '@/types';
@@ -15,6 +15,7 @@ interface PDFCardProps {
 
 export function PDFCard({ file, index, onRemove, isDragging = false }: PDFCardProps) {
   const t = useTranslations('common');
+  const locale = useLocale();
 
   const handleRemove = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -82,7 +83,7 @@ export function PDFCard({ file, index, onRemove, isDragging = false }: PDFCardPr
           {file.name}
         </p>
         <p className="text-xs text-gray-500">
-          {formatFileSize(file.size)}
+          {formatFileSize(file.size, locale)}
         </p>
       </div>
     </div>

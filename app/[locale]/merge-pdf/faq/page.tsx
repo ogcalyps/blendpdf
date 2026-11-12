@@ -17,7 +17,7 @@ export default function MergePDFFAQ() {
     },
     {
       question: 'Is it safe to merge PDFs online?',
-      answer: 'Yes, BlendPDF is safe to use. All uploads are encrypted with SSL/TLS. Files are automatically deleted within one hour, most immediately after processing. No account or personal information is required, and we never read, store, or share the contents of your documents. We use Google Analytics for aggregate, anonymous usage measurement only, never your document contents.'
+      answer: 'Yes, BlendPDF is safe to use. All uploads are encrypted with SSL/TLS. Files are automatically deleted within one hour, most immediately after processing. No account or personal information is required, and we never read, store, or share the contents of your documents. We only measure usage as anonymous totals, through Google Analytics and our own count of tool runs, never your documents.'
     },
     {
       question: 'Does BlendPDF work with Arabic PDFs?',

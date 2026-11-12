@@ -63,16 +63,9 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
         <Link
           href="/forms"
           onClick={onClose}
-          className="block py-3 px-2 text-start font-bold text-gray-900 hover:text-primary border-t border-gray-100"
+          className="block py-3 px-2 text-start font-bold text-gray-900 hover:text-primary border-y border-gray-100"
         >
           {t('nav.formTemplates')}
-        </Link>
-        <Link
-          href="/blog"
-          onClick={onClose}
-          className="block py-3 px-2 text-start font-bold text-gray-900 hover:text-primary border-b border-gray-100"
-        >
-          {t('nav.blog')}
         </Link>
       </div>
     </div>

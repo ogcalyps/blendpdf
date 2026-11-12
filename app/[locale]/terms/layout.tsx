@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { languageAlternates, ogLocale } from '@/lib/i18n/seo';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -15,16 +16,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description: t('description'),
       url: canonicalUrl,
       siteName: 'BlendPDF',
-      locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+      locale: ogLocale(locale),
       type: 'website',
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        en: `${baseUrl}/terms`,
-        ar: `${baseUrl}/ar/terms`,
-        'x-default': `${baseUrl}/terms`,
-      },
+      languages: languageAlternates(baseUrl, '/terms'),
     },
   };
 }

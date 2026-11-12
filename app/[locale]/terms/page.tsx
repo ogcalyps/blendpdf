@@ -7,7 +7,7 @@ import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 
 // Real last-revision date of this policy text — update when the policy changes.
-const POLICY_UPDATED = new Date('2026-08-10');
+const POLICY_UPDATED = new Date('2026-11-11');
 
 const SECTION_KEYS = ['useOfService', 'disclaimer', 'liability', 'acceptableUse', 'contact'] as const;
 
@@ -26,7 +26,7 @@ export default function TermsPage() {
           </Link>
           <h1 className="text-3xl font-bold text-dark mb-2">{t('title')}</h1>
           <p className="text-gray-600 text-sm mb-8">
-            {t('lastUpdated')} {POLICY_UPDATED.toLocaleDateString(locale === 'ar' ? 'ar' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+            {t('lastUpdated')} {POLICY_UPDATED.toLocaleDateString(locale === 'en' ? 'en-GB' : locale, { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
           <p className="text-gray-700 leading-relaxed mb-8">{t('intro')}</p>
           <div className="space-y-8">

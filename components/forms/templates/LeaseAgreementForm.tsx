@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 const STEPS = [
@@ -32,6 +33,7 @@ const OPTIONAL_CLAUSES = [
 ];
 
 export function LeaseAgreementForm() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('lease_agreement_form', {
         landlordName: '',
         landlordAddress: '',
@@ -207,6 +209,7 @@ export function LeaseAgreementForm() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'Residential_Lease_Agreement.pdf');
+        markSuccess();
 
         clearPersistedData();
         setCurrentStep(1);
@@ -635,6 +638,7 @@ export function LeaseAgreementForm() {
                         </button>
                     )}
                 </div>
+                {reviewAsk}
             </div>
         </div>
     );

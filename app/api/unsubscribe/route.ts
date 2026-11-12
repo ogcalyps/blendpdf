@@ -3,6 +3,7 @@ import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { getDynamoDBClient, getEmailsTableName } from '@/lib/dynamodb-client';
 import { verifyUnsubscribeSig, normalizeEmail } from '@/lib/unsubscribe';
 import { logger } from '@/lib/cloudwatch-logger';
+import { emailLogRef } from '@/lib/log-redact';
 
 export const runtime = 'nodejs';
 
@@ -16,14 +17,18 @@ function escapeHtml(value: string): string {
 }
 
 /**
- * Minimal self-contained bilingual (English + Arabic) confirmation page.
+ * Minimal self-contained trilingual (English, French, Arabic) confirmation page.
  * This route lives outside the [locale] tree and is opened from email links,
  * so it renders both languages inline instead of using next-intl.
  */
 function htmlPage(params: {
   titleEn: string;
+  titleFr: string;
+  titleEs: string;
   titleAr: string;
   bodyEn: string;
+  bodyFr: string;
+  bodyEs: string;
   bodyAr: string;
   status: number;
 }): NextResponse {
@@ -41,6 +46,16 @@ function htmlPage(params: {
     <div dir="ltr" style="margin-bottom:24px;">
       <h1 style="margin:0 0 8px;font-size:20px;color:#111827;">${params.titleEn}</h1>
       <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">${params.bodyEn}</p>
+    </div>
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
+    <div dir="ltr" lang="fr" style="margin-bottom:24px;">
+      <h1 style="margin:0 0 8px;font-size:20px;color:#111827;">${params.titleFr}</h1>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">${params.bodyFr}</p>
+    </div>
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
+    <div dir="ltr" lang="es" style="margin-bottom:24px;">
+      <h1 style="margin:0 0 8px;font-size:20px;color:#111827;">${params.titleEs}</h1>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">${params.bodyEs}</p>
     </div>
     <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
     <div dir="rtl" lang="ar">
@@ -78,8 +93,12 @@ export async function GET(request: NextRequest) {
     logger.warn('[Unsubscribe] Invalid or missing signature', { hasEmail: !!email, hasSig: !!sig }, requestId);
     return htmlPage({
       titleEn: 'Invalid unsubscribe link',
+      titleFr: 'Lien de désabonnement non valide',
+      titleEs: 'Enlace para darse de baja no válido',
       titleAr: 'رابط إلغاء الاشتراك غير صالح',
       bodyEn: 'This unsubscribe link is invalid or has expired. Please use the link from the most recent email we sent you.',
+      bodyFr: 'Ce lien de désabonnement n’est pas valide ou a expiré. Utilisez le lien du dernier courriel que nous vous avons envoyé.',
+      bodyEs: 'Este enlace para darse de baja no es válido o ya caducó. Use el enlace del último correo que le enviamos.',
       bodyAr: 'رابط إلغاء الاشتراك هذا غير صالح أو انتهت صلاحيته. يرجى استخدام الرابط الموجود في أحدث رسالة بريد إلكتروني أرسلناها إليك.',
       status: 400,
     });
@@ -102,20 +121,24 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    logger.info('[Unsubscribe] Email unsubscribed', { email: normalizedEmail }, requestId);
+    logger.info('[Unsubscribe] Email unsubscribed', { emailRef: emailLogRef(normalizedEmail) }, requestId);
   } catch (error: any) {
     const isDev = process.env.NODE_ENV === 'development' || !process.env.AWS_REGION;
 
     if (isDev) {
       // Match the subscribe route's DEV fallback: log and continue so the flow
       // can be tested without AWS.
-      logger.warn('[Unsubscribe] DEV MODE - DynamoDB not available, unsubscribe logged only', { email: normalizedEmail, error: error.message }, requestId);
+      logger.warn('[Unsubscribe] DEV MODE - DynamoDB not available, unsubscribe logged only', { emailRef: emailLogRef(normalizedEmail), error: error.message }, requestId);
     } else {
-      logger.error('[Unsubscribe] Failed to update DynamoDB record', { email: normalizedEmail, error: error.message }, requestId);
+      logger.error('[Unsubscribe] Failed to update DynamoDB record', { emailRef: emailLogRef(normalizedEmail), error: error.message }, requestId);
       return htmlPage({
         titleEn: 'Something went wrong',
+        titleFr: 'Une erreur s’est produite',
+        titleEs: 'Algo salió mal',
         titleAr: 'حدث خطأ ما',
         bodyEn: 'We could not process your unsubscribe request right now. Please try again later.',
+        bodyFr: 'Votre demande de désabonnement n’a pas pu être traitée pour le moment. Réessayez plus tard.',
+        bodyEs: 'En este momento no podemos procesar su solicitud de baja. Vuelva a intentarlo más tarde.',
         bodyAr: 'تعذّرت معالجة طلب إلغاء الاشتراك في الوقت الحالي. يرجى المحاولة مرة أخرى لاحقًا.',
         status: 500,
       });
@@ -124,8 +147,12 @@ export async function GET(request: NextRequest) {
 
   return htmlPage({
     titleEn: 'You have been unsubscribed',
+    titleFr: 'Votre désabonnement est confirmé',
+    titleEs: 'Se dio de baja correctamente',
     titleAr: 'تم إلغاء اشتراكك',
     bodyEn: `${safeEmail} will no longer receive emails from BlendPDF.`,
+    bodyFr: `L’adresse ${safeEmail} ne recevra plus de courriels de BlendPDF.`,
+    bodyEs: `La dirección ${safeEmail} ya no recibirá correos de BlendPDF.`,
     bodyAr: `لن يتلقى ${safeEmail} أي رسائل بريد إلكتروني من BlendPDF بعد الآن.`,
     status: 200,
   });

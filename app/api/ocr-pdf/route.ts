@@ -4,27 +4,30 @@ import { writeFile, readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { randomUUID } from 'crypto';
-import { exec, execFile } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { toHeaderSafeFilename } from '@/lib/pdf-processor';
+import { inspectPdf } from '@/lib/pdf-validation';
+import { runProcess, withScratchDir } from '@/lib/run-process';
+import { OCR_MAX_PAGES } from '@/lib/ocr-limits';
 
 const execAsync = promisify(exec);
-const execFileAsync = promisify(execFile);
 
 export const runtime = 'nodejs';
 // OCR is by far the slowest tool on the box (~1-2s/page, up to 50 pages).
 export const maxDuration = 300;
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-const MAX_PAGES = 50;
+const MAX_PAGES = OCR_MAX_PAGES;
 const OCR_TIMEOUT_MS = 240_000;
 
 // Only these tesseract language packs are installed on the server
 // (see scripts/provision-server.sh). The languages string ends up on an
 // ocrmypdf command line, so it is strictly allowlisted.
-const ALLOWED_LANGUAGES = ['ara', 'eng', 'fra'] as const;
+const ALLOWED_LANGUAGES = ['ara', 'eng', 'fra', 'spa'] as const;
 
 /**
  * Validate a user-supplied languages string like "ara+eng".
@@ -112,10 +115,23 @@ function ocrError(message: string, errorCode: string): OcrError {
   return error;
 }
 
+/**
+ * The pages ocrmypdf left alone because they already had text. With
+ * --skip-text it still exits 0 when that is every page, and sent the file
+ * back unchanged as if it had been read; it logs each one as
+ * "    3 skipping all processing on this page" (15.2 on the server, 17.x too).
+ */
+function pagesSkippedForText(stderr: string): number {
+  const pages = new Set<string>();
+  for (const match of stderr.matchAll(/^\s*(\d+)\s.*skipping all processing on this page/gm)) pages.add(match[1]);
+  return pages.size;
+}
+
 async function runOcr(
   pdfBuffer: Buffer,
   languages: string,
   mode: 'searchable' | 'redo',
+  pageCount: number,
   requestId: string
 ): Promise<Buffer> {
   const ocrmypdfPath = await getOcrmypdfPath();
@@ -132,8 +148,8 @@ async function runOcr(
   try {
     await writeFile(inputPath, pdfBuffer);
 
-    // execFile with an argv array (never a shell string): the languages value
-    // is user-influenced even after allowlisting.
+    // An argv array (never a shell string): the languages value is
+    // user-influenced even after allowlisting.
     const args = [
       '-l', languages,
       mode === 'redo' ? '--redo-ocr' : '--skip-text',
@@ -145,28 +161,35 @@ async function runOcr(
 
     logger.info(`[ocr-pdf] Running ocrmypdf`, { languages, mode }, requestId);
 
-    try {
-      await execFileAsync(ocrmypdfPath, args, {
-        timeout: OCR_TIMEOUT_MS,
-        maxBuffer: 10 * 1024 * 1024,
-        env: { ...process.env, PATH: buildPath() },
-      });
-    } catch (execError) {
-      const err = execError as Error & { code?: number | string; stderr?: string; killed?: boolean };
-      // ocrmypdf exit code 6 = PriorOcrFoundError: every page already has a
-      // text layer, so --skip-text found nothing to do.
-      if (err.code === 6) {
-        throw ocrError(
-          'Every page in this PDF already has a text layer, so there is nothing to OCR. If the existing text is wrong, retry with the re-OCR option.',
-          'ALREADY_HAS_TEXT'
-        );
-      }
+    // ocrmypdf runs tesseract and gs underneath, so a timeout has to take the
+    // whole process group (lib/run-process.ts), not just ocrmypdf. Its work
+    // folder goes in a private TMPDIR that is removed afterwards, because a
+    // killed ocrmypdf never gets to clean that up itself.
+    const { stderr, exitCode, signal, timedOut } = await withScratchDir('ocr-', (scratch) =>
+      runProcess(ocrmypdfPath, args, {
+        timeoutMs: OCR_TIMEOUT_MS,
+        env: { ...process.env, PATH: buildPath(), TMPDIR: scratch },
+      })
+    );
+
+    // Every page already has a text layer, so --skip-text found nothing to do
+    // (exit code 6, PriorOcrFoundError, in older ocrmypdf; a 0 now).
+    if (exitCode === 6 || (exitCode === 0 && mode === 'searchable' && pagesSkippedForText(stderr) >= pageCount)) {
+      throw ocrError(
+        'Every page in this PDF already has a text layer, so there is nothing to OCR. If the existing text is wrong, retry with the re-OCR option.',
+        'ALREADY_HAS_TEXT'
+      );
+    }
+    if (timedOut || exitCode !== 0) {
+      // No shell in between, so a native crash shows up as the signal.
+      const errorCode = timedOut ? 'TIMEOUT' : signal !== null ? 'CONVERTER_CRASHED' : 'OCR_FAILED';
       logger.error('[ocr-pdf] ocrmypdf failed', {
-        exitCode: err.code,
-        killed: err.killed,
-        stderr: typeof err.stderr === 'string' ? err.stderr.slice(0, 2000) : undefined,
+        errorCode,
+        exitCode,
+        signal,
+        stderr: stderr.slice(0, 2000),
       }, requestId);
-      throw new Error('OCR processing failed. The file may be damaged or use an unsupported scan format.');
+      throw ocrError('OCR processing failed. The file may be damaged or use an unsupported scan format.', errorCode);
     }
 
     return await readFile(outputPath);
@@ -211,67 +234,59 @@ export async function POST(request: NextRequest) {
     const languages = (formData.get('languages') as string | null) || 'eng';
     const mode = (formData.get('mode') as string) === 'redo' ? 'redo' : 'searchable';
 
+    /**
+     * A rejection is a normal outcome, but it still has to be visible: the
+     * ocr_pdf errors in GA4 were untriageable because these 400s returned
+     * without writing anything to the log, so there was no way to tell which
+     * branch a user had hit. Every rejection goes through here.
+     */
+    const reject = (
+      status: number,
+      errorCode: string,
+      error: string,
+      detail?: Record<string, unknown>
+    ) => {
+      logger.warn('[ocr-pdf] Request rejected', { errorCode, status, ...detail }, requestId);
+      return NextResponse.json({ error, errorCode, requestId }, { status });
+    };
+
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided. Please select a PDF to OCR.', requestId },
-        { status: 400 }
-      );
+      return reject(400, 'NO_FILE', 'No file provided. Please select a PDF to OCR.');
     }
 
     if (!isValidLanguages(languages)) {
-      return NextResponse.json(
-        {
-          error: 'Invalid languages. Supported OCR languages are Arabic (ara), English (eng), and French (fra), joined with "+".',
-          errorCode: 'INVALID_LANGUAGES',
-          requestId,
-        },
-        { status: 400 }
+      return reject(
+        400,
+        'INVALID_LANGUAGES',
+        'Invalid languages. Supported OCR languages are Arabic (ara), English (eng), French (fra) and Spanish (spa), joined with "+".',
+        { languages }
       );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
     if (buffer.length > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        {
-          error: 'File size limit is 50MB. Try our Compress PDF tool first.',
-          errorCode: 'FILE_TOO_LARGE',
-          requestId,
-        },
-        { status: 400 }
-      );
+      return reject(400, 'FILE_TOO_LARGE', 'File size limit is 50MB. Try our Compress PDF tool first.', {
+        sizeMB: (buffer.length / 1024 / 1024).toFixed(2),
+      });
     }
 
-    if (buffer.length < 5 || buffer.toString('utf8', 0, 5) !== '%PDF-') {
-      return NextResponse.json(
-        { error: "This file doesn't appear to be a valid PDF.", requestId },
-        { status: 400 }
-      );
+    // Shared front door: magic bytes, a parse that also touches getPageCount
+    // (pdf-lib is lazy — load() accepts a broken file and getPageCount() is what
+    // throws), and the encrypted check.
+    const inspection = await inspectPdf(buffer);
+    if (!inspection.ok) {
+      const { errorCode, message, detail } = inspection.rejection;
+      return reject(400, errorCode, message, detail);
     }
 
-    // Inspect the PDF before spending OCR time on it.
-    const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-
-    if (pdfDoc.isEncrypted) {
-      return NextResponse.json(
-        {
-          error: 'This PDF is password-protected. Please use the Unlock PDF tool to remove the password first, then try again.',
-          errorCode: 'ENCRYPTED_PDF',
-          requestId,
-        },
-        { status: 400 }
-      );
-    }
-
-    const pageCount = pdfDoc.getPageCount();
+    const { pageCount } = inspection.value;
     if (pageCount > MAX_PAGES) {
-      return NextResponse.json(
-        {
-          error: `This PDF has ${pageCount} pages. OCR is limited to ${MAX_PAGES} pages so processing stays reliable — split the file first and OCR the parts separately.`,
-          errorCode: 'PAGE_LIMIT',
-          requestId,
-        },
-        { status: 400 }
+      return reject(
+        400,
+        'PAGE_LIMIT',
+        `This PDF has ${pageCount} pages. OCR is limited to ${MAX_PAGES} pages so processing stays reliable — split the file first and OCR the parts separately.`,
+        { pageCount }
       );
     }
 
@@ -308,8 +323,7 @@ export async function POST(request: NextRequest) {
 
     const fileSizeMB = (buffer.length / 1024 / 1024).toFixed(2);
     logger.info('OCR PDF started', {
-      fileSize: `${fileSizeMB}MB`,
-      fileName: file.name,
+      ...fileLogMeta(file),
       pageCount,
       languages,
       mode,
@@ -317,7 +331,7 @@ export async function POST(request: NextRequest) {
     }, requestId);
 
     const startedAt = Date.now();
-    const ocredPdf = await enqueueOcrJob(() => runOcr(buffer, languages, mode, requestId));
+    const ocredPdf = await enqueueOcrJob(() => runOcr(buffer, languages, mode, pageCount, requestId));
 
     const outputSizeMB = (ocredPdf.length / 1024 / 1024).toFixed(2);
     logger.info('OCR PDF completed', {
@@ -342,7 +356,7 @@ export async function POST(request: NextRequest) {
 
     if (err.errorCode === 'ALREADY_HAS_TEXT') {
       return NextResponse.json(
-        { error: err.message, errorCode: 'ALREADY_HAS_TEXT', requestId },
+        { error: err.message, errorCode: 'ALREADY_HAS_TEXT', requestId }, // leak-guard: authored — thrown by this route, not an engine
         { status: 400 }
       );
     }
@@ -352,15 +366,33 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
+    // Ran out of time: the same file would time out again, so the visitor is
+    // told to split it rather than to retry (lib/ocr-limits.ts). A 5xx like
+    // pdf-to-word's CONVERSION_TIMEOUT: the box not keeping up counts as the
+    // tool failing in the back office.
+    if (err.errorCode === 'TIMEOUT') {
+      logger.error('OCR PDF failed', { errorCode: 'TIMEOUT' }, requestId);
+      return NextResponse.json(
+        {
+          error: 'This scan takes too long to read in one go. Split it into smaller parts, about 10 pages each, and OCR them one at a time.',
+          errorCode: 'OCR_TIMEOUT',
+          requestId,
+        },
+        { status: 504 }
+      );
+    }
 
     logger.error('OCR PDF failed', {
       error: err instanceof Error ? err.message : 'Unknown error',
+      errorCode: err?.errorCode,
       stack: err instanceof Error ? err.stack : undefined,
     }, requestId);
 
     return NextResponse.json(
       {
-        error: err instanceof Error && err.message ? err.message : 'Failed to OCR the PDF.',
+        // ocrmypdf's stderr reached users through this line.
+        error: 'Failed to OCR the PDF. Please try again.',
+        errorCode: 'OCR_FAILED',
         requestId,
       },
       { status: 500 }

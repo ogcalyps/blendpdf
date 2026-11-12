@@ -6,6 +6,7 @@ import { fillPdfForm } from '@/lib/pdf-generation';
 import { Loader2, ArrowRight, ArrowLeft, Shield, Users, Calendar, PenTool, CheckCircle2, Download, Languages } from 'lucide-react';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 // NOTE: the bilingual template module (lib/form-templates-bilingual-data.ts)
@@ -50,6 +51,7 @@ function FieldLabel({ field, required }: { field: BilingualField; required?: boo
 }
 
 export function NDABilingualForm() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('nda-bilingual', {
         disclosingPartyName: '',
         disclosingPartyAddress: '',
@@ -177,6 +179,7 @@ export function NDABilingualForm() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'Bilingual_NDA_Completed.pdf');
+        markSuccess();
         clearPersistedData();
         setCurrentStep(1);
         setPreviewFile(null);
@@ -418,6 +421,7 @@ export function NDABilingualForm() {
                     </button>
                 )}
             </div>
+            {reviewAsk}
         </div>
     );
 }

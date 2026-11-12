@@ -1,17 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PDFDocument } from 'pdf-lib';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { logger } from '@/lib/cloudwatch-logger';
+import { fileLogMeta } from '@/lib/log-redact';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { writeFile, readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { randomUUID } from 'crypto';
+import { inspectPdf } from '@/lib/pdf-validation';
+import { runProcess } from '@/lib/run-process';
+import { convertWithLibreOffice } from '@/lib/libreoffice';
+import { PDF_TO_WORD_MAX_PAGES, pdf2docxFailureSummary, pdf2docxProgress } from '@/lib/pdf-to-word-limits';
+import { ARABIC_LAYOUT_PY } from '@/lib/pdf-to-word-arabic';
 
 const execAsync = promisify(exec);
 
+const PDF2DOCX_TIMEOUT_MS = 120_000;
+const LIBREOFFICE_TIMEOUT_MS = 90_000;
+
+/**
+ * Conversion failures carry an errorCode so the client can show a localized
+ * message. The raw engine output NEVER reaches the response body — it is
+ * diagnostic only, and used to have segfault dumps and tmp paths rendered on
+ * users' screens.
+ */
+interface ConversionError extends Error {
+  errorCode?: string;
+}
+
+function conversionError(message: string, errorCode: string): ConversionError {
+  const error = new Error(message) as ConversionError;
+  error.errorCode = errorCode;
+  return error;
+}
+
+/**
+ * What every log line about a run carries in place of the filename. On
+ * 2026-10-04 two timeouts logged only `timeoutMs`, so nobody could tell whether
+ * the file was long, heavy or both.
+ */
+interface RunLog {
+  pages: number;
+  bytes: number;
+  fileRef: string;
+}
+
 export const runtime = 'nodejs';
-export const maxDuration = 120; // Increased for pdf2docx/LibreOffice conversion
+// The converter's 120 s budget plus room to read the upload, inspect it and
+// answer, so a platform that enforces this cannot cut the request before the
+// friendly CONVERSION_TIMEOUT answer is sent. `next start` does not enforce it,
+// and nginx allows 600 s on the box.
+export const maxDuration = 150;
 
 // Engine detection is memoized at module scope: binaries do not appear/disappear
 // between requests, so exec-ing `which`/import probes per request is wasted latency.
@@ -117,12 +158,13 @@ async function detectPdf2Docx(requestId?: string): Promise<boolean> {
  * This provides much better formatting preservation than LibreOffice or text extraction
  * Same approach used by BentoPDF
  */
-async function convertPdfToWordPdf2Docx(pdfBuffer: Buffer, requestId: string): Promise<Buffer> {
+async function convertPdfToWordPdf2Docx(pdfBuffer: Buffer, requestId: string, runLog: RunLog): Promise<Buffer> {
   const tempDir = tmpdir();
   const inputId = randomUUID();
   const inputPath = join(tempDir, `${inputId}.pdf`);
   const expectedOutputPath = join(tempDir, `${inputId}.docx`);
   const pythonScriptPath = join(tempDir, `${inputId}_convert.py`); // Declare at function level for cleanup
+  const type3TextPath = join(tempDir, `${inputId}_type3.pdf`);
   
   try {
     // Write PDF to temp file
@@ -132,32 +174,166 @@ async function convertPdfToWordPdf2Docx(pdfBuffer: Buffer, requestId: string): P
     // This provides much better quality than LibreOffice
     // Write Python script to a temp file to avoid shell escaping issues
     // Added error handling for version compatibility issues
+    //
+    // The logging filter drops pdf2docx's 'Ignore Line "<text>" due to overlap'
+    // warnings, one per overlapping line. They quote the document, and on a
+    // table-heavy file they fill the 1 MB of stderr runProcess keeps, so the
+    // progress lines the timeout log reads ("[4/4]", "(8/21) Page 8") are cut
+    // off. pdf2docx logs through the root logger, so a filter on that logger
+    // catches them; the one on its handlers also catches child loggers.
+    //
+    // Type 3 fonts (headless Chrome prints variable fonts this way, matplotlib
+    // by default): a glyph that starts with d1 takes its colour from the text.
+    // PyMuPDF 1.26 reads a fill inside one as "colour undefined", draws the
+    // glyph as loose vector paths and keeps the text only as invisible text,
+    // which pdf2docx discards as a hidden OCR layer, and it splits every space
+    // into its own span, which pdf2docx also drops. A 2026-11-03 brochure came
+    // out with 43 of 293 words, glued together. A fill colour right after d1 is
+    // ignored when drawing (d1 glyphs cannot set colour), but it makes MuPDF
+    // keep the glyphs as ordinary text. Only a copy is rewritten, and only
+    // when the file has such glyphs.
+    //
+    // pdf2docx leaves a page cut short when building it fails (it logs
+    // "Ignore page" and still exits 0); its borderless-table guesser is the
+    // usual cause, so the file is converted once more without it while there
+    // is time.
+    //
+    // A scan after OCR (ours or anyone's) has only invisible text over a page
+    // picture. pdf2docx drops invisible text unless told the file is OCR-ed
+    // (ocr=2), so such a scan became a .docx holding one picture and no words.
+    // When every bit of text in the file is invisible, it gets ocr=2: the
+    // recognised text, without the page pictures.
+    //
+    // Arabic lines are read in reading order and their paragraphs marked
+    // right-to-left (lib/pdf-to-word-arabic.ts). That is new on 2026-11-12, so
+    // a conversion that fails with it is tried once more without it.
     const pythonScript = `from pdf2docx import Converter
+import logging
 import sys
-import traceback
+import time
+${ARABIC_LAYOUT_PY}
+
+class DropQuotedLines(logging.Filter):
+    def filter(self, record):
+        return not str(record.msg).startswith('Ignore Line')
+
+logging.getLogger().addFilter(DropQuotedLines())
+for handler in logging.getLogger().handlers:
+    handler.addFilter(DropQuotedLines())
+
+class CountPageErrors(logging.Handler):
+    def __init__(self):
+        super().__init__(logging.ERROR)
+        self.count = 0
+    def emit(self, record):
+        if str(record.msg).startswith('Ignore page'):
+            self.count += 1
+
+page_errors = CountPageErrors()
+logging.getLogger().addHandler(page_errors)
+
+def type3_glyphs_as_text(src, dst):
+    import fitz
+    doc = fitz.open(src)
+    changed = 0
+    for xref in range(1, doc.xref_length()):
+        if doc.xref_get_key(xref, "Subtype")[1] != "/Type3":
+            continue
+        kind, procs = doc.xref_get_key(xref, "CharProcs")
+        if kind == "xref":
+            procs = doc.xref_object(int(procs.split()[0]), compressed=True)
+        tokens = procs.replace("<<", " ").replace(">>", " ").replace("/", " /").split()
+        for i in range(len(tokens) - 2):
+            if tokens[i + 2] != "R" or not tokens[i].isdigit():
+                continue
+            data = doc.xref_stream(int(tokens[i]))
+            if not data or data.split(None, 7)[6:7] != [b"d1"]:
+                continue
+            at = data.find(b"d1") + 2
+            doc.update_stream(int(tokens[i]), data[:at] + b" 0 g" + data[at:])
+            changed += 1
+    if changed:
+        doc.save(dst)
+    doc.close()
+    return dst if changed else src
+
+def only_ocr_text(src):
+    import fitz
+    doc = fitz.open(src)
+    try:
+        hidden = 0
+        for page in doc:
+            for span in page.get_texttrace():
+                if span.get("type") != 3:
+                    return False
+                hidden += 1
+        return hidden > 0
+    finally:
+        doc.close()
 
 try:
-    cv = Converter("${inputPath}")
+    source = type3_glyphs_as_text("${inputPath}", "${type3TextPath}")
+except Exception:
+    source = "${inputPath}"
+
+# Only an OCR-ed scan gets the ocr setting; every other file converts as before.
+try:
+    ocr = {"ocr": 2} if only_ocr_text(source) else {}
+except Exception:
+    ocr = {}
+
+try:
+    arabic_undo = arabic_reader()
+except Exception:
+    arabic_undo = None
+
+try:
+    started = time.monotonic()
+    cv = Converter(source)
     # Try conversion with error handling for version compatibility
     try:
-        cv.convert("${expectedOutputPath}", start=0, end=None)
+        try:
+            cv.convert("${expectedOutputPath}", start=0, end=None, **ocr)
+        except Exception:
+            if not (arabic_undo and arabic_lines_fixed):
+                raise
+            arabic_undo()
+            cv.close()
+            cv = Converter(source)
+            cv.convert("${expectedOutputPath}", start=0, end=None, **ocr)
+            print("ARABIC_READER_DROPPED")
         cv.close()
+        if page_errors.count and time.monotonic() - started < 50:
+            try:
+                cv = Converter(source)
+                cv.convert("${expectedOutputPath}", start=0, end=None, parse_stream_table=False, **ocr)
+                cv.close()
+                print("RETRIED")
+            except Exception:
+                pass
+        if source != "${inputPath}":
+            print("TYPE3_FIXED")
+        if ocr:
+            print("OCR_TEXT")
+        try:
+            if arabic_docx("${expectedOutputPath}"):
+                print("ARABIC_FIXED")
+        except Exception:
+            print("ARABIC_DOCX_FAILED")
         print("SUCCESS")
     except AttributeError as attr_error:
         # Handle version compatibility issues (e.g., 'Rect' object has no attribute 'get_area')
         if 'get_area' in str(attr_error) or 'Rect' in str(attr_error):
             # Try with different parameters or re-raise with better error message
             cv.close()
-            print(f"VERSION_ERROR: pdf2docx version compatibility issue: {attr_error}", file=sys.stderr)
-            print(f"Please update pdf2docx: pip3 install --upgrade pdf2docx", file=sys.stderr)
+            print("VERSION_ERROR", file=sys.stderr)
             sys.exit(2)
         else:
             raise
 except Exception as e:
     error_msg = str(e)
-    error_trace = traceback.format_exc()
-    print(f"ERROR: {error_msg}", file=sys.stderr)
-    # Log full traceback for debugging
+    # The class name only: the message can quote the document's text.
+    print(f"ERROR_TYPE: {type(e).__name__}", file=sys.stderr)
     if "get_area" in error_msg or "Rect" in error_msg:
         print("VERSION_COMPATIBILITY_ERROR", file=sys.stderr)
     sys.exit(1)
@@ -180,50 +356,61 @@ except Exception as e:
     const pathParts = pathEnv.split(':').filter(p => p);
     const updatedPath = [...new Set([...commonPaths, ...pathParts])].join(':');
 
-    // Execute the Python script file instead of using -c to avoid escaping issues
-    let stdout: string = '';
-    let stderr: string = '';
-    let exitCode: number = 0;
-    
-    try {
-      const result = await execAsync(`python3 "${pythonScriptPath}"`, {
-        timeout: 120000, // 2 minute timeout
-        maxBuffer: 50 * 1024 * 1024,
-        env: {
-          ...process.env,
-          PATH: updatedPath,
-        },
-      });
-      stdout = result.stdout || '';
-      stderr = result.stderr || '';
-    } catch (execError: any) {
-      stdout = execError.stdout || '';
-      stderr = execError.stderr || '';
-      exitCode = execError.code || 1;
-      
-      // Check for version compatibility errors
-      if (stderr && (stderr.includes('VERSION_COMPATIBILITY_ERROR') || 
-                     stderr.includes('get_area') || 
-                     stderr.includes("'Rect' object has no attribute"))) {
-        logger.error(`[pdf2docx] Version compatibility error detected`, { stderr, exitCode }, requestId);
-        throw new Error(`pdf2docx version compatibility issue. The installed version may be incompatible. Please update: pip3 install --upgrade pdf2docx. Error: ${stderr.split('\\n')[0]}`);
+    // No shell, own process group: on timeout the python process itself is
+    // killed, and this only returns once it has exited, so the cleanup below
+    // cannot run before its last write (see lib/run-process.ts).
+    const startedAt = Date.now();
+    const { stdout, stderr, exitCode, signal, timedOut } = await runProcess('python3', [pythonScriptPath], {
+      timeoutMs: PDF2DOCX_TIMEOUT_MS,
+      env: {
+        ...process.env,
+        PATH: updatedPath,
+      },
+    });
+    // Pages, bytes and time on every outcome line, so seconds per page can be
+    // read straight off the log.
+    const outcome = { ...runLog, elapsedMs: Date.now() - startedAt };
+
+    if (timedOut) {
+      logger.warn(
+        `[pdf2docx] Timed out; process group killed`,
+        { ...outcome, timeoutMs: PDF2DOCX_TIMEOUT_MS, progress: pdf2docxProgress(stderr) },
+        requestId
+      );
+      throw conversionError(`pdf2docx timed out after ${PDF2DOCX_TIMEOUT_MS / 1000}s`, 'TIMEOUT');
+    }
+
+    if (exitCode !== 0) {
+      // Logged as a summary only (exception class, flags, counts), never the
+      // stderr: pdf2docx warnings and exception messages can quote the document.
+      const failure = pdf2docxFailureSummary(stderr);
+
+      // Version mismatch (marker from the wrapper, or exit code 2)
+      if (failure.versionIssue || exitCode === 2) {
+        logger.error(`[pdf2docx] Version compatibility error detected`, { ...outcome, exitCode, ...failure }, requestId);
+        throw new Error('pdf2docx version compatibility issue. The installed version may be incompatible. Please update: pip3 install --upgrade pdf2docx');
       }
       
-      // If exit code is 2, it's a version error
-      if (exitCode === 2) {
-        logger.error(`[pdf2docx] Version error (exit code 2)`, { stderr }, requestId);
-        throw new Error(`pdf2docx version compatibility issue. Please update: pip3 install --upgrade pdf2docx`);
-      }
-      
-      // For other errors, re-throw to trigger LibreOffice fallback
       if (!stdout.includes('SUCCESS')) {
-        logger.warn(`[pdf2docx] Conversion failed`, { stderr, exitCode }, requestId);
-        throw new Error(`pdf2docx conversion failed: ${stderr || execError.message || 'Unknown error'}`);
+        // pdf2docx 0.5.13 runs against a much newer PyMuPDF and can die in
+        // native code on complex layouts; that is a crash, not a rejection, so
+        // it gets its own code. Without a shell in between, the crash arrives
+        // as the signal itself (SIGSEGV) rather than the shell's exit code 139.
+        const crashed = signal !== null || /Segmentation fault|core dumped/i.test(stderr);
+        logger.warn(
+          `[pdf2docx] Conversion failed`,
+          { ...outcome, exitCode, signal, crashed, ...failure },
+          requestId
+        );
+        throw conversionError(
+          `pdf2docx conversion failed: ${failure.errorType ?? `exit ${exitCode ?? signal}`}`,
+          crashed ? 'CONVERTER_CRASHED' : 'CONVERSION_FAILED'
+        );
       }
     }
     
     if (stderr && !stdout.includes('SUCCESS')) {
-      logger.warn(`[pdf2docx] Warning: ${stderr}`, {}, requestId);
+      logger.warn('[pdf2docx] Exited 0 without SUCCESS', { ...outcome, ...pdf2docxFailureSummary(stderr) }, requestId);
     }
     
     // Wait for file system sync
@@ -247,11 +434,23 @@ except Exception as e:
     if (!docxBuffer) {
       throw new Error('pdf2docx conversion failed: No output generated');
     }
+
+    logger.info('[pdf2docx] Converted', {
+      ...outcome,
+      outputBytes: docxBuffer.length,
+      type3Fixed: stdout.includes('TYPE3_FIXED'),
+      retriedWithoutStreamTables: stdout.includes('RETRIED'),
+      ocrText: stdout.includes('OCR_TEXT'),
+      arabic: stdout.includes('ARABIC_FIXED'),
+      arabicReaderDropped: stdout.includes('ARABIC_READER_DROPPED'),
+      arabicDocxFailed: stdout.includes('ARABIC_DOCX_FAILED'),
+    }, requestId);
     
     // Cleanup
     await unlink(inputPath).catch(() => {});
     await unlink(expectedOutputPath).catch(() => {});
     await unlink(pythonScriptPath).catch(() => {});
+    await unlink(type3TextPath).catch(() => {});
     
     return docxBuffer;
   } catch (error) {
@@ -259,6 +458,7 @@ except Exception as e:
     await unlink(inputPath).catch(() => {});
     await unlink(expectedOutputPath).catch(() => {});
     await unlink(pythonScriptPath).catch(() => {});
+    await unlink(type3TextPath).catch(() => {});
     throw error;
   }
 }
@@ -328,10 +528,6 @@ async function convertPdfToWordLibreOffice(pdfBuffer: Buffer, requestId: string)
   const tempDir = tmpdir();
   const inputId = randomUUID();
   const inputPath = join(tempDir, `${inputId}.pdf`);
-  
-  // Expected output file: same name as input but with .docx extension
-  // LibreOffice outputs with the same base filename as input, just changes extension
-  const expectedOutputPath = join(tempDir, `${inputId}.docx`);
   
   try {
     // Get the correct LibreOffice command
@@ -407,52 +603,37 @@ async function convertPdfToWordLibreOffice(pdfBuffer: Buffer, requestId: string)
     // Use LibreOffice to convert PDF to DOCX
     // LibreOffice handles PDFs natively without needing --infilter parameter
     // --headless: Run without GUI
-    // --convert-to docx: Convert to DOCX format
-    // --outdir: Output directory
-    // Use absolute paths to avoid any path resolution issues
-    const absoluteInputPath = inputPath; // Already absolute from join(tempDir, ...)
+    // (--convert-to docx and a private --outdir are added by convertWithLibreOffice)
+    const flags = ['--headless'];
     
-    // Use simple command without cd - just absolute paths
-    // Remove quotes from paths to avoid shell interpretation issues
-    const command = `${libreOfficeCmd} --headless --convert-to docx --outdir ${tempDir} ${absoluteInputPath}`;
-    
-    logger.info(`[LibreOffice] Converting: ${inputId}.pdf`, { inputPath: absoluteInputPath, tempDir, command }, requestId);
+    logger.info(`[LibreOffice] Converting: ${inputId}.pdf`, { inputPath, flags }, requestId);
     
     // Create a proper HOME directory for LibreOffice if needed
     const libreOfficeHome = process.env.HOME || tempDir;
     
-    let stdout: string = '';
-    let stderr: string = '';
-    
-    try {
-      const result = await execAsync(command, {
-        timeout: 90000, // 90 second timeout
-        maxBuffer: 50 * 1024 * 1024, // 50MB buffer
-        env: {
-          ...process.env,
-          PATH: updatedPath,
-          HOME: libreOfficeHome, // Use actual HOME or fallback
-          TMPDIR: tempDir, // Use temp directory for LibreOffice temp files
-          // LibreOffice user profile to avoid conflicts
-          'SAL_USE_VCLPLUGIN': 'headless',
-          'SAL_DISABLE_OPENCL': '1',
-          // Disable LibreOffice user profile to avoid permission issues
-          'SAL_NO_DEFAULT': '1',
-          // Additional LibreOffice environment variables
-          'LIBREOFFICE_USER_PROFILE': join(tempDir, `lo-profile-${inputId}`),
-        },
-        cwd: tempDir, // Set working directory to temp directory
-        shell: '/bin/bash', // Explicitly use bash shell
-      });
-      stdout = result.stdout || '';
-      stderr = result.stderr || '';
-    } catch (execError: any) {
-      stdout = execError.stdout || '';
-      stderr = execError.stderr || '';
+    // A non-zero exit is not treated as fatal here: whether an output came
+    // back decides, as before. A timeout is: the process group is gone by
+    // now, so nothing more will be written.
+    const { output, stdout, stderr, exitCode, signal, timedOut } = await convertWithLibreOffice(libreOfficeCmd, inputPath, 'docx', {
+      flags,
+      timeoutMs: LIBREOFFICE_TIMEOUT_MS,
+      env: {
+        ...process.env,
+        PATH: updatedPath,
+        HOME: libreOfficeHome, // Use actual HOME or fallback
+        'SAL_USE_VCLPLUGIN': 'headless',
+        'SAL_DISABLE_OPENCL': '1',
+        'SAL_NO_DEFAULT': '1',
+      },
+    });
+
+    if (timedOut) {
+      logger.warn('[LibreOffice] Timed out; process group killed', { timeoutMs: LIBREOFFICE_TIMEOUT_MS }, requestId);
+      throw conversionError(`LibreOffice timed out after ${LIBREOFFICE_TIMEOUT_MS / 1000}s`, 'TIMEOUT');
     }
     
     // Log stdout and stderr for debugging (important for production troubleshooting)
-    logger.info('LibreOffice conversion stdout', { stdout: stdout || '(empty)', command }, requestId);
+    logger.info('LibreOffice conversion stdout', { stdout: stdout || '(empty)', exitCode, signal }, requestId);
     if (stderr) {
       logger.warn('LibreOffice conversion stderr', { stderr }, requestId);
     }
@@ -485,16 +666,6 @@ async function convertPdfToWordLibreOffice(pdfBuffer: Buffer, requestId: string)
       throw new Error(`LibreOffice cannot load PDF file. File path: ${inputPath}. This may indicate: 1) File permissions issue, 2) Corrupted PDF, or 3) LibreOffice cannot access the file. Error: ${stderr.trim()}`);
     }
     
-    // Parse stdout to find the actual output file path
-    // LibreOffice outputs: "convert /path/to/input.pdf as ... -> /path/to/output.docx using filter ..."
-    let parsedOutputPath: string | null = null;
-    if (stdout) {
-      const match = stdout.match(/->\s+([^\s]+\.docx)/);
-      if (match && match[1]) {
-        parsedOutputPath = match[1];
-      }
-    }
-    
     // Check if conversion actually succeeded by looking for success indicators in stdout
     // LibreOffice typically outputs: "convert /path/to/input.pdf -> /path/to/output.docx using filter ..."
     const conversionSucceeded = stdout && (stdout.includes('->') || stdout.includes('convert') || stdout.includes('using filter'));
@@ -514,152 +685,25 @@ async function convertPdfToWordLibreOffice(pdfBuffer: Buffer, requestId: string)
       logger.warn('LibreOffice conversion may have failed - no success indicator in stdout', { stdout: stdout || '(empty)', stderr: stderr || '(empty)' }, requestId);
     }
     
-    // Wait for file system sync (increased wait time for production)
-    // LibreOffice may need time to flush the file to disk
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // List all files in temp directory after conversion
-    const { readdir, stat } = await import('fs/promises');
-    let allFiles: string[] = [];
-    try {
-      allFiles = await readdir(tempDir);
-      // Log all files found (important for debugging)
-      logger.info('Files in temp directory after conversion', { 
-        files: allFiles, 
-        tempDir,
-        inputId,
-        expectedPath: expectedOutputPath 
-      }, requestId);
-      const docxFiles = allFiles.filter(f => f.endsWith('.docx'));
-      logger.info('DOCX files found in temp directory', { docxFiles, count: docxFiles.length }, requestId);
-    } catch (dirError) {
-      logger.error('Error listing temp directory', { 
-        error: dirError instanceof Error ? dirError.message : 'Unknown error',
-        tempDir 
-      }, requestId);
-    }
-    
-    // Try multiple strategies to find the output file
-    let docxBuffer: Buffer | null = null;
-    const pathsToTry = [
-      parsedOutputPath,                  // Path from LibreOffice stdout
-      expectedOutputPath,                 // Expected path (same name as input)
-      join(tempDir, `${inputId}.docx`),  // Alternative check
-    ].filter((p): p is string => p !== null);
-    
-    logger.debug('Trying output file paths', { paths: pathsToTry }, requestId);
-    
-    // First, try the parsed and expected paths
-    for (const path of pathsToTry) {
-      try {
-        const stats = await stat(path);
-        if (stats.isFile() && stats.size > 0) {
-          docxBuffer = await readFile(path);
-          logger.info('Found LibreOffice output file', { path, size: `${(docxBuffer.length / 1024 / 1024).toFixed(2)}MB` }, requestId);
-          break;
-        }
-      } catch (err) {
-        logger.debug('Output file not found at path', { path }, requestId);
-      }
-    }
-    
-    // If still not found, search for any recent .docx file in temp directory
-    if (!docxBuffer) {
-      try {
-        const docxFiles = allFiles.filter(f => f.endsWith('.docx'));
-        logger.info('Searching for DOCX files in temp directory (fallback)', { count: docxFiles.length, files: docxFiles }, requestId);
-        
-        // Sort by modification time (most recent first)
-        const filesWithStats = await Promise.all(
-          docxFiles.map(async (file) => {
-            try {
-              const filePath = join(tempDir, file);
-              const stats = await stat(filePath);
-              return { file, path: filePath, mtime: stats.mtimeMs, size: stats.size };
-            } catch {
-              return null;
-            }
-          })
-        );
-        
-        const validFiles = filesWithStats.filter(f => f !== null && f.size > 0) as Array<{file: string, path: string, mtime: number, size: number}>;
-        validFiles.sort((a, b) => b.mtime - a.mtime); // Most recent first
-        
-        logger.info('Valid DOCX files found', { 
-          count: validFiles.length, 
-          files: validFiles.map(f => ({ name: f.file, size: `${(f.size / 1024 / 1024).toFixed(2)}MB`, age: `${Math.round((Date.now() - f.mtime) / 1000)}s` }))
-        }, requestId);
-        
-        // Try the most recent file (likely our output) - increased time window to 60 seconds
-        if (validFiles.length > 0) {
-          const mostRecent = validFiles[0];
-          const now = Date.now();
-          // Check if file was modified in last 60 seconds (increased from 30)
-          if (now - mostRecent.mtime < 60000) {
-            docxBuffer = await readFile(mostRecent.path);
-            logger.info('Found most recent DOCX file', { path: mostRecent.path, size: `${(docxBuffer.length / 1024 / 1024).toFixed(2)}MB`, age: `${Math.round((now - mostRecent.mtime) / 1000)}s` }, requestId);
-          } else {
-            logger.warn('Most recent DOCX file is too old', { 
-              path: mostRecent.path, 
-              age: `${Math.round((now - mostRecent.mtime) / 1000)}s`,
-              threshold: '60s'
-            }, requestId);
-          }
-        }
-      } catch (dirError) {
-        logger.error('Error searching temp directory', { error: dirError instanceof Error ? dirError.message : 'Unknown error' }, requestId);
-      }
-    }
-    
-    if (!docxBuffer) {
+    if (!output) {
       // Enhanced error logging with all diagnostic information
       logger.error('LibreOffice conversion failed: Output file not found', { 
-        expectedPath: expectedOutputPath, 
-        parsedPath: parsedOutputPath, 
-        allFiles: allFiles.slice(0, 50), // Limit to first 50 files to avoid huge logs
-        tempDir,
         inputId,
         stdout: stdout || '(empty)',
         stderr: stderr || '(empty)',
-        command
+        flags,
+        exitCode,
+        signal,
       }, requestId);
       throw new Error('LibreOffice conversion failed: Output file not found');
     }
     
-    
-    // Cleanup temp files
-    try {
-      await unlink(inputPath);
-      // Clean up output file
-      await unlink(expectedOutputPath).catch(() => {});
-      if (parsedOutputPath && parsedOutputPath !== expectedOutputPath) {
-        await unlink(parsedOutputPath).catch(() => {});
-      }
-      // Also try to clean up any .docx files with the input ID
-      try {
-        const files = await readdir(tempDir);
-        for (const file of files) {
-          if (file.endsWith('.docx') && file.includes(inputId)) {
-            await unlink(join(tempDir, file)).catch(() => {});
-          }
-        }
-      } catch {
-        // Ignore cleanup errors
-      }
-    } catch (cleanupError) {
-      logger.warn('Failed to cleanup temp files', { error: cleanupError instanceof Error ? cleanupError.message : 'Unknown error' }, requestId);
-    }
-    
-    return docxBuffer;
+    logger.info('Found LibreOffice output file', { size: `${(output.length / 1024 / 1024).toFixed(2)}MB` }, requestId);
+    await unlink(inputPath).catch(() => {});
+    return output;
   } catch (error) {
     // Cleanup on error
-    try {
-      await unlink(inputPath).catch(() => {});
-      await unlink(expectedOutputPath).catch(() => {});
-    } catch (cleanupError) {
-      // Ignore cleanup errors
-    }
-    
+    await unlink(inputPath).catch(() => {});
     throw error;
   }
 }
@@ -678,6 +722,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Too many conversion requests. Please wait a few minutes before trying again.',
+        errorCode: 'RATE_LIMITED',
         requestId,
       },
       {
@@ -691,6 +736,7 @@ export async function POST(request: NextRequest) {
     );
   }
   
+  let runLog: RunLog | undefined;
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -718,7 +764,37 @@ export async function POST(request: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileSizeMB = (buffer.length / 1024 / 1024).toFixed(2);
-    logger.info('PDF to Word conversion started', { fileSize: `${fileSizeMB}MB`, fileName: file.name }, requestId);
+
+    // Check this before spending 40+ seconds in the converter: an encrypted or
+    // structurally broken PDF fails deep inside the engine, which surfaced as an
+    // opaque 500 instead of the actionable "unlock it first" / "not a valid PDF"
+    // hint. inspectPdf also touches getPageCount, which is the call that
+    // actually throws on a file pdf-lib's lazy load() waved through.
+    const inspection = await inspectPdf(buffer);
+    if (!inspection.ok) {
+      const { errorCode, message, detail } = inspection.rejection;
+      logger.warn('PDF rejected before conversion', { errorCode, ...detail }, requestId);
+      return NextResponse.json({ error: message, errorCode, requestId }, { status: 400 });
+    }
+
+    runLog = { pages: inspection.value.pageCount, bytes: buffer.length, fileRef: fileLogMeta(file).fileRef };
+
+    // Past this many pages one run would take most of the box's free memory,
+    // whatever the file contains (see lib/pdf-to-word-limits.ts). Say so now,
+    // with the way through, before python starts.
+    if (runLog.pages > PDF_TO_WORD_MAX_PAGES) {
+      logger.warn('PDF rejected before conversion: too many pages', { ...runLog, maxPages: PDF_TO_WORD_MAX_PAGES }, requestId);
+      return NextResponse.json(
+        {
+          error: 'This PDF has too many pages to convert in one go. Split it into smaller files and convert them one at a time.',
+          errorCode: 'TOO_MANY_PAGES',
+          requestId,
+        },
+        { status: 422 }
+      );
+    }
+
+    logger.info('PDF to Word conversion started', { ...fileLogMeta(file), pages: runLog.pages, bytes: runLog.bytes }, requestId);
     
     // Check if pdf2docx is available (best quality - same as BentoPDF)
     const hasPdf2Docx = await checkPdf2Docx(requestId);
@@ -733,27 +809,21 @@ export async function POST(request: NextRequest) {
     if (hasPdf2Docx) {
       // Use pdf2docx for best conversion quality (same as BentoPDF)
       try {
-        docxBuffer = await convertPdfToWordPdf2Docx(buffer, requestId);
+        docxBuffer = await convertPdfToWordPdf2Docx(buffer, requestId, runLog);
         conversionMethod = 'pdf2docx';
       } catch (pdf2docxError) {
-        logger.warn('pdf2docx failed, falling back to LibreOffice', { error: pdf2docxError instanceof Error ? pdf2docxError.message : 'Unknown error' }, requestId);
-        // Fallback to LibreOffice
-        const hasLibreOffice = await checkLibreOffice();
-        if (hasLibreOffice) {
-          try {
-            docxBuffer = await convertPdfToWordLibreOffice(buffer, requestId);
-            conversionMethod = 'libreoffice';
-          } catch (libreOfficeError) {
-            logger.error('Both pdf2docx and LibreOffice conversion failed', { 
-              pdf2docxError: pdf2docxError instanceof Error ? pdf2docxError.message : 'Unknown error',
-              libreOfficeError: libreOfficeError instanceof Error ? libreOfficeError.message : 'Unknown error'
-            }, requestId);
-            // Provide helpful error message
-            throw new Error(`PDF to Word conversion failed. pdf2docx error: ${pdf2docxError instanceof Error ? pdf2docxError.message : 'Unknown'}. LibreOffice error: ${libreOfficeError instanceof Error ? libreOfficeError.message : 'Unknown'}. Please ensure pdf2docx is installed: pip3 install pdf2docx`);
-          }
-        } else {
-          throw new Error(`pdf2docx failed and LibreOffice is not available. pdf2docx error: ${pdf2docxError instanceof Error ? pdf2docxError.message : 'Unknown'}. Please install pdf2docx: pip3 install pdf2docx`);
-        }
+        // Deliberately NOT falling back to LibreOffice here. Across the whole
+        // production log history it rescued a pdf2docx failure 0 times out of
+        // 11, because `libreoffice --convert-to docx <pdf>` is not a real
+        // PDF->DOCX path; it only ever burned its full 90s timeout before
+        // failing anyway. Failing fast turns a ~135s dead wait into ~45s.
+        // (LibreOffice is still the primary engine when pdf2docx is absent.)
+        logger.error('pdf2docx conversion failed; LibreOffice fallback skipped (0/11 historical rescues)', {
+          ...runLog,
+          error: pdf2docxError instanceof Error ? pdf2docxError.message : 'Unknown error',
+          errorCode: (pdf2docxError as ConversionError)?.errorCode,
+        }, requestId);
+        throw pdf2docxError;
       }
     } else {
       // Fallback to LibreOffice if pdf2docx not available
@@ -764,11 +834,17 @@ export async function POST(request: NextRequest) {
           docxBuffer = await convertPdfToWordLibreOffice(buffer, requestId);
           conversionMethod = 'libreoffice';
         } catch (libreOfficeError) {
-          logger.error('LibreOffice conversion failed', { error: libreOfficeError instanceof Error ? libreOfficeError.message : 'Unknown error' }, requestId);
-          throw new Error(`LibreOffice conversion failed: ${libreOfficeError instanceof Error ? libreOfficeError.message : 'Unknown error'}. Consider installing pdf2docx for better results: pip3 install pdf2docx`);
+          logger.error('LibreOffice conversion failed', {
+            error: libreOfficeError instanceof Error ? libreOfficeError.message : 'Unknown error',
+            errorCode: (libreOfficeError as ConversionError)?.errorCode,
+          }, requestId);
+          throw conversionError(
+            `LibreOffice conversion failed: ${libreOfficeError instanceof Error ? libreOfficeError.message : 'Unknown error'}`,
+            'CONVERSION_FAILED'
+          );
         }
       } else {
-        throw new Error('Neither pdf2docx nor LibreOffice is available. Please install pdf2docx: pip3 install pdf2docx');
+        throw conversionError('No PDF-to-Word engine is available on the server.', 'ENGINE_UNAVAILABLE');
       }
     }
 
@@ -783,7 +859,7 @@ export async function POST(request: NextRequest) {
       method: conversionMethod, 
       inputSize: `${fileSizeMB}MB`, 
       outputSize: `${(docxBuffer.length / 1024 / 1024).toFixed(2)}MB`,
-      fileName: file.name 
+      ...runLog,
     }, requestId);
     
     // Return DOCX file
@@ -796,15 +872,49 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('PDF to Word conversion failed', { error: error instanceof Error ? error.message : 'Unknown error', stack: error instanceof Error ? error.stack : undefined }, requestId);
-    
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : 'An unknown error occurred while converting the PDF';
-    
+    const err = error as ConversionError;
+
+    // The engine's own output — stderr, tmp paths, stack — is logged here and
+    // ONLY here. It used to be echoed straight into the response body, which
+    // put "Segmentation fault (core dumped)", a /tmp path and a
+    // `pip3 install pdf2docx` instruction on a real user's phone.
+    logger.error('PDF to Word conversion failed', {
+      ...runLog,
+      error: err instanceof Error ? err.message : 'Unknown error',
+      errorCode: err?.errorCode,
+      stack: err instanceof Error ? err.stack : undefined,
+    }, requestId);
+
+    // Ran out of time. Splitting the file is the way through, so the visitor
+    // gets that instead of "too complex". It stays a 5xx: a timeout is the box
+    // not keeping up, and the back office and GA4 count 5xx as the tool
+    // failing, which is the signal that surfaced this incident.
+    if (err?.errorCode === 'TIMEOUT') {
+      return NextResponse.json(
+        {
+          error: 'This PDF takes too long to convert in one go. Split it into smaller files and convert them one at a time.',
+          errorCode: 'CONVERSION_TIMEOUT',
+          requestId,
+        },
+        { status: 504 }
+      );
+    }
+
+    if (err?.errorCode === 'ENGINE_UNAVAILABLE') {
+      return NextResponse.json(
+        {
+          error: 'PDF to Word conversion is temporarily unavailable. Please try again in a few minutes.',
+          errorCode: 'ENGINE_UNAVAILABLE',
+          requestId,
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       {
-        error: errorMessage,
+        error: "We couldn't convert this PDF to Word — its layout is too complex for the converter.",
+        errorCode: err?.errorCode === 'CONVERTER_CRASHED' ? 'CONVERTER_CRASHED' : 'CONVERSION_FAILED',
         requestId,
       },
       { status: 500 }

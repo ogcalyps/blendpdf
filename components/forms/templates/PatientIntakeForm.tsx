@@ -7,6 +7,7 @@ import { patientIntakeTemplate, formDefinitions } from '@/lib/form-templates-dat
 import { Loader2, ArrowRight, ArrowLeft, User, PhoneCall, Stethoscope, Activity, PenTool, CheckCircle2, Download, Shield } from 'lucide-react';
 import { SignaturePad } from '../SignaturePad';
 import { useFormPersist } from '@/hooks/useFormPersist';
+import { useReviewAskAfterSuccess } from '@/hooks/useReviewAskAfterSuccess';
 import { PDFLivePreview } from '@/components/PDFLivePreview';
 
 const STEPS = [
@@ -19,6 +20,7 @@ const STEPS = [
 ];
 
 export function PatientIntakeForm() {
+    const { markSuccess, reviewAsk } = useReviewAskAfterSuccess();
     const { formData, setFormData, isLoaded, clearPersistedData, hasDraft } = useFormPersist('patient_intake_form', {
         fullName: '',
         dob: '',
@@ -127,6 +129,7 @@ export function PatientIntakeForm() {
     const downloadPdf = () => {
         if (!previewFile) return;
         downloadBlob(previewFile, 'Patient_Intake_Completed.pdf');
+        markSuccess();
         clearPersistedData();
         setCurrentStep(1); // Reset
         setPreviewFile(null);
@@ -411,6 +414,7 @@ export function PatientIntakeForm() {
                         </button>
                     )}
                 </div>
+                {reviewAsk}
             </div>
         </div>
     );

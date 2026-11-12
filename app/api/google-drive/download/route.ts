@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { contentDisposition } from '@/lib/pdf-processor';
 
 /**
  * API Route: Download file from Google Drive
@@ -55,13 +56,16 @@ export async function POST(request: NextRequest) {
     return new NextResponse(blob, {
       headers: {
         'Content-Type': blob.type || 'application/pdf',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
+        // Drive filenames are user-chosen and routinely non-ASCII; raw
+        // interpolation made the Response constructor throw and 500 the request.
+        'Content-Disposition': contentDisposition(fileName, 'document.pdf'),
       },
     });
   } catch (error: any) {
     console.error('[Google Drive] Error downloading file:', error);
+    // Fixed copy only — the thrown message is internal detail (logged above).
     return NextResponse.json(
-      { error: error.message || 'Failed to download file from Google Drive' },
+      { error: 'Failed to download the file from Google Drive.', errorCode: 'PROCESSING_FAILED' },
       { status: 500 }
     );
   }
