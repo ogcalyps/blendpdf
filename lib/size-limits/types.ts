@@ -7,7 +7,7 @@
 
 export type SizeTargetSlug = 'to-100kb' | 'to-200kb' | 'to-500kb' | 'to-1mb' | 'to-2mb';
 export type PortalSlug = 'for-ants' | 'for-ircc' | 'for-campus-france' | 'for-anef' | 'for-caf' | 'for-france-travail';
-export type PageLocale = 'en' | 'fr' | 'ar';
+export type PageLocale = 'en' | 'fr' | 'ar' | 'es';
 
 /** A limit and how much fits under it. */
 export interface SizeLimit {

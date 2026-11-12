@@ -114,7 +114,9 @@ describe('client email cap vs the server SES limits', () => {
   // would upload ~10MB just to be told to download. The cap must fit what SES accepts.
   it('a file exactly at MAX_EMAIL_FILE_SIZE still fits in one SES message', async () => {
     const { sendFileEmailViaSes } = await import('../lib/send-file-email-ses');
-    const b64 = Buffer.alloc(MAX_EMAIL_FILE_SIZE, 7).toString('base64');
+    const file = Buffer.alloc(MAX_EMAIL_FILE_SIZE, 7);
+    file.write('%PDF-1.7\n', 'latin1');
+    const b64 = file.toString('base64');
     await expect(
       sendFileEmailViaSes({ to: 'a@b.co', filename: 'x.pdf', fileType: 'application/pdf', fileDataBase64: b64 })
     ).resolves.toBeUndefined();

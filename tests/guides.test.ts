@@ -4,12 +4,13 @@
  * tells people to click is a label the site really shows in that language.
  */
 import { describe, expect, it } from 'vitest';
+import { badSpanish } from './helpers/spanish';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GUIDES, guideChrome, guideContent, guideShot, type GuideContent } from '../lib/guides';
 
 const ROOT = join(__dirname, '..');
-const LOCALES = ['en', 'fr', 'ar'] as const;
+const LOCALES = ['en', 'fr', 'ar', 'es'] as const;
 
 /** Every text a guide shows. */
 function texts(g: GuideContent): string[] {
@@ -77,6 +78,7 @@ describe('guides', () => {
     // French: a no-break space before ; : ! ? » and after «
     const badFrench = all('fr').filter((t) => /[^  ][;:!?»]|«[^  ]/.test(t.replace(/https?:\/\/\S+/g, '')));
     expect(badFrench).toEqual([]);
+    expect(all('es').filter(badSpanish)).toEqual([]);
     const banned = ['تحميل', 'الإيميل', 'يرجى', 'سيتم', 'الخاص بك', 'بدلًا من ذلك', 'بنجاح', '—'];
     expect(all('ar').filter((t) => banned.some((w) => t.includes(w)))).toEqual([]);
   });

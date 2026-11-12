@@ -156,6 +156,81 @@ export const pdf24: Comparison = {
       card: 'Gratuit comme nous, mais son éditeur a enregistré notre ligne arabe ajoutée sous forme d’image, et son éditeur en ligne ne modifie pas le texte existant.',
     },
 
+    es: {
+      metaTitle: 'Alternativa a PDF24 para PDF en árabe: texto real que se puede buscar | BlendPDF',
+      description:
+        'Agregamos la misma línea en árabe en PDF24 y en BlendPDF. PDF24 la guardó como una imagen, así que no se puede buscar ni copiar. BlendPDF guardó texto real.',
+      title: 'Una alternativa a PDF24 para PDF en árabe',
+      tested: 'Probado el 12 de noviembre de 2026',
+      summary:
+        'PDF24 es gratuito, como BlendPDF. Pero en nuestra prueba su editor guardó como imagen una línea en árabe que agregamos, así que no se pueden buscar ni copiar las palabras. Su editor tampoco cambia el texto existente. En BlendPDF, **Texto** guarda el árabe como texto real y **Editar el texto** (beta) cambia una línea, en su navegador.',
+      cta: 'Editar un PDF en árabe',
+      quotes: {
+        title: 'Lo que dice PDF24 en sus propias páginas',
+        intro: 'Sobre cómo cambiar el texto y sobre adónde van los archivos:',
+        glosses: [
+          'Traducción: “La mejor manera de hacerlo es convertir un PDF a formato Word”.',
+          'Traducción: “Las herramientas en línea de PDF24 procesan los archivos en servidores especiales de PDF24”.',
+        ],
+        after: 'En BlendPDF, **Editar el texto** (beta) cambia una línea directamente en la página, y **Editar PDF** funciona en su navegador.',
+      },
+      table: {
+        title: 'Comparación directa',
+        head: ['Lo que comprobamos', 'BlendPDF', 'PDF24'],
+        rows: [
+          {
+            label: 'Agregar una línea en árabe',
+            blendpdf: 'Se guarda como texto: puede buscarla, seleccionarla y copiarla.',
+            them: 'Se guardó como imagen (576 × 99 píxeles). Se ve bien, pero no se pueden buscar, seleccionar ni copiar las palabras.',
+          },
+          {
+            label: 'Cambiar el texto existente',
+            blendpdf: 'Directamente en la página, una línea a la vez (beta).',
+            them: 'No en su editor: su página sugiere convertir el archivo a Word.',
+          },
+          {
+            label: 'Adónde va su archivo',
+            blendpdf:
+              '“Editar PDF” funciona en su navegador, igual que “Extraer páginas”, “Recortar PDF”, “Aplanar PDF”, “Eliminar metadatos”, “PDF a texto” y “Extraer imágenes”.',
+            them: 'Sus herramientas en línea procesan los archivos en servidores de PDF24 y los eliminan en un plazo de una hora.',
+          },
+          { label: 'Precio, cuenta, marca de agua', blendpdf: 'Gratis, sin cuenta, sin marca de agua.', them: 'Gratis, sin cuenta, sin marca de agua.' },
+        ],
+        note: 'Probado el 12 de noviembre de 2026, con las páginas de PDF24 consultadas ese mismo día. PDF24 puede haber cambiado desde entonces: consulte tools.pdf24.org.',
+      },
+      strengths: {
+        title: 'En qué PDF24 iguala o supera a BlendPDF',
+        items: [
+          'Es gratuito para todos, sin cuenta y sin marca de agua, como BlendPDF. Su sitio dice: “There are no artificial limits at PDF24.” (En PDF24 no hay límites artificiales.)',
+          'Elimina los archivos en un plazo de una hora tras procesarlos, igual que nosotros.',
+          'Acepta archivos mucho más grandes: hasta 1000 MB por archivo al unir PDF, frente a 50 MB en BlendPDF.',
+          'Su sitio y su OCR también funcionan en árabe.',
+        ],
+      },
+      faq: [
+        {
+          question: '¿PDF24 guarda bien el texto en árabe?',
+          answer:
+            'Se ve bien, pero en nuestra prueba del 12 de noviembre de 2026 el editor de PDF24 guardó como imagen (576 × 99 píxeles), no como texto, la línea en árabe que agregamos. Se puede ver, pero no se pueden buscar, seleccionar ni copiar las palabras. BlendPDF las guarda como texto real.',
+        },
+        {
+          question: '¿PDF24 puede cambiar el texto existente?',
+          answer:
+            'No en su editor en línea. Su página Edit PDF dice “The best way to do this is to convert a PDF to Word format”, es decir, que lo mejor es convertir el PDF a Word (página consultada el 12 de noviembre de 2026). BlendPDF cambia una línea existente directamente en la página, una línea a la vez (beta).',
+        },
+        {
+          question: '¿PDF24 es gratuito?',
+          answer: 'Sí. Su sitio dice que es gratuito para todos, sin registro y sin marca de agua, como BlendPDF.',
+        },
+        CHROME.es.faq.upload,
+        CHROME.es.faq.realText,
+      ],
+      disclaimer:
+        'PDF24 es una marca comercial de su propietario. BlendPDF no tiene ninguna relación con PDF24. Hicimos esta prueba nosotros mismos el 12 de noviembre de 2026 en tools.pdf24.org, sin cuenta, y citamos sus páginas tal como estaban ese día. PDF24 puede haber cambiado desde entonces: consulte tools.pdf24.org para ver sus funciones y límites actuales.',
+      breadcrumb: 'BlendPDF frente a PDF24',
+      card: 'Gratuito como nosotros, pero su editor guardó como imagen la línea en árabe que agregamos, y su editor en línea no cambia el texto existente.',
+    },
+
     ar: {
       metaTitle: 'بديل PDF24 لملفات PDF العربية: نص حقيقي يمكن البحث فيه | BlendPDF',
       description:

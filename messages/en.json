@@ -2736,7 +2736,7 @@
       },
       "whenToFlatten": {
         "question": "When should I flatten a PDF form?",
-        "answer": "Flatten after you've filled a form and before you submit, email, or print it. It locks your answers in place and ensures the form looks the same in every PDF viewer. You can fill forms first with our Fill Form tool, then flatten the result here."
+        "answer": "Flatten after you've filled a form and before you submit, email, or print it. It locks your answers in place and ensures the form looks the same in every PDF viewer. You can fill the form first in your PDF reader or browser, then flatten the result here."
       },
       "reversible": {
         "question": "Can flattening be undone?",
@@ -2756,7 +2756,7 @@
       },
       "fillFormFlattening": {
         "question": "Can I fill a form before flattening it?",
-        "answer": "Yes — that's the intended workflow. Use the BlendPDF Fill Form tool to type your answers into the interactive fields, download the filled PDF, then flatten it here so the answers can't be changed."
+        "answer": "Yes — that's the intended workflow. Type your answers into the interactive fields in your PDF reader or browser, save the filled PDF, then flatten it here so the answers can't be changed."
       },
       "flattenPasswordProtected": {
         "question": "Can I flatten password-protected PDFs?",

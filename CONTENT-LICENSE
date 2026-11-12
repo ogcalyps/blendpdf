@@ -21,7 +21,8 @@ ogcalyps, **all rights reserved**.
 The surrounding code (components, layout, routing, schema generation, the
 PDF pipeline and the i18n plumbing) is AGPL-3.0. The upload limits table itself
 (`lib/upload-limits/data.ts`, also served as `/pdf-upload-limits.csv` and
-`.json`) is published under CC BY 4.0, as its page says. The fonts in `public/fonts/` keep
+`.json`) and the Arabic PDF editing test set (`public/arabic-pdf-editor-test/`,
+its cases and results) are published under CC BY 4.0, as their pages say. The fonts in `public/fonts/` keep
 their own licences, which sit next to each file.
 
 ## What you may do

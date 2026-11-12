@@ -76,11 +76,12 @@ export const PORTALS: readonly PortalTarget[] = [
   },
 ];
 
-/** "100 KB", "1 Mo", "2 ميجابايت": KB under 1 MB, in the units the workspace uses. */
+/** "100 KB", "1 Mo", "2 ميجابايت", "1,5 MB": KB under 1 MB, in the units the workspace uses. */
 export function sizeLabel(limitMb: number, locale: string): string {
   const kb = limitMb < 1;
   const n = kb ? Math.round(limitMb * 1000) : limitMb;
   if (locale === 'fr') return `${n.toLocaleString('fr-FR')} ${kb ? 'Ko' : 'Mo'}`;
   if (locale === 'ar') return `${n} ${kb ? 'كيلوبايت' : 'ميجابايت'}`;
+  if (locale === 'es') return `${n.toLocaleString('es-ES')}\u00a0${kb ? 'KB' : 'MB'}`;
   return `${n} ${kb ? 'KB' : 'MB'}`;
 }

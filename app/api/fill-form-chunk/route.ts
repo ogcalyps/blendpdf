@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PDFDocument, PDFName, PDFRef, PDFPage } from 'pdf-lib';
+import { tooManyPixels } from '@/lib/image-size';
+import { readBodyText } from '@/lib/read-body';
 import { rateLimitMiddleware } from '@/lib/rate-limit';
 import { hasPdfMagicBytes } from '@/lib/pdf-validation';
 
@@ -7,6 +9,11 @@ const MAX_PDF_SIZE = 50 * 1024 * 1024; // 50MB decoded template
 // Base64 inflates ~4/3, plus mapping/rows payload
 const MAX_BODY_SIZE = 80 * 1024 * 1024;
 const MAX_ROWS_PER_REQUEST = 50;
+/**
+ * Every row is a full copy of the template, held until the response goes out:
+ * rows x template size stays under this (50 rows of a 50 MB template was 2.5 GB).
+ */
+const MAX_OUTPUT_BYTES = 100 * 1024 * 1024;
 
 /**
  * Interface for the mapping configuration
@@ -103,12 +110,13 @@ export async function POST(request: Request) {
     }
 
     try {
-        const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
-        if (contentLength > MAX_BODY_SIZE) {
+        // Counted while reading: a chunked upload has no Content-Length to check
+        const text = await readBodyText(request, MAX_BODY_SIZE);
+        if (text === null) {
             return NextResponse.json({ error: 'Request body too large. The PDF template must be under 50MB.' }, { status: 413 });
         }
 
-        const body = await request.json();
+        const body = JSON.parse(text);
         const { pdfBase64, mapping, rows } = body as {
             pdfBase64: string;
             mapping: FieldMapping;
@@ -131,6 +139,13 @@ export async function POST(request: Request) {
 
         if (pdfBytes.length > MAX_PDF_SIZE) {
             return NextResponse.json({ error: 'PDF template exceeds the 50MB limit.' }, { status: 413 });
+        }
+
+        if (pdfBytes.length * rows.length > MAX_OUTPUT_BYTES) {
+            return NextResponse.json(
+                { error: 'Too much to fill at once for a template this size. Please send fewer rows per batch.' },
+                { status: 413 }
+            );
         }
 
         if (!hasPdfMagicBytes(Buffer.from(pdfBytes))) {
@@ -226,7 +241,13 @@ export async function POST(request: Request) {
                         const page = pages[sig.pageIndex];
                         if (!page) continue;
 
-                        const image = sig.data.includes('image/png')
+                        const isPng = sig.data.includes('image/png');
+                        // pdf-lib decodes a PNG whole: refuse huge dimensions before it does
+                        if (isPng && tooManyPixels(Buffer.from(sig.data.slice(sig.data.indexOf(',') + 1), 'base64'))) {
+                            warnings.push('A signature image was too large and was skipped');
+                            continue;
+                        }
+                        const image = isPng
                             ? await pdfDoc.embedPng(sig.data)
                             : await pdfDoc.embedJpg(sig.data);
 

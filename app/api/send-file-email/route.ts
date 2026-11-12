@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/cloudwatch-logger';
 import { emailLogRef, fileLogMeta } from '@/lib/log-redact';
 import { rateLimitMiddleware } from '@/lib/rate-limit';
+import { takeEmailSlot } from '@/lib/email-send-caps';
 import {
+  AttachmentNotAllowedError,
   FileTooLargeForEmailError,
+  emailAttachment,
   getSesFileEmailConfig,
   sendFileEmailViaSes,
   sendTrustpilotInviteTrigger,
@@ -12,8 +15,10 @@ import {
 /**
  * API Route: Send file via email
  * 
- * Sends the processed file to the user's email address.
- * Uses AWS SES or similar email service.
+ * Sends the processed file to the user's email address, through SES.
+ * Anyone can call it with any address, so it only carries the kinds of file
+ * the tools make (emailAttachment), and caps how often one address, and
+ * everyone together, can be mailed (lib/email-send-caps.ts).
  */
 export async function POST(request: NextRequest) {
   const requestId = `send-email-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -99,6 +104,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!emailAttachment(String(filename), String(fileData))) {
+      return NextResponse.json(
+        { error: 'This kind of file can\'t be emailed. Please download it instead.', errorCode: 'EMAIL_TYPE', requestId },
+        { status: 415 }
+      );
+    }
+
+    const slot = takeEmailSlot(String(email));
+    if (!slot.ok) {
+      logger.warn('[Send File Email] Cap reached', { reason: slot.reason, ...logMeta }, requestId);
+      return NextResponse.json(
+        {
+          error:
+            slot.reason === 'recipient'
+              ? 'This address has already received several files today. Please download the file instead.'
+              : 'Email delivery is busy right now. Please download the file instead.',
+          errorCode: 'EMAIL_CAP',
+          requestId,
+        },
+        { status: 429 }
+      );
+    }
+
     try {
       await sendFileEmailViaSes({
         to: email,
@@ -109,6 +137,12 @@ export async function POST(request: NextRequest) {
         tool,
       });
     } catch (sendErr: unknown) {
+      if (sendErr instanceof AttachmentNotAllowedError) {
+        return NextResponse.json(
+          { error: 'This kind of file can\'t be emailed. Please download it instead.', errorCode: 'EMAIL_TYPE', requestId },
+          { status: 415 }
+        );
+      }
       if (sendErr instanceof FileTooLargeForEmailError) {
         return NextResponse.json(
           { error: sendErr.message, requestId }, // leak-guard: authored — FileTooLargeForEmailError carries our copy
@@ -133,9 +167,10 @@ export async function POST(request: NextRequest) {
 
     logger.info('[Send File Email] Sent via SES', logMeta, requestId);
 
-    // The user already has their file, so a failed trigger only costs one review invitation
+    // The user already has their file, so a failed trigger only costs one review invitation.
+    // One per address per day at most: a repeat sender (or someone mailing a stranger) never multiplies them.
     try {
-      await sendTrustpilotInviteTrigger(email, locale);
+      if (slot.firstToday) await sendTrustpilotInviteTrigger(email, locale);
     } catch (err: unknown) {
       logger.warn('[Send File Email] Trustpilot invite trigger failed', {
         errorName: err instanceof Error ? err.name : typeof err,

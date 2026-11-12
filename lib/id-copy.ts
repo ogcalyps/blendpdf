@@ -5,12 +5,12 @@
  * server-only, like lib/guides. Text may mark a UI label in **bold**.
  */
 
-export type IdCopyLocale = 'en' | 'fr' | 'ar';
+export type IdCopyLocale = 'en' | 'fr' | 'ar' | 'es';
 
 const NBSP = ' ';
 const NNBSP = ' ';
 
-export const idCopyLocale = (locale: string): IdCopyLocale => (locale === 'fr' || locale === 'ar' ? locale : 'en');
+export const idCopyLocale = (locale: string): IdCopyLocale => (locale === 'fr' || locale === 'ar' || locale === 'es' ? locale : 'en');
 
 /** The tiled text: who it's for, what for, the date. Empty answers are left out. */
 export function idCopyText(locale: string, who: string, what: string, date: Date): string {
@@ -21,6 +21,9 @@ export function idCopyText(locale: string, who: string, what: string, date: Date
   const day = [date.getDate(), date.getMonth() + 1].map((n) => String(n).padStart(2, '0')).concat(String(date.getFullYear())).join('/');
   if (l === 'fr') return [w ? `Copie destinée à ${w}` : 'Copie', p && `pour ${p}`, `le ${day}`].filter(Boolean).join(', ');
   if (l === 'ar') return [w ? `نسخة خاصة بـ${w}` : 'نسخة', p && `من أجل ${p}`, `بتاريخ ${day}`].filter(Boolean).join('، ');
+  // "Copia exclusiva para…" is how a copy gets restricted in Spain and Latin America; with no recipient it names the purpose.
+  // "para" never contracts (unlike "de el" → "del"), so it takes whatever the visitor types.
+  if (l === 'es') return [w || p ? `Copia exclusiva para ${w || p}` : 'Copia', w && p && `para ${p}`, day].filter(Boolean).join(', ');
   return [w ? `Copy for ${w} only` : 'Copy', p && `for ${p}`, day].filter(Boolean).join(', ');
 }
 
@@ -110,6 +113,40 @@ const TEXT: Record<IdCopyLocale, IdCopyText> = {
     photos: { text: `Des photos de votre pièce${NNBSP}? Mettez-les d’abord en PDF.`, link: 'Images en PDF' },
     home: 'Accueil',
     watermark: 'Ajouter un filigrane',
+  },
+  es: {
+    title: 'Agregar una marca de agua a la copia de su documento de identidad',
+    metaTitle: 'Marca de agua en una copia de documento de identidad o pasaporte, gratis | BlendPDF',
+    description:
+      'Escriba en cada página de la copia para quién es, para qué trámite y la fecha, para que nadie pueda volver a usarla. Es gratis y el archivo no sale de su navegador.',
+    intro:
+      'Antes de enviar una copia de su documento de identidad o de su pasaporte, escriba en ella para quién es, para qué trámite y la fecha. Si la copia termina en otras manos, nadie podrá usarla para otra cosa.',
+    summary:
+      'Complete los dos campos y luego abra su escaneo más abajo. El texto se repite en todas las páginas. Todavía puede cambiarlo en el panel **Marca de agua** antes de hacer clic en **Agregar marca de agua**.',
+    whoLabel: '¿Para quién es?',
+    whoPlaceholder: 'Por ejemplo: la inmobiliaria',
+    whatLabel: '¿Para qué trámite?',
+    whatPlaceholder: 'Por ejemplo: el contrato de alquiler',
+    preview: 'Su marca de agua:',
+    faq: [
+      {
+        question: '¿Se envía mi documento a su servidor?',
+        answer:
+          'No. La marca de agua se agrega en su navegador y el archivo se queda en su dispositivo. Solo pasa por nuestro servidor si se lo envía a usted mismo por correo electrónico.',
+      },
+      {
+        question: '¿Se puede quitar la marca de agua?',
+        answer:
+          'Queda dibujada dentro de cada página; no es una capa que se pueda desactivar. Por eso también indica para quién es la copia: una copia marcada para una inmobiliaria no sirve para abrir una cuenta bancaria.',
+      },
+      {
+        question: '¿Qué debo escribir?',
+        answer: 'Quién la recibe, para qué trámite y la fecha. Use un texto corto para que cada línea quepa a lo ancho de la página.',
+      },
+    ],
+    photos: { text: '¿Tiene fotos de su documento? Conviértalas primero en PDF.', link: 'Imágenes a PDF' },
+    home: 'Inicio',
+    watermark: 'Agregar marca de agua',
   },
   ar: {
     title: 'إضافة علامة مائية على نسخة بطاقة التعريف',

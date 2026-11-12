@@ -163,10 +163,4 @@ export const getEditTools = (t: TranslationFunction): NavItem[] => [
     description: t('nav.tools.signPdf.description'),
     href: '/sign-pdf',
   },
-  {
-    title: t('nav.tools.batchFill.title'),
-    description: t('nav.tools.batchFill.description'),
-    href: '/fill-form',
-    badge: 'NEW',
-  },
 ];

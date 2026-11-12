@@ -2736,7 +2736,7 @@
       },
       "whenToFlatten": {
         "question": "Quand faut-il aplatir un formulaire PDF ?",
-        "answer": "Aplatissez le formulaire une fois rempli, avant de le déposer, de l’envoyer par courriel ou de l’imprimer. Vos réponses sont ainsi figées, et le formulaire s’affiche de la même façon dans tous les lecteurs PDF. Vous pouvez d’abord remplir le formulaire avec notre outil Remplir un formulaire, puis aplatir le résultat ici."
+        "answer": "Aplatissez le formulaire une fois rempli, avant de le déposer, de l’envoyer par courriel ou de l’imprimer. Vos réponses sont ainsi figées, et le formulaire s’affiche de la même façon dans tous les lecteurs PDF. Vous pouvez d’abord remplir le formulaire dans votre lecteur PDF ou votre navigateur, puis aplatir le résultat ici."
       },
       "reversible": {
         "question": "Peut-on annuler l’aplatissement ?",
@@ -2756,7 +2756,7 @@
       },
       "fillFormFlattening": {
         "question": "Puis-je remplir un formulaire avant de l’aplatir ?",
-        "answer": "Oui, c’est l’usage prévu. Saisissez vos réponses dans les champs interactifs avec l’outil Remplir un formulaire de BlendPDF, téléchargez le PDF rempli, puis aplatissez-le ici pour que les réponses ne puissent plus être modifiées."
+        "answer": "Oui, c’est l’usage prévu. Saisissez vos réponses dans les champs interactifs avec votre lecteur PDF ou votre navigateur, enregistrez le PDF rempli, puis aplatissez-le ici pour que les réponses ne puissent plus être modifiées."
       },
       "flattenPasswordProtected": {
         "question": "Peut-on aplatir un PDF protégé par mot de passe ?",

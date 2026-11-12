@@ -84,14 +84,17 @@ export async function POST(request: NextRequest) {
         // If email already exists (ConditionalCheckFailedException), that's okay
         // Just update the record to refresh the timestamp. reviewRequestSent is
         // left alone, so signing up again never brings a second review request.
+        // So are unsubscribed and unsubscribedAt: anyone can submit any address
+        // here, so this form must never undo someone's unsubscribe
+        // (security review, 2026-11-12).
         if (error.name === 'ConditionalCheckFailedException') {
           const now = new Date().toISOString();
           await client.send(new UpdateCommand({
             TableName: tableName,
             Key: { email: normalizedEmail },
-            UpdateExpression: 'SET #s = :s, createdAt = :now, updatedAt = :now, unsubscribed = :f, #l = :l REMOVE unsubscribedAt',
+            UpdateExpression: 'SET #s = :s, createdAt = :now, updatedAt = :now, #l = :l',
             ExpressionAttributeNames: { '#s': 'source', '#l': 'locale' },
-            ExpressionAttributeValues: { ':s': 'download-capture', ':now': now, ':f': false, ':l': locale },
+            ExpressionAttributeValues: { ':s': 'download-capture', ':now': now, ':l': locale },
           }));
           console.log('[Email Capture] Email already exists, updated timestamp:', emailLogRef(normalizedEmail));
         } else {
@@ -140,13 +143,9 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Don't expose internal DynamoDB errors to client in production
-    const errorMessage = error.name === 'ResourceNotFoundException'
-      ? 'Email storage service not configured. Please contact support.'
-      : error.message || 'Failed to subscribe email';
-
+    // Fixed text only: a DynamoDB error message can carry the account id and role ARN
     return NextResponse.json(
-      { error: errorMessage },
+      { error: 'Could not save your email right now. Your file is not affected.' },
       { status: 500 }
     );
   }

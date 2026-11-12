@@ -1,17 +1,18 @@
 /**
  * The guides (/guides and /guides/<slug>): their order, the tool each one
- * leads to, related guides, and their text per language (./en, ./fr, ./ar).
+ * leads to, related guides, and their text per language (./en, ./fr, ./ar, ./es).
  * Server-only content: it never reaches the browser bundle as messages.
  */
 import type { GuideChrome, GuideContent, GuideSlug } from './types';
 import * as en from './en';
 import * as fr from './fr';
 import * as ar from './ar';
+import * as es from './es';
 import shots from './shots.json';
 
 export type { GuideChrome, GuideContent, GuideSlug, GuideStep } from './types';
 
-export type GuideLocale = 'en' | 'fr' | 'ar';
+export type GuideLocale = 'en' | 'fr' | 'ar' | 'es';
 
 export interface GuideMeta {
   slug: GuideSlug;
@@ -33,9 +34,9 @@ export const GUIDES: readonly GuideMeta[] = [
   { slug: 'edit-pdf-text', tool: '/edit-pdf', minutes: 2, related: ['sign-and-stamp-pdf', 'add-letterhead-to-pdf'], cover: 2 },
 ];
 
-const CONTENT: Record<GuideLocale, { chrome: GuideChrome; guides: Record<GuideSlug, GuideContent> }> = { en, fr, ar };
+const CONTENT: Record<GuideLocale, { chrome: GuideChrome; guides: Record<GuideSlug, GuideContent> }> = { en, fr, ar, es };
 
-export const guideLocale = (locale: string): GuideLocale => (locale === 'fr' || locale === 'ar' ? locale : 'en');
+export const guideLocale = (locale: string): GuideLocale => (locale === 'fr' || locale === 'ar' || locale === 'es' ? locale : 'en');
 
 export function guideChrome(locale: string): GuideChrome {
   return CONTENT[guideLocale(locale)].chrome;

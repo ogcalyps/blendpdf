@@ -166,6 +166,84 @@ export const adobeAcrobat: Comparison = {
       card: 'D’après ses propres pages, son éditeur en ligne gratuit ne modifie pas le texte existant et exige un compte pour télécharger.',
     },
 
+    es: {
+      metaTitle: 'Alternativa a Adobe Acrobat para cambiar el texto de un PDF gratis y sin cuenta | BlendPDF',
+      description:
+        'El editor en línea gratuito de Adobe no cambia el texto existente y pide una cuenta para descargar. BlendPDF cambia una línea gratis, sin cuenta, también en árabe.',
+      title: 'Una alternativa a Adobe Acrobat para cambios rápidos en un PDF',
+      tested: 'Comprobado el 12 de noviembre de 2026',
+      summary:
+        'Según las propias páginas de Adobe, su editor en línea gratuito no permite editar el texto existente en el cuerpo de un PDF, y para descargar lo que editó necesita una cuenta gratuita de Adobe. En BlendPDF, **Editar el texto** (beta) cambia una línea gratis, y usted descarga el archivo sin cuenta.',
+      cta: 'Editar un PDF',
+      quotes: {
+        title: 'Lo que dice Adobe en sus propias páginas',
+        intro: 'En la página de su editor y en su página de ayuda sobre las herramientas gratuitas en línea:',
+        glosses: [
+          'Traducción: “no le permite editar el texto existente en el cuerpo de un PDF”',
+          'Traducción: “se necesita una cuenta gratuita de Adobe para descargar o compartir sus archivos editados”',
+          'Traducción: “la mayoría de las herramientas le permiten hacer una operación gratuita y descargar el archivo resultante una vez”',
+        ],
+        after: 'No subimos ningún archivo a Adobe para esta página, porque para descargar se necesita una cuenta y no creamos cuentas para estas pruebas.',
+      },
+      table: {
+        title: 'Comparación directa',
+        head: ['Lo que comprobamos', 'BlendPDF', 'Adobe Acrobat en línea'],
+        rows: [
+          {
+            label: 'Cambiar el texto existente, gratis',
+            blendpdf: 'Sí, una línea a la vez (beta).',
+            them: 'No en el editor en línea gratuito. Acrobat Pro, que es de pago, sí lo hace.',
+          },
+          { label: 'Cuenta para descargar', blendpdf: 'Ninguna.', them: 'Una cuenta gratuita de Adobe.' },
+          {
+            label: 'Uso gratuito sin cuenta',
+            blendpdf: 'Sin límite diario.',
+            them: 'Una operación gratuita y una descarga en la mayoría de las herramientas.',
+          },
+          {
+            label: 'Adónde va su archivo',
+            blendpdf: 'La edición se hace en su navegador.',
+            them: 'Se sube al almacenamiento en la nube de Adobe, según su página de ayuda.',
+          },
+        ],
+        note: 'Según las páginas de Adobe, consultadas el 12 de noviembre de 2026. Su página de ayuda sobre los límites se actualizó por última vez el 2 de junio de 2025. No probamos Adobe por nuestra cuenta. Consulte en adobe.com los planes y precios actuales.',
+      },
+      strengths: {
+        title: 'Lo que Adobe hace bien',
+        items: [
+          'Acrobat Pro, su aplicación de pago, edita el texto existente.',
+          'Sus herramientas gratuitas aceptan archivos más grandes: 100 MB en la mayoría, y su herramienta para unir PDF combina hasta 100 archivos.',
+          'Con la sesión iniciada, completar formularios, firmar, compartir y comentar es gratis.',
+        ],
+      },
+      faq: [
+        {
+          question: '¿Puedo editar el texto de un PDF gratis con Adobe?',
+          answer:
+            'Su editor en línea gratuito no edita el texto existente. La página de Adobe dice que “does not let you edit existing body text within a PDF” (no le permite editar el texto existente en el cuerpo de un PDF), y para eso hace falta Acrobat Pro. BlendPDF cambia el texto existente gratis, una línea a la vez (beta).',
+        },
+        {
+          question: '¿Necesito una cuenta de Adobe?',
+          answer:
+            'Para descargar o compartir archivos desde el editor en línea de Adobe, sí. Adobe dice que “a free Adobe account is required to download or share your edited files” (se necesita una cuenta gratuita de Adobe para descargar o compartir sus archivos editados). BlendPDF nunca le pide una cuenta.',
+        },
+        {
+          question: '¿Cuántas ediciones gratuitas permite Adobe?',
+          answer:
+            'Sin iniciar sesión, la página de ayuda de Adobe dice que la mayoría de las herramientas permiten una operación gratuita y una descarga. Con la sesión iniciada, sus herramientas premium permiten una operación gratuita cada 30 días. BlendPDF no tiene límite diario. (La página de Adobe se actualizó por última vez el 2 de junio de 2025, y la consultamos el 12 de noviembre de 2026.)',
+        },
+        CHROME.es.faq.upload,
+        {
+          question: '¿BlendPDF funciona en árabe?',
+          answer: 'Sí. El sitio está en español, árabe, francés e inglés, y tanto “Texto” como “Editar el texto” escriben el árabe de derecha a izquierda.',
+        },
+      ],
+      disclaimer:
+        'Adobe y Acrobat son marcas comerciales de Adobe. BlendPDF no tiene ninguna relación con Adobe. No probamos el editor de Adobe por nuestra cuenta: todo lo que esta página dice sobre Adobe viene de las propias páginas de Adobe, consultadas el 12 de noviembre de 2026. Consulte en adobe.com sus funciones, límites y precios actuales.',
+      breadcrumb: 'BlendPDF frente a Adobe Acrobat',
+      card: 'Según las propias páginas de Adobe, su editor en línea gratuito no cambia el texto existente y pide una cuenta para descargar.',
+    },
+
     ar: {
       metaTitle: 'بديل Adobe Acrobat لتعديل نص PDF مجانًا وبلا حساب | BlendPDF',
       description:

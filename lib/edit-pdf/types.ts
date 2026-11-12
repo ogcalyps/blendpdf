@@ -735,7 +735,7 @@ export interface AppendResult {
   /** Files left out. */
   skipped: { name: string; reason: 'ENCRYPTED' | 'UNREADABLE' }[];
 }
-/** Largest working source the workspace builds by inserting (merge-upload's total cap, app/api/merge-upload/route.ts). */
+/** Largest working source the workspace builds by inserting (100 MB, the cap the old server merge had). */
 export const WORKSPACE_MAX_BYTES = 100 * 1024 * 1024;
 export const MAX_MERGE_FILES = 20;
 

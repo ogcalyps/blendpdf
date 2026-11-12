@@ -3,12 +3,16 @@ import { PDFDocument } from 'pdf-lib';
 import { rateLimitMiddleware, getClientIP } from '@/lib/rate-limit';
 import { logger } from '@/lib/cloudwatch-logger';
 import { fileLogMeta } from '@/lib/log-redact';
+import { BUSY_RESPONSE, runHeavyJob } from '@/lib/heavy-jobs';
+import { MAX_DECODED_PIXELS, imageSize } from '@/lib/image-size';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB per image (mirrors the client-side limit)
 const MAX_IMAGES = 100;
+/** PNGs are decoded whole (lib/image-size.ts): one request decodes at most this many pixels in all. */
+const MAX_PNG_PIXELS_PER_REQUEST = 150_000_000;
 
 // A4 page size in PDF points
 const A4_WIDTH = 595;
@@ -62,103 +66,120 @@ export async function POST(request: NextRequest) {
 
     logger.info('Images to PDF conversion started', { count, pageSize }, requestId);
 
-    // Create new PDF
-    const pdfDoc = await PDFDocument.create();
+    // One memory-heavy image job at a time (lib/heavy-jobs.ts)
+    const job = runHeavyJob(async () => {
+      // Create new PDF
+      const pdfDoc = await PDFDocument.create();
 
-    // Inputs that could not be embedded (unsupported type, too large, corrupt data).
-    // Reported back via the X-Skipped-Files header instead of being silently dropped.
-    const skippedFiles: string[] = [];
+      // Inputs that could not be embedded (unsupported type, too large, corrupt data).
+      // Reported back via the X-Skipped-Files header instead of being silently dropped.
+      const skippedFiles: string[] = [];
+      let pngPixels = 0;
 
-    // Process each image in order
-    for (let i = 0; i < count; i++) {
-      const imageFile = formData.get(`image_${i}`) as File;
-      if (!imageFile) continue;
+      // Process each image in order
+      for (let i = 0; i < count; i++) {
+        const imageFile = formData.get(`image_${i}`) as File;
+        if (!imageFile) continue;
 
-      if (imageFile.size > MAX_IMAGE_SIZE) {
-        skippedFiles.push(imageFile.name || `image_${i}`);
-        continue;
-      }
-
-      const imageBytes = await imageFile.arrayBuffer();
-
-      // Embed image based on type
-      let image;
-      try {
-        if (imageFile.type === 'image/jpeg' || imageFile.type === 'image/jpg') {
-          image = await pdfDoc.embedJpg(imageBytes);
-        } else if (imageFile.type === 'image/png') {
-          image = await pdfDoc.embedPng(imageBytes);
-        } else {
-          // pdf-lib only supports JPEG and PNG (the client normalizes WebP to PNG)
+        if (imageFile.size > MAX_IMAGE_SIZE) {
           skippedFiles.push(imageFile.name || `image_${i}`);
           continue;
         }
-      } catch (embedError) {
-        logger.warn('Failed to embed image', {
-          ...fileLogMeta(imageFile),
-          error: embedError instanceof Error ? embedError.message : 'Unknown error',
-        }, requestId);
-        skippedFiles.push(imageFile.name || `image_${i}`);
-        continue;
+
+        const imageBytes = await imageFile.arrayBuffer();
+
+        // pdf-lib decodes a PNG whole: refuse huge dimensions before it does
+        if (imageFile.type === 'image/png') {
+          const size = imageSize(new Uint8Array(imageBytes));
+          const pixels = size ? size.width * size.height : Infinity;
+          if (pixels > MAX_DECODED_PIXELS || pngPixels + pixels > MAX_PNG_PIXELS_PER_REQUEST) {
+            skippedFiles.push(imageFile.name || `image_${i}`);
+            continue;
+          }
+          pngPixels += pixels;
+        }
+
+        // Embed image based on type
+        let image;
+        try {
+          if (imageFile.type === 'image/jpeg' || imageFile.type === 'image/jpg') {
+            image = await pdfDoc.embedJpg(imageBytes);
+          } else if (imageFile.type === 'image/png') {
+            image = await pdfDoc.embedPng(imageBytes);
+          } else {
+            // pdf-lib only supports JPEG and PNG (the client normalizes WebP to PNG)
+            skippedFiles.push(imageFile.name || `image_${i}`);
+            continue;
+          }
+        } catch (embedError) {
+          logger.warn('Failed to embed image', {
+            ...fileLogMeta(imageFile),
+            error: embedError instanceof Error ? embedError.message : 'Unknown error',
+          }, requestId);
+          skippedFiles.push(imageFile.name || `image_${i}`);
+          continue;
+        }
+
+        // Get image dimensions
+        const { width, height } = image;
+
+        if (pageSize === 'fit') {
+          // Page sized exactly to the image: no margins, no scaling loss
+          const page = pdfDoc.addPage([width, height]);
+          page.drawImage(image, { x: 0, y: 0, width, height });
+        } else {
+          // Fit image to A4 page (595 x 842 points)
+          const page = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
+
+          // Calculate scaling to fit image within page while maintaining aspect ratio
+          const scale = Math.min(A4_WIDTH / width, A4_HEIGHT / height);
+
+          const scaledWidth = width * scale;
+          const scaledHeight = height * scale;
+
+          // Center image on page
+          const x = (A4_WIDTH - scaledWidth) / 2;
+          const y = (A4_HEIGHT - scaledHeight) / 2;
+
+          page.drawImage(image, {
+            x,
+            y,
+            width: scaledWidth,
+            height: scaledHeight,
+          });
+        }
       }
 
-      // Get image dimensions
-      const { width, height } = image;
-
-      if (pageSize === 'fit') {
-        // Page sized exactly to the image: no margins, no scaling loss
-        const page = pdfDoc.addPage([width, height]);
-        page.drawImage(image, { x: 0, y: 0, width, height });
-      } else {
-        // Fit image to A4 page (595 x 842 points)
-        const page = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
-
-        // Calculate scaling to fit image within page while maintaining aspect ratio
-        const scale = Math.min(A4_WIDTH / width, A4_HEIGHT / height);
-
-        const scaledWidth = width * scale;
-        const scaledHeight = height * scale;
-
-        // Center image on page
-        const x = (A4_WIDTH - scaledWidth) / 2;
-        const y = (A4_HEIGHT - scaledHeight) / 2;
-
-        page.drawImage(image, {
-          x,
-          y,
-          width: scaledWidth,
-          height: scaledHeight,
-        });
+      if (pdfDoc.getPageCount() === 0) {
+        return NextResponse.json(
+          { error: 'None of the provided images could be converted. Please use JPG, PNG, or WEBP images up to 10MB each.', requestId },
+          { status: 400 }
+        );
       }
-    }
 
-    if (pdfDoc.getPageCount() === 0) {
-      return NextResponse.json(
-        { error: 'None of the provided images could be converted. Please use JPG, PNG, or WEBP images up to 10MB each.', requestId },
-        { status: 400 }
-      );
-    }
+      // Save PDF
+      const pdfBytes = await pdfDoc.save();
 
-    // Save PDF
-    const pdfBytes = await pdfDoc.save();
+      logger.info('Images to PDF conversion completed', {
+        pages: pdfDoc.getPageCount(),
+        skipped: skippedFiles.length,
+        outputSize: `${(pdfBytes.length / 1024 / 1024).toFixed(2)}MB`,
+      }, requestId);
 
-    logger.info('Images to PDF conversion completed', {
-      pages: pdfDoc.getPageCount(),
-      skipped: skippedFiles.length,
-      outputSize: `${(pdfBytes.length / 1024 / 1024).toFixed(2)}MB`,
-    }, requestId);
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="images.pdf"',
+        'X-Request-ID': requestId,
+      };
+      if (skippedFiles.length > 0) {
+        // Header values must be Latin-1 safe: URI-encode each name
+        headers['X-Skipped-Files'] = skippedFiles.map(name => encodeURIComponent(name)).join(',');
+      }
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename="images.pdf"',
-      'X-Request-ID': requestId,
-    };
-    if (skippedFiles.length > 0) {
-      // Header values must be Latin-1 safe: URI-encode each name
-      headers['X-Skipped-Files'] = skippedFiles.map(name => encodeURIComponent(name)).join(',');
-    }
-
-    return new NextResponse(Buffer.from(pdfBytes), { headers });
+      return new NextResponse(Buffer.from(pdfBytes), { headers });
+    });
+    if (!job) return NextResponse.json({ ...BUSY_RESPONSE, requestId }, { status: 503 });
+    return await job;
   } catch (error) {
     logger.error('Images to PDF conversion failed', {
       error: error instanceof Error ? error.message : 'Unknown error',

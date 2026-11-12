@@ -1,6 +1,6 @@
-export type ComparisonLocale = 'en' | 'fr' | 'ar';
+export type ComparisonLocale = 'en' | 'fr' | 'ar' | 'es';
 
-export const comparisonLocale = (locale: string): ComparisonLocale => (locale === 'fr' || locale === 'ar' ? locale : 'en');
+export const comparisonLocale = (locale: string): ComparisonLocale => (locale === 'fr' || locale === 'ar' || locale === 'es' ? locale : 'en');
 
 /** A render of a saved test file, at 2x. `phone`: a crop that stays readable at 375 px. */
 export interface ComparisonShot {

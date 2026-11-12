@@ -4,17 +4,27 @@ import { logger } from '@/lib/cloudwatch-logger';
 import { fileLogMeta } from '@/lib/log-redact';
 import { getPdfJs } from '@/lib/pdf-processor';
 import { createCanvas } from 'canvas';
-import { writeFile, readFile, mkdtemp, rm } from 'fs/promises';
+import { writeFile, mkdtemp, rm, stat } from 'fs/promises';
+import { createReadStream, createWriteStream } from 'fs';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import JSZip from 'jszip';
 import { inspectPdf, pdfRejectionResponse } from '@/lib/pdf-validation';
+import { BUSY_RESPONSE, runHeavyJob } from '@/lib/heavy-jobs';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
 // Rendering above this many pages risks OOM/timeouts on the 1.9GB production host
 const MAX_PAGES = 100;
+/**
+ * Largest page canvas: 25 MP covers A4 at 600 dpi. A bigger page is drawn at a
+ * lower scale instead of allocating gigabytes (a 3900 pt page at 600 dpi was a
+ * 4.2 GB canvas; security review, 2026-11-12).
+ */
+const MAX_PAGE_PIXELS = 25_000_000;
 
 /**
  * Convert PDF pages to images
@@ -119,67 +129,71 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // PDF user space is 72 DPI, so the render scale is exactly dpi / 72
-    // (requested DPI == actual output DPI)
+    // PDF user space is 72 DPI, so the render scale is dpi / 72, lowered for a
+    // page so large that it would pass MAX_PAGE_PIXELS
     const scale = dpi / 72;
+    const imageExtension = format === 'png' ? 'png' : 'jpg';
 
-    // Private (0700) temp directory for the page images. The finally below
-    // removes the whole directory on every exit path; removing only the page
-    // files left an empty pdf-images-* directory in /tmp after each conversion.
+    // Private (0700) temp directory for the page images and the ZIP. It goes
+    // when the response stream closes, or in the finally below on any other exit.
     const tempDir = await mkdtemp(join(tmpdir(), 'pdf-images-'));
+    let handedOff = false;
+    const removeTempDir = () =>
+      rm(tempDir, { recursive: true, force: true }).catch((error) => {
+        logger.warn('Could not remove temp directory', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }, requestId);
+      });
 
     try {
-      const imageFiles: Array<{ path: string; pageNumber: number }> = [];
+      // One memory-heavy image job at a time (lib/heavy-jobs.ts)
+      const job = runHeavyJob(async () => {
+        const imagePaths: string[] = [];
+        let scaledDown = 0;
 
-      // Convert each page to an image
-      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale });
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const natural = page.getViewport({ scale: 1 });
+          const pageScale = Math.min(scale, Math.sqrt(MAX_PAGE_PIXELS / (natural.width * natural.height)));
+          if (pageScale < scale) scaledDown++;
+          const viewport = page.getViewport({ scale: pageScale });
 
-        // Create canvas
-        const canvas = createCanvas(viewport.width, viewport.height);
-        const context = canvas.getContext('2d');
+          const canvas = createCanvas(Math.max(1, Math.floor(viewport.width)), Math.max(1, Math.floor(viewport.height)));
+          const context = canvas.getContext('2d');
+          await page.render({ canvasContext: context as any, viewport }).promise;
 
-        // Render PDF page to canvas
-        const renderContext = {
-          canvasContext: context as any,
-          viewport: viewport,
-        };
+          const imageBuffer = format === 'png'
+            ? canvas.toBuffer('image/png')
+            : canvas.toBuffer('image/jpeg', { quality: 95 });
+          // Free the page's pixels now rather than at the next garbage collection
+          canvas.width = 0;
+          canvas.height = 0;
+          page.cleanup();
 
-        await page.render(renderContext).promise;
+          // Zero-padded so files sort correctly when extracted
+          const imagePath = join(tempDir, `page-${String(pageNum).padStart(3, '0')}.${imageExtension}`);
+          await writeFile(imagePath, imageBuffer);
+          imagePaths.push(imagePath);
+        }
 
-        // Convert canvas to image buffer
-        const imageBuffer = format === 'png' 
-          ? canvas.toBuffer('image/png')
-          : canvas.toBuffer('image/jpeg', { quality: 95 });
+        // The ZIP is streamed from the page files to disk: 100 pages at 300 dpi
+        // used to sit in memory twice (JSZip, then its output buffer)
+        const zip = new JSZip();
+        imagePaths.forEach((path, index) => {
+          zip.file(`page-${String(index + 1).padStart(3, '0')}.${imageExtension}`, createReadStream(path));
+        });
+        const zipPath = join(tempDir, 'images.zip');
+        await pipeline(zip.generateNodeStream({ type: 'nodebuffer', streamFiles: true }), createWriteStream(zipPath));
+        return { zipPath, size: (await stat(zipPath)).size, scaledDown };
+      });
+      if (!job) return NextResponse.json({ ...BUSY_RESPONSE, requestId }, { status: 503 });
+      const { zipPath, size, scaledDown } = await job;
 
-        // Save image to temp directory (zero-padded so files sort correctly when extracted)
-        const imageExtension = format === 'png' ? 'png' : 'jpg';
-        const imagePath = join(tempDir, `page-${String(pageNum).padStart(3, '0')}.${imageExtension}`);
-        await writeFile(imagePath, imageBuffer);
-        
-        imageFiles.push({ path: imagePath, pageNumber: pageNum });
-      }
-
-      logger.info('All pages converted to images', { count: imageFiles.length }, requestId);
-
-      // Create ZIP file with all images
-      const zip = new JSZip();
-      
-      for (const { path, pageNumber } of imageFiles) {
-        const imageBuffer = await readFile(path);
-        const imageExtension = format === 'png' ? 'png' : 'jpg';
-        const fileName = `page-${String(pageNumber).padStart(3, '0')}.${imageExtension}`;
-        zip.file(fileName, imageBuffer);
-      }
-
-      const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
-      const zipSizeMB = (zipBuffer.length / 1024 / 1024).toFixed(2);
-      
-      logger.info('ZIP file created', { 
-        size: `${zipSizeMB}MB`, 
-        imageCount: imageFiles.length,
-        format 
+      logger.info('ZIP file created', {
+        size: `${(size / 1024 / 1024).toFixed(2)}MB`,
+        imageCount: numPages,
+        scaledDown,
+        format
       }, requestId);
 
       // Sanitize filename for Content-Disposition header
@@ -190,9 +204,13 @@ export async function POST(request: NextRequest) {
       
       const zipFilename = `${sanitizedFilename}_images.zip`;
 
-      // Return ZIP file
-      return new NextResponse(new Uint8Array(zipBuffer), {
+      const stream = createReadStream(zipPath);
+      stream.on('close', () => void removeTempDir());
+      handedOff = true;
+
+      return new NextResponse(Readable.toWeb(stream) as ReadableStream<Uint8Array>, {
         headers: {
+          'Content-Length': String(size),
           'Content-Type': 'application/zip',
           'Content-Disposition': `attachment; filename="${zipFilename}"; filename*=UTF-8''${encodeURIComponent(zipFilename)}`,
           'X-Request-ID': requestId,
@@ -202,11 +220,14 @@ export async function POST(request: NextRequest) {
         },
       });
     } finally {
-      await rm(tempDir, { recursive: true, force: true }).catch((error) => {
-        logger.warn('Could not remove temp directory', {
-          error: error instanceof Error ? error.message : 'Unknown error',
-        }, requestId);
-      });
+      // Once the response has the ZIP, its stream removes the directory when it closes
+      if (!handedOff) {
+        await rm(tempDir, { recursive: true, force: true }).catch((error) => {
+          logger.warn('Could not remove temp directory', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+          }, requestId);
+        });
+      }
     }
   } catch (error) {
     logger.error('PDF to Images conversion failed', { 

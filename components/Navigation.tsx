@@ -31,12 +31,6 @@ export function Navigation() {
             <NavDropdown title={t('nav.optimize')} items={getOptimizeTools(t)} />
             <NavDropdown title={t('nav.security')} items={getSecurityTools(t)} />
             <NavDropdown title={t('nav.edit')} items={getEditTools(t)} />
-            <Link
-              href="/forms"
-              className="px-3 py-2 text-gray-700 hover:text-primary font-medium transition-colors rounded-lg hover:bg-orange-50 whitespace-nowrap"
-            >
-              {t('nav.formTemplates')}
-            </Link>
           </div>
 
           {/* Right side: Language switcher and mobile menu */}

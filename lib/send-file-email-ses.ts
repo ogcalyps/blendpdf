@@ -164,13 +164,49 @@ function encodeHeaderValue(value: string): string {
 }
 
 /**
- * fileType comes from the client. Accept a bare type/subtype with simple
- * parameters (pdf-to-text sends "text/plain;charset=utf-8"); anything else
- * could smuggle header lines into the attachment part.
+ * The only attachments the file email carries: what the tools make, each
+ * recognised by its extension and its first bytes. The MIME type comes from
+ * this table, never from the client, so nobody can use the route to mail an
+ * HTML page or a program from our domain (security review, 2026-11-12).
  */
-function safeMimeType(type: string | undefined): string {
-  const t = (type ?? '').trim().replace(/[;\s]+$/, '');
-  return /^[\w.+-]+\/[\w.+-]+(\s*;\s*[\w.+-]+=[\w.+-]+)*$/.test(t) ? t : 'application/octet-stream';
+const ATTACHMENT_TYPES: Readonly<Record<string, { mime: string; starts: string | null }>> = {
+  pdf: { mime: 'application/pdf', starts: '%PDF' },
+  docx: { mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', starts: 'PK\x03\x04' },
+  xlsx: { mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', starts: 'PK\x03\x04' },
+  zip: { mime: 'application/zip', starts: 'PK\x03\x04' },
+  // pdf-to-text; checked as UTF-8 with no NUL below, so no binary hides behind .txt
+  txt: { mime: 'text/plain; charset=utf-8', starts: null },
+};
+
+export class AttachmentNotAllowedError extends Error {
+  constructor() {
+    super('Only files made by the tools can be emailed');
+    this.name = 'AttachmentNotAllowedError';
+  }
+}
+
+/**
+ * The attachment as it will be sent (cleaned name, MIME type), or null when
+ * it isn't a kind of file the tools make.
+ */
+export function emailAttachment(filename: string, base64: string): { name: string; mime: string } | null {
+  const name = cleanFilename(filename);
+  const ext = /\.([A-Za-z0-9]{1,10})$/.exec(name)?.[1].toLowerCase();
+  const kind = ext ? ATTACHMENT_TYPES[ext] : undefined;
+  if (!kind) return null;
+  const clean = base64.replace(/\s/g, '');
+  if (kind.starts !== null) {
+    const head = Buffer.from(clean.slice(0, 16), 'base64').toString('latin1');
+    return head.startsWith(kind.starts) ? { name, mime: kind.mime } : null;
+  }
+  const bytes = Buffer.from(clean, 'base64');
+  if (bytes.includes(0)) return null;
+  try {
+    new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    return null;
+  }
+  return { name, mime: kind.mime };
 }
 
 function foldBase64(b64: string): string {
@@ -200,6 +236,10 @@ export function escapeHtml(value: string): string {
 type EmailCopy = {
   /** The file name as it should appear inside this language's sentences. */
   showName: (name: string) => string;
+  /**
+   * Never the file name: the subject is what a recipient sees first, and the
+   * name is whatever the sender typed (security review, 2026-11-12).
+   */
   subject: string;
   attached: (name: string) => string;
   madeWith: (tool: string) => string;
@@ -211,7 +251,7 @@ type EmailCopy = {
   unsubscribe: string;
 };
 
-function emailCopy(locale: EmailLocale, product: string, name: string): EmailCopy {
+function emailCopy(locale: EmailLocale, product: string): EmailCopy {
   if (locale === 'ar') {
     // FSI...PDI isolate the name from the RTL sentence, and LRI...PDI keep its
     // Latin tail ("2024.pdf", ".pdf") in one left-to-right piece: without that,
@@ -220,7 +260,7 @@ function emailCopy(locale: EmailLocale, product: string, name: string): EmailCop
       `\u2068${s.replace(/[\x21-\x7E]*\.[A-Za-z0-9]{1,10}$/, (tail) => `\u2066${tail}\u2069`)}\u2069`;
     return {
       showName,
-      subject: `ملفك من ${product}: ${showName(name)}`,
+      subject: `ملفك من ${product}`,
       attached: (n) => `ملفك «${n}» مرفق بهذه الرسالة.`,
       madeWith: (tool) => `استخدمت أداة ${tool}، وتجدها هنا متى احتجتها مجددًا:`,
       keep: `احتفظ بهذه الرسالة إن احتجت الملف لاحقًا، فنحن لا نحتفظ بنسخة منه، وكل ملف يُرفع إلى ${product} يُحذف خلال ساعة.`,
@@ -235,7 +275,7 @@ function emailCopy(locale: EmailLocale, product: string, name: string): EmailCop
     // \u00a0 / \u202f: the no-break spaces French puts before : ? and inside « »
     return {
       showName: (n) => n,
-      subject: `Votre fichier ${product}\u00a0: ${name}`,
+      subject: `Votre fichier ${product}`,
       attached: (n) => `Votre fichier «\u202f${n}\u202f» est joint à ce courriel.`,
       madeWith: (tool) => `Vous avez utilisé l’outil «\u202f${tool}\u202f». Pour y revenir\u00a0:`,
       keep: `Conservez ce courriel si vous avez encore besoin du fichier. Nous n’en gardons aucune copie\u00a0: tout fichier importé sur ${product} est supprimé dans l’heure.`,
@@ -249,7 +289,7 @@ function emailCopy(locale: EmailLocale, product: string, name: string): EmailCop
   if (locale === 'es') {
     return {
       showName: (n) => n,
-      subject: `Su archivo de ${product}: ${name}`,
+      subject: `Su archivo de ${product}`,
       attached: (n) => `Le enviamos adjunto su archivo “${n}”.`,
       madeWith: (tool) => `Archivo creado con la herramienta ${tool}. La próxima vez, empiece aquí:`,
       keep: `Conserve este correo si va a necesitar el archivo más adelante. No guardamos ninguna copia: todo lo que se sube a ${product} se elimina en menos de una hora.`,
@@ -262,7 +302,7 @@ function emailCopy(locale: EmailLocale, product: string, name: string): EmailCop
   }
   return {
     showName: (n) => n,
-    subject: `Your ${product} file: ${name}`,
+    subject: `Your ${product} file`,
     attached: (n) => `Your file "${n}" is attached.`,
     madeWith: (tool) => `Made with ${tool}. Next time, start here:`,
     keep: `Hang on to this email if you'll need the file again. We don't keep it: anything uploaded to ${product} is deleted within an hour.`,
@@ -451,7 +491,8 @@ export class FileTooLargeForEmailError extends Error {
 export async function sendFileEmailViaSes(options: {
   to: string;
   filename: string;
-  fileType: string;
+  /** What the browser said the file is. Ignored: the type comes from emailAttachment. */
+  fileType?: string;
   fileDataBase64: string;
   locale?: EmailLocale;
   /** Route slug of the tool that made the file (e.g. "compress-pdf"); unknown values are ignored. */
@@ -467,15 +508,18 @@ export async function sendFileEmailViaSes(options: {
     throw new FileTooLargeForEmailError();
   }
 
+  const attachment = emailAttachment(options.filename, cleanB64);
+  if (!attachment) throw new AttachmentNotAllowedError();
+
   const locale: EmailLocale = options.locale === 'ar' || options.locale === 'fr' || options.locale === 'es' ? options.locale : 'en';
-  const name = cleanFilename(options.filename);
+  const { name } = attachment;
   const product =
     process.env.EMAIL_BRAND_NAME?.trim() || process.env.NEXT_PUBLIC_SITE_NAME?.trim() || 'BlendPDF';
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://blendpdf.com').replace(/\/$/, '');
   // en lives at the unprefixed root, the others under /<locale> (same as the site's canonical URLs)
   const siteUrl = locale === 'en' ? baseUrl : `${baseUrl}/${locale}`;
   const unsubscribeUrl = buildUnsubscribeUrl(options.to);
-  const copy = emailCopy(locale, product, name);
+  const copy = emailCopy(locale, product);
   const tool = emailToolInfo(options.tool, locale, siteUrl);
   const body: BodyParams = { locale, product, copy, name, siteUrl, unsubscribeUrl, tool };
 
@@ -487,7 +531,7 @@ export async function sendFileEmailViaSes(options: {
     textBody: textBody(body),
     htmlBody: htmlBody(body),
     filename: name,
-    mimeType: safeMimeType(options.fileType),
+    mimeType: attachment.mime,
     attachmentBase64: cleanB64,
     unsubscribeUrl,
   });

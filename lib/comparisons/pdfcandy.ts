@@ -194,6 +194,98 @@ export const pdfcandy: Comparison = {
       card: 'Les mots arabes qu’il ajoute sont du vrai texte aux lettres liées, mais ils ont été enregistrés dans l’ordre inverse, et son offre gratuite a des limites horaires.',
     },
 
+    es: {
+      metaTitle: 'Alternativa a PDF Candy para PDF en árabe: lo probamos | BlendPDF',
+      description:
+        'Agregamos la misma línea en árabe en PDF Candy y en BlendPDF. Los dos guardaron texto real con las letras unidas, pero PDF Candy puso las palabras en orden inverso.',
+      title: 'Una alternativa a PDF Candy para PDF en árabe',
+      tested: 'Probado el 12 de noviembre de 2026',
+      summary:
+        'De los editores gratuitos que probamos para agregar texto en árabe, PDF Candy fue el único, aparte de BlendPDF, que guardó texto real con las letras unidas. Pero guardó sus tres palabras en orden inverso, y su plan gratuito tiene “Page and hourly restrictions” (límites de páginas y por hora). En BlendPDF, **Texto** mantiene el orden de las palabras en árabe, **Editar el texto** (beta) cambia una línea y no hay límite por hora.',
+      cta: 'Editar un PDF en árabe',
+      evidence: {
+        title: 'La misma página, las mismas palabras',
+        intro:
+          'Agregamos “السيد يوسف الإدريسي” (tres palabras: un tratamiento de cortesía y un nombre) a un certificado de trabajo en árabe de una página, una vez con la herramienta de texto de PDF Candy y otra con la de BlendPDF, sin cuenta. Abajo se ve la parte de cada página guardada donde quedaron las palabras.',
+        shots: {
+          blendpdf: {
+            label: 'BlendPDF',
+            caption: 'Las tres palabras en orden, de derecha a izquierda, con las letras unidas.',
+            alt: 'La línea guardada por BlendPDF: “السيد يوسف الإدريسي”, tres palabras con las letras unidas.',
+          },
+          them: {
+            label: 'PDF Candy',
+            caption: 'Texto real con las letras unidas, pero las palabras están en orden inverso: leída de derecha a izquierda, la línea dice “الإدريسي يوسف السيد”.',
+            alt: 'La línea guardada por PDF Candy: tres palabras con las letras unidas, en orden inverso.',
+          },
+        },
+      },
+      quotes: {
+        title: 'Lo que dice PDF Candy en sus propias páginas',
+        intro: 'Sobre su editor y sobre su plan gratuito:',
+        glosses: [
+          'Traducción: “reemplazar o eliminar párrafos enteros y corregir errores tipográficos al instante”',
+          'Traducción: “Límites de páginas y por hora”',
+        ],
+        after:
+          'En nuestra prueba, al hacer doble clic en la línea en árabe solo se seleccionaba, y no pudimos cambiarla, así que no podemos confirmar la primera afirmación para el árabe.',
+      },
+      table: {
+        title: 'Comparación directa',
+        head: ['Lo que comprobamos', 'BlendPDF', 'PDF Candy'],
+        rows: [
+          {
+            label: 'Agregar una línea en árabe',
+            blendpdf: 'Texto real, letras unidas, palabras en orden.',
+            them: 'Texto real, letras unidas, palabras en orden inverso.',
+          },
+          {
+            label: 'Cambiar una línea en árabe',
+            blendpdf: 'Se cambia directamente en la página, una línea a la vez (beta).',
+            them: 'No pudimos cambiarla en nuestra prueba. Su página dice que el editor reemplaza párrafos enteros.',
+          },
+          { label: 'Uso gratuito', blendpdf: 'Sin límite por hora.', them: '“Page and hourly restrictions” (límites de páginas y por hora) en el plan gratuito.' },
+          {
+            label: 'Cuándo se eliminan los archivos',
+            blendpdf: 'En un plazo de una hora, para los archivos que se suben. El editor solo sube el archivo si usted pide el resultado por correo electrónico.',
+            them: 'Se guardan en sus servidores 2 horas como máximo, según PDF Candy.',
+          },
+        ],
+        note: 'Probado el 12 de noviembre de 2026, con las páginas de PDF Candy consultadas ese mismo día. PDF Candy puede haber cambiado desde entonces: consulte pdfcandy.com.',
+      },
+      strengths: {
+        title: 'Lo que PDF Candy hace bien',
+        items: [
+          'El árabe que agrega es texto real, con las letras unidas, y se puede buscar. En la misma prueba, Smallpdf dejó las letras separadas y PDF24 guardó la línea como imagen.',
+          'Según la página de su editor, edita párrafos enteros del texto existente, más que BlendPDF, que cambia una línea a la vez.',
+          'Su plan gratuito acepta archivos de hasta 50 MB, igual que el nuestro, y su sitio también está en árabe.',
+        ],
+      },
+      faq: [
+        {
+          question: '¿PDF Candy funciona con el árabe?',
+          answer:
+            'En parte. El 12 de noviembre de 2026 fue el único editor de nuestra prueba de agregar texto, aparte de BlendPDF, que guardó texto real con las letras unidas. Pero guardó sus tres palabras en orden inverso, así que revise el resultado antes de enviar el archivo.',
+        },
+        {
+          question: '¿PDF Candy puede cambiar el texto existente?',
+          answer:
+            'La página de su editor dice que puede “replace or delete entire paragraphs, and correct typos instantly” (reemplazar o eliminar párrafos enteros y corregir errores tipográficos al instante). En nuestra prueba, al hacer doble clic en la línea en árabe solo se seleccionaba, y no pudimos cambiarla. BlendPDF cambia una línea existente en árabe directamente en la página, una línea a la vez (beta).',
+        },
+        {
+          question: '¿El uso gratuito tiene límites?',
+          answer:
+            'La página de precios de PDF Candy indica “Page and hourly restrictions” (límites de páginas y por hora) en el plan gratuito (consultada el 12 de noviembre de 2026). BlendPDF no tiene límite por hora ni por día.',
+        },
+        CHROME.es.faq.upload,
+        CHROME.es.faq.realText,
+      ],
+      disclaimer:
+        'PDF Candy es una marca comercial de su propietario. BlendPDF no tiene ninguna relación con PDF Candy. Hicimos esta prueba nosotros mismos el 12 de noviembre de 2026 en pdfcandy.com, sin cuenta, y citamos sus páginas tal como estaban ese día. PDF Candy puede haber cambiado desde entonces: consulte pdfcandy.com para ver sus funciones y límites actuales.',
+      breadcrumb: 'BlendPDF frente a PDF Candy',
+      card: 'El árabe que agrega es texto real con las letras unidas, pero las palabras quedaron en orden inverso, y su plan gratuito tiene límites por hora.',
+    },
+
     ar: {
       metaTitle: 'بديل PDF Candy لملفات PDF العربية: جرّبنا الأداتين | BlendPDF',
       description:

@@ -13,7 +13,7 @@ import { ProofSection } from '@/components/ProofSection';
 import { Footer } from '@/components/Footer';
 import { HomeDropZone } from '@/components/HomeDropZone';
 
-type Category = 'all' | 'organize' | 'optimize' | 'convert' | 'edit' | 'security' | 'forms';
+type Category = 'all' | 'organize' | 'optimize' | 'convert' | 'edit' | 'security';
 
 export default function Home() {
   const t = useTranslations();
@@ -49,8 +49,6 @@ export default function Home() {
     { id: 'crop', name: t('nav.tools.cropPdf.title'), url: '/crop-pdf', description: t('nav.tools.cropPdf.description'), icon: <Crop className="w-full h-full" />, category: 'edit', badge: t('home.new'), badgeColor: 'green' },
     { id: 'flatten', name: t('nav.tools.flattenPdf.title'), url: '/flatten-pdf', description: t('nav.tools.flattenPdf.description'), icon: <LayersIcon className="w-full h-full" />, category: 'edit' },
     { id: 'remove-metadata', name: t('nav.tools.removeMetadata.title'), url: '/remove-metadata', description: t('nav.tools.removeMetadata.description'), icon: <EyeOff className="w-full h-full" />, category: 'security' },
-    { id: 'fill-form', name: t('nav.tools.batchFill.title'), url: '/fill-form', description: t('nav.tools.batchFill.description'), icon: <Edit3 className="w-full h-full" />, category: 'edit', badge: t('home.new'), badgeColor: 'green' },
-    { id: 'forms-lib', name: t('home.formsCard.title'), url: '/forms', description: t('home.formsCard.description'), icon: <FileText className="w-full h-full" />, category: 'forms', badge: t('home.new'), badgeColor: 'green' },
   ];
 
   const categories: { id: Category; label: string; icon: any }[] = [
@@ -60,7 +58,6 @@ export default function Home() {
     { id: 'convert', label: t('common.convert'), icon: FileType },
     { id: 'edit', label: t('common.edit'), icon: Edit3 },
     { id: 'security', label: t('common.security'), icon: Shield },
-    { id: 'forms', label: t('common.forms'), icon: FileText },
   ];
 
   const filteredTools = activeCategory === 'all'

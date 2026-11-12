@@ -39,7 +39,7 @@ export function languageAlternatesFor(baseUrl: string, path: string, pageLocales
  * page, the upload limits reference) are written in these locales. Under any other locale they show the
  * English text.
  */
-export const LONG_FORM_LOCALES: readonly Locale[] = ['en', 'ar', 'fr'];
+export const LONG_FORM_LOCALES: readonly Locale[] = ['en', 'ar', 'fr', 'es'];
 
 /**
  * canonical, hreflang and robots for a long-form page. In a locale it is

@@ -6,6 +6,7 @@
  * carry the same rows, and the page is in the sitemap and the footer.
  */
 import { describe, expect, it } from 'vitest';
+import { badSpanish } from './helpers/spanish';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PORTALS } from '../lib/size-limits/targets';
@@ -13,7 +14,7 @@ import { LIMITS, UPLOAD_LIMITS_PATH, compressLink, countryName, limitsByCountry,
 import sitemap from '../app/sitemap';
 
 const ROOT = join(__dirname, '..');
-const LOCALES = ['en', 'fr', 'ar'] as const;
+const LOCALES = ['en', 'fr', 'ar', 'es'] as const;
 
 /** "300Kb" → 0.3, "10Mo par fichier" → 10, "4 MB" → 4. */
 function statedMb(stated: string): number | null {
@@ -118,6 +119,7 @@ describe('upload limits reference', () => {
     for (const locale of ['en', 'fr'] as const) expect(texts(locale).filter((s) => /[–—]/.test(s)), locale).toEqual([]);
     const badFrench = texts('fr').filter((s) => /[^  ][;:!?»]|«[^  ]/.test(s.replace(/https?:\/\/\S+/g, '')) || s.includes("'"));
     expect(badFrench).toEqual([]);
+    expect(texts('es').filter(badSpanish)).toEqual([]);
     const banned = ['تحميل', 'الإيميل', 'يرجى', 'سيتم', 'الخاص بك', 'بدلًا من ذلك', 'بنجاح', '—'];
     expect(texts('ar').filter((s) => banned.some((w) => s.includes(w)))).toEqual([]);
   });
@@ -137,7 +139,7 @@ describe('upload limits reference', () => {
 
   it('is in the sitemap in every language and linked from the footer and the size pages', async () => {
     const urls = new Set((await sitemap()).map((e) => e.url));
-    for (const prefix of ['', '/fr', '/ar']) expect(urls.has(`https://blendpdf.com${prefix}${UPLOAD_LIMITS_PATH}`), prefix).toBe(true);
+    for (const prefix of ['', '/fr', '/ar', '/es']) expect(urls.has(`https://blendpdf.com${prefix}${UPLOAD_LIMITS_PATH}`), prefix).toBe(true);
     expect(readFileSync(join(ROOT, 'components/Footer.tsx'), 'utf8')).toContain(`href="${UPLOAD_LIMITS_PATH}"`);
     expect(readFileSync(join(ROOT, 'app/[locale]/compress-pdf/[target]/page.tsx'), 'utf8')).toContain('href={UPLOAD_LIMITS_PATH}');
     for (const locale of LOCALES) {

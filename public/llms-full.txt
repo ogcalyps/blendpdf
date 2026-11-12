@@ -31,7 +31,7 @@ BlendPDF runs each tool as a dedicated page. Upload a file, process it, and down
 - [Compress PDF](https://blendpdf.com/compress-pdf): Reduce PDF file size while keeping text selectable (Ghostscript-based). Returns the original if the file is already optimized.
 - [Compress PDF to a size](https://blendpdf.com/compress-pdf/to-1mb): The compress tool opened with "Under a size limit" already set, for upload forms that refuse big files: [100 KB](https://blendpdf.com/compress-pdf/to-100kb), [200 KB](https://blendpdf.com/compress-pdf/to-200kb), [500 KB](https://blendpdf.com/compress-pdf/to-500kb), [1 MB](https://blendpdf.com/compress-pdf/to-1mb), [2 MB](https://blendpdf.com/compress-pdf/to-2mb). Tries the sharpest setting first and stops at the first one that fits; a colour phone scan of an A4 page is about 90 KB at good quality.
 - [Compress PDF for a site's upload limit](https://blendpdf.com/fr/compress-pdf/for-ants): The same, preset to one site's documented limit, with its rules and source: [ANTS carte grise, 1 Mo](https://blendpdf.com/fr/compress-pdf/for-ants), [IRCC, 4 MB](https://blendpdf.com/compress-pdf/for-ircc), [Études en France, 10 Mo](https://blendpdf.com/fr/compress-pdf/for-campus-france), [ANEF, 10 Mo, 3 files per section](https://blendpdf.com/fr/compress-pdf/for-anef), [CAF, 10 Mo per send](https://blendpdf.com/fr/compress-pdf/for-caf), [France Travail, 5 Mo](https://blendpdf.com/fr/compress-pdf/for-france-travail).
-- [PDF upload limits by portal](https://blendpdf.com/pdf-upload-limits): The largest PDF that government, visa and university portals accept (ANTS, CAF, ANEF, IRCC, USCIS, UCAS, IND and more), each with the portal's own words, a link to the source and the date it was checked. Free to reuse under CC BY 4.0, also as [CSV](https://blendpdf.com/pdf-upload-limits.csv) and [JSON](https://blendpdf.com/pdf-upload-limits.json). In English, French (/fr/...) and Arabic (/ar/...).
+- [PDF upload limits by portal](https://blendpdf.com/pdf-upload-limits): The largest PDF that government, visa and university portals accept (ANTS, CAF, ANEF, IRCC, USCIS, UCAS, IND and more), each with the portal's own words, a link to the source and the date it was checked. Free to reuse under CC BY 4.0, also as [CSV](https://blendpdf.com/pdf-upload-limits.csv) and [JSON](https://blendpdf.com/pdf-upload-limits.json). In English, Spanish (/es/...), French (/fr/...) and Arabic (/ar/...).
 - [OCR PDF](https://blendpdf.com/ocr-pdf): Make scanned PDFs searchable with OCR — first-class Arabic support (plus English, French and Spanish). Up to 50 pages.
 - [Repair PDF](https://blendpdf.com/repair-pdf): Attempt recovery of corrupted PDF files. Not all corruption is fixable — the tool is honest about failures.
 
@@ -50,13 +50,10 @@ BlendPDF runs each tool as a dedicated page. Upload a file, process it, and down
 - [Add Page Numbers](https://blendpdf.com/add-page-numbers): Stamp customizable page numbers.
 - [Crop PDF](https://blendpdf.com/crop-pdf): Trim margins or crop pages by dragging a rectangle on a live preview. Runs entirely in your browser.
 - [Flatten PDF](https://blendpdf.com/flatten-pdf): Make filled form fields permanent and non-editable. Runs entirely in your browser.
-- [Batch Fill Forms](https://blendpdf.com/fill-form): Fill any interactive PDF form, or batch-fill up to 50 copies from an Excel/CSV file with visual field mapping.
-- [Form Templates](https://blendpdf.com/forms): Free fillable business form templates (W-9, NDA, I-9, lease agreement, patient intake) filled entirely in your browser.
-- [Bilingual Arabic/English Templates](https://blendpdf.com/forms): Bilingual NDA, employment contract, and residential lease with English and Arabic side by side — Arabic input renders correctly in the PDF, filled entirely in your browser.
 
 ## Comparisons
 
-Each was checked on 12 November 2026 without an account: what the saved files showed (renders where we have them) and the other service's own words. All are in English, French (/fr/...) and Arabic (/ar/...). Hub: [BlendPDF vs other editors](https://blendpdf.com/compare).
+Each was checked on 12 November 2026 without an account: what the saved files showed (renders where we have them) and the other service's own words. All are in English, Spanish (/es/...), French (/fr/...) and Arabic (/ar/...). Hub: [BlendPDF vs other editors](https://blendpdf.com/compare).
 
 - [BlendPDF vs iLovePDF](https://blendpdf.com/blendpdf-vs-ilovepdf): iLovePDF's Edit PDF page says its Content Editor "does not currently support Right-to-Left (RTL) languages"; BlendPDF's Edit existing text (beta) changes an Arabic line right to left. iLovePDF takes bigger free files in some tools.
 - [BlendPDF vs Smallpdf](https://blendpdf.com/blendpdf-vs-smallpdf): Smallpdf's free Add text saved two of three Arabic words, with unjoined letters; its existing-text editing is Pro only ("Direct PDF text editing requires a Pro subscription").
@@ -65,12 +62,13 @@ Each was checked on 12 November 2026 without an account: what the saved files sh
 - [BlendPDF vs PDF Candy](https://blendpdf.com/blendpdf-vs-pdfcandy): PDF Candy's added Arabic was real text with joined letters, but its words came out in reverse order; its free plan has hourly limits.
 - [BlendPDF vs Adobe Acrobat](https://blendpdf.com/blendpdf-vs-adobe-acrobat): from Adobe's own pages (not tested hands-on): its free online editor doesn't edit existing text and needs a free account to download.
 - [BlendPDF vs PdfBayt](https://blendpdf.com/ar/blendpdf-vs-pdfbayt): the Arabic-only PdfBayt saved an added Arabic line as a picture, says its Add text doesn't change the original text, and needs an account for Compress and PDF to Word.
+- [Can your PDF editor handle Arabic?](https://blendpdf.com/arabic-pdf-editor-test): a test set anyone can rerun on any PDF editor: seven real Arabic PDFs (Chrome, LibreOffice, Word for Mac; lam-alef, harakat, Arabic with Latin and numbers, a shadowed page), eleven tasks and a Node checker (pdftotext + qpdf) that reads the saved file. Shows BlendPDF's own results, failures included. Files under CC BY 4.0. English only.
 
 ## Limits and policies
 
 - Free with no account, no email requirement, and no watermarks on output.
 - Maximum file size: 50 MB per file; merge accepts up to 20 files (100 MB total).
-- Uploaded files are deleted from our servers within 1 hour; most are deleted immediately after processing. Form-template filling happens entirely in your browser — that data never reaches our servers.
+- Uploaded files are deleted from our servers within 1 hour; most are deleted immediately after processing.
 - Privacy policy: https://blendpdf.com/privacy · Terms: https://blendpdf.com/terms
 
 ## FAQs
@@ -481,7 +479,7 @@ Q: What does flattening a PDF mean?
 A: Flattening merges interactive form fields — text boxes, checkboxes, dropdowns, radio buttons — into the page content itself. The answers stay visible, but the fields are gone, so nobody can edit them anymore.
 
 Q: When should I flatten a PDF form?
-A: Flatten after you've filled a form and before you submit, email, or print it. It locks your answers in place and ensures the form looks the same in every PDF viewer. You can fill forms first with our Fill Form tool, then flatten the result here.
+A: Flatten after you've filled a form and before you submit, email, or print it. It locks your answers in place and ensures the form looks the same in every PDF viewer. You can fill the form first in your PDF reader or browser, then flatten the result here.
 
 Q: Can flattening be undone?
 A: No — flattening is permanent in the output file. The original file on your device is never modified, though, so keep it if you may need to edit the form again later.
@@ -496,7 +494,7 @@ Q: Which form field types can be flattened?
 A: All standard interactive (AcroForm) fields: text boxes, checkboxes, radio buttons, and dropdown lists. The tool lists every detected field by name before flattening, so you can see exactly what will be merged into the page.
 
 Q: Can I fill a form before flattening it?
-A: Yes — that's the intended workflow. Use the BlendPDF Fill Form tool to type your answers into the interactive fields, download the filled PDF, then flatten it here so the answers can't be changed.
+A: Yes — that's the intended workflow. Type your answers into the interactive fields in your PDF reader or browser, save the filled PDF, then flatten it here so the answers can't be changed.
 
 Q: Can I flatten password-protected PDFs?
 A: Not directly — encrypted PDFs can't be modified without the password. Remove the password first with the BlendPDF Unlock PDF tool, then flatten the unlocked file.

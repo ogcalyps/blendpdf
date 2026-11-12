@@ -1,0 +1,103 @@
+{
+  "name": "Can your PDF editor handle Arabic?",
+  "version": "1",
+  "published": "2026-11-12",
+  "url": "https://blendpdf.com/arabic-pdf-editor-test",
+  "files": [
+    {
+      "file": "01-chrome-times-new-roman.pdf",
+      "madeWith": "Google Chrome 157, Print to PDF",
+      "font": "Times New Roman",
+      "lines": [
+        "شهادة عمل",
+        "تشهد شركة الأطلس للتجارة بأن السيد محمد العلوي يعمل لديها بصفة محاسب منذ 1 يناير 2021.",
+        "رقم البطاقة الوطنية: BK123456",
+        "سلمت هذه الشهادة للمعني بالأمر بطلب منه لاستعمالها فيما يسمح به القانون.",
+        "حرر بالدار البيضاء في 5 نوفمبر 2026"
+      ]
+    },
+    {
+      "file": "02-libreoffice-arial.pdf",
+      "madeWith": "LibreOffice Writer 25.8",
+      "font": "Arial",
+      "lines": [
+        "جمعية النور للتنمية المحلية",
+        "الرباط في 3 نوفمبر 2026",
+        "إلى السيدة سعاد بنعلي",
+        "يسعدنا أن ندعوكم إلى الجمع العام السنوي للجمعية يوم السبت 6 ديسمبر 2026.",
+        "يرجى تأكيد حضوركم قبل نهاية الشهر.",
+        "مع خالص التقدير."
+      ]
+    },
+    {
+      "file": "03-word-tahoma.pdf",
+      "madeWith": "Microsoft Word for Mac, Save as PDF",
+      "font": "Tahoma",
+      "lines": [
+        "مذكرة داخلية",
+        "إلى: جميع الموظفين",
+        "الموضوع: مواعيد العمل في فصل الصيف",
+        "تبدأ مواعيد العمل من الساعة التاسعة صباحا إلى الساعة الثالثة بعد الظهر.",
+        "يبدأ العمل بهذه المواعيد يوم 1 يوليو.",
+        "قسم الموارد البشرية"
+      ]
+    },
+    {
+      "file": "04-lam-alef.pdf",
+      "madeWith": "Google Chrome 157, Print to PDF",
+      "font": "Arial",
+      "lines": [
+        "إعلان",
+        "لا يقبل أي طلب إلا بعد استكمال الوثائق اللازمة.",
+        "آخر أجل لإيداع الملفات هو يوم الاثنين.",
+        "الآن يمكنكم تحميل الاستمارة من موقع الإدارة."
+      ]
+    },
+    {
+      "file": "05-harakat.pdf",
+      "madeWith": "Google Chrome 157, Print to PDF",
+      "font": "Arial",
+      "lines": [
+        "ورقة عمل: القراءة بالشكل التام",
+        "اقرأ المثلين الآتيين:",
+        "مَنْ جَدَّ وَجَدَ، وَمَنْ زَرَعَ حَصَدَ.",
+        "العِلْمُ نُورٌ وَالجَهْلُ ظَلَامٌ."
+      ]
+    },
+    {
+      "file": "06-arabic-latin-numbers.pdf",
+      "madeWith": "Google Chrome 157, Print to PDF",
+      "font": "Arial",
+      "lines": [
+        "فاتورة رقم INV-2026-0147",
+        "التاريخ: 12/11/2026",
+        "الخدمة: تصميم موقع إلكتروني على WordPress",
+        "المبلغ الإجمالي: 4,800.00 درهم",
+        "شكرا لثقتكم."
+      ]
+    },
+    {
+      "file": "07-text-shadow.pdf",
+      "madeWith": "Google Chrome 157, Print to PDF",
+      "font": "Arial",
+      "lines": [
+        "معرض الكتاب المدرسي",
+        "من 15 إلى 20 ديسمبر 2026 بقاعة المعارض",
+        "الدخول مجاني لجميع الزوار"
+      ]
+    }
+  ],
+  "tasks": [
+    { "id": "1a", "file": "01-chrome-times-new-roman.pdf", "do": "change", "from": "محمد العلوي", "to": "يوسف الإدريسي" },
+    { "id": "1b", "file": "01-chrome-times-new-roman.pdf", "do": "add", "text": "السيد يوسف الإدريسي" },
+    { "id": "2", "file": "02-libreoffice-arial.pdf", "do": "change", "from": "السيدة سعاد بنعلي", "to": "السيد كريم التازي" },
+    { "id": "3", "file": "03-word-tahoma.pdf", "do": "change", "from": "التاسعة", "to": "الثامنة" },
+    { "id": "4a", "file": "04-lam-alef.pdf", "do": "change", "from": "يوم الاثنين.", "to": "الأربعاء، ولا تأجيل بعده." },
+    { "id": "4b", "file": "04-lam-alef.pdf", "do": "add", "text": "لا تأجيل بعد الآن" },
+    { "id": "5a", "file": "05-harakat.pdf", "do": "change", "from": "زَرَعَ حَصَدَ", "to": "صَبَرَ ظَفِرَ" },
+    { "id": "5b", "file": "05-harakat.pdf", "do": "add", "text": "الصَّبْرُ مِفْتَاحُ الفَرَجِ" },
+    { "id": "6a", "file": "06-arabic-latin-numbers.pdf", "do": "change", "from": "تصميم موقع إلكتروني على WordPress", "to": "متجر إلكتروني على Shopify لمدة 12 شهرا" },
+    { "id": "6b", "file": "06-arabic-latin-numbers.pdf", "do": "add", "text": "تم الدفع عبر PayPal يوم 14 نوفمبر" },
+    { "id": "7", "file": "07-text-shadow.pdf", "do": "change", "from": "لجميع الزوار", "to": "للتلاميذ وأوليائهم" }
+  ]
+}

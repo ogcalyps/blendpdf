@@ -176,6 +176,84 @@ export const pdfbayt: Comparison = {
       card: 'Conçu pour l’arabe, mais son outil d’ajout de texte a enregistré notre ligne arabe sous forme d’image, et ses outils de compression et de conversion en Word exigent un compte gratuit.',
     },
 
+    es: {
+      metaTitle: 'Alternativa a PdfBayt para PDF en árabe: lo probamos | BlendPDF',
+      description:
+        'PdfBayt está hecho para el árabe, pero en nuestra prueba su herramienta para agregar texto guardó la línea en árabe como imagen. BlendPDF guarda texto real, edita líneas existentes y nunca pide una cuenta.',
+      title: 'Una alternativa a PdfBayt para PDF en árabe',
+      tested: 'Probado el 12 de noviembre de 2026',
+      summary:
+        'PdfBayt está hecho para el árabe, pero en nuestra prueba su herramienta para agregar texto guardó la línea en árabe como imagen, y su propia página dice que esa herramienta no cambia el texto original. Además, sus herramientas para comprimir y para convertir a Word piden una cuenta gratuita. En BlendPDF, **Texto** guarda el árabe como texto real, **Editar el texto** (beta) cambia una línea y ninguna herramienta pide una cuenta.',
+      cta: 'Editar un PDF en árabe',
+      quotes: {
+        title: 'Lo que dice PdfBayt en sus propias páginas',
+        intro: 'De sus páginas para agregar texto, comprimir y convertir a Word, en árabe:',
+        glosses: [
+          'Traducción: “Esta herramienta agrega una nueva capa de texto sobre el archivo y no modifica los textos originales”.',
+          'Traducción: “Para comprimir se necesita una cuenta gratuita o iniciar sesión antes de que empiece el procesamiento”.',
+          'Traducción: “La herramienta es gratuita y necesita una cuenta gratuita para completar la conversión”.',
+        ],
+        after: 'En BlendPDF, **Editar el texto** (beta) cambia la propia línea original, y ninguna de nuestras herramientas pide una cuenta.',
+      },
+      table: {
+        title: 'Comparación directa',
+        head: ['Lo que comprobamos', 'BlendPDF', 'PdfBayt'],
+        rows: [
+          {
+            label: 'Agregar una línea en árabe',
+            blendpdf: 'Se guarda como texto real: puede buscarla, seleccionarla y copiarla.',
+            them: 'Se guardó como imagen (390 × 98 píxeles): no se puede seleccionar ni buscar.',
+          },
+          {
+            label: 'Cambiar el texto existente',
+            blendpdf: 'Una línea a la vez (beta).',
+            them: 'No encontramos ninguna herramienta para hacerlo. Su página para agregar texto dice que esa herramienta no cambia el texto original.',
+          },
+          { label: 'Cuenta', blendpdf: 'Nunca se necesita.', them: 'Una cuenta gratuita para comprimir y para convertir a Word.' },
+          {
+            label: 'Cuándo se eliminan los archivos',
+            blendpdf: 'En un plazo de una hora, para los archivos que se suben. El editor solo sube el archivo si usted pide el resultado por correo electrónico.',
+            them: 'Después del procesamiento o cuando termina un plazo fijado. La página que describe el servicio no dice cuánto dura ese plazo.',
+          },
+        ],
+        note: 'Probado el 12 de noviembre de 2026, con las páginas de PdfBayt consultadas ese mismo día. PdfBayt puede haber cambiado desde entonces: consulte pdfbayt.com.',
+      },
+      strengths: {
+        title: 'Lo que PdfBayt hace bien',
+        items: [
+          'Está hecho para el árabe, y su herramienta para agregar texto permite alinear de derecha a izquierda.',
+          'Muchas de sus herramientas funcionan en el navegador, sin subir el archivo, como las nuestras.',
+          'Tiene herramientas que BlendPDF no tiene, como Pro Sign, para enviar un documento a firmar.',
+        ],
+      },
+      faq: [
+        {
+          question: '¿Puedo buscar el texto en árabe que agrego en PdfBayt?',
+          answer:
+            'No en nuestra prueba del 12 de noviembre de 2026: su herramienta para agregar texto guardó la línea en árabe como imagen (390 × 98 píxeles). Se veía bien, pero no se podía seleccionar ni buscar. BlendPDF guarda el árabe que usted agrega como texto real.',
+        },
+        {
+          question: '¿PdfBayt puede cambiar el texto existente en árabe?',
+          answer:
+            'No encontramos cómo hacerlo el 12 de noviembre de 2026. Su página para agregar texto dice que la herramienta agrega una nueva capa de texto y no cambia el texto original. En BlendPDF, “Editar el texto” (beta) cambia una línea directamente en la página, una línea a la vez.',
+        },
+        {
+          question: '¿Necesito una cuenta?',
+          answer:
+            'BlendPDF nunca la pide. PdfBayt pide una cuenta gratuita para comprimir y para convertir a Word, según las páginas de esas herramientas (consultadas el 12 de noviembre de 2026).',
+        },
+        {
+          question: '¿BlendPDF está solo en árabe?',
+          answer: 'No. Está en español, árabe, francés e inglés, y puede escribir árabe y español en el mismo cuadro de texto.',
+        },
+        CHROME.es.faq.upload,
+      ],
+      disclaimer:
+        'PdfBayt es una marca comercial de su propietario. BlendPDF no tiene ninguna relación con PdfBayt. Hicimos esta prueba nosotros mismos el 12 de noviembre de 2026 en pdfbayt.com, sin cuenta, y citamos sus páginas tal como estaban ese día. PdfBayt puede haber cambiado desde entonces: consulte pdfbayt.com para ver sus funciones y límites actuales.',
+      breadcrumb: 'BlendPDF frente a PdfBayt',
+      card: 'Hecho para el árabe, pero su herramienta para agregar texto guardó como imagen nuestra línea en árabe, y sus herramientas para comprimir y para convertir a Word piden una cuenta gratuita.',
+    },
+
     ar: {
       metaTitle: 'بديل PdfBayt لتعديل ملفات PDF العربية: جرّبنا الأداتين | BlendPDF',
       description:

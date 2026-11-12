@@ -60,13 +60,6 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
         <MobileMenuSection title={t('nav.optimize')} items={getOptimizeTools(t)} onClose={onClose} />
         <MobileMenuSection title={t('nav.security')} items={getSecurityTools(t)} onClose={onClose} />
         <MobileMenuSection title={t('nav.edit')} items={getEditTools(t)} onClose={onClose} />
-        <Link
-          href="/forms"
-          onClick={onClose}
-          className="block py-3 px-2 text-start font-bold text-gray-900 hover:text-primary border-y border-gray-100"
-        >
-          {t('nav.formTemplates')}
-        </Link>
       </div>
     </div>
   );

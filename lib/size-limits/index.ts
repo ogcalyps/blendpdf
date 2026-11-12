@@ -1,25 +1,27 @@
 /**
  * The size pages (/compress-pdf/to-<n>): their limits and their text per
- * language (./en, ./fr, ./ar). Server-only content, like lib/guides.
+ * language (./en, ./fr, ./ar, ./es). Server-only content, like lib/guides.
  */
 import type { PortalSlug, PortalTarget, PortalText, SizeChrome, SizePageText, SizeTarget, SizeTargetSlug } from './types';
 import * as en from './en';
 import * as fr from './fr';
 import * as ar from './ar';
+import * as es from './es';
 import { PORTALS, SIZE_TARGETS } from './targets';
 
 export type { PageLocale, PortalSlug, PortalTarget, PortalText, SizeChrome, SizeLimit, SizePageText, SizeTarget, SizeTargetSlug } from './types';
 export { PORTALS, SIZE_TARGETS, sizeLabel } from './targets';
 
-export type SizeLocale = 'en' | 'fr' | 'ar';
+export type SizeLocale = 'en' | 'fr' | 'ar' | 'es';
 
 const CONTENT: Record<SizeLocale, { chrome: SizeChrome; pages: Record<SizeTargetSlug, SizePageText>; portals: Partial<Record<PortalSlug, PortalText>> }> = {
   en,
   fr,
   ar,
+  es,
 };
 
-export const sizeLocale = (locale: string): SizeLocale => (locale === 'fr' || locale === 'ar' ? locale : 'en');
+export const sizeLocale = (locale: string): SizeLocale => (locale === 'fr' || locale === 'ar' || locale === 'es' ? locale : 'en');
 
 export function sizeTarget(slug: string): SizeTarget | undefined {
   return SIZE_TARGETS.find((t) => t.slug === slug);

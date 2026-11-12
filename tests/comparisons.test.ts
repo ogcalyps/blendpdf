@@ -6,6 +6,7 @@
  * and reachable from the footer and /edit-pdf.
  */
 import { describe, expect, it } from 'vitest';
+import { badSpanish } from './helpers/spanish';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CHROME } from '../lib/comparisons/chrome';
@@ -13,7 +14,7 @@ import { COMPARE_PATH, COMPARISONS, comparison } from '../lib/comparisons';
 import sitemap from '../app/sitemap';
 
 const ROOT = join(__dirname, '..');
-const LOCALES = ['en', 'fr', 'ar'] as const;
+const LOCALES = ['en', 'fr', 'ar', 'es'] as const;
 const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
 const catalog = (locale: string) => JSON.parse(read(`messages/${locale}.json`)) as Record<string, Record<string, unknown>>;
 
@@ -59,7 +60,7 @@ describe('comparison pages', () => {
     for (const c of COMPARISONS) {
       for (const locale of LOCALES) {
         const t = c.text[locale];
-        for (const s of [t.tested, t.table.note, t.disclaimer]) expect(s, `${c.slug} ${locale}`).toMatch(/12 \S+ 2026/);
+        for (const s of [t.tested, t.table.note, t.disclaimer]) expect(s, `${c.slug} ${locale}`).toMatch(/12 (?:de )?\S+ (?:de )?2026/);
       }
     }
   });
@@ -98,6 +99,7 @@ describe('comparison pages', () => {
     // French spacing, leaving out their words, which are quoted in English
     const french = (s: string) => QUOTED.reduce((rest, q) => rest.replace(q, ''), s.replace(/https?:\/\/\S+/g, ''));
     expect(texts('fr').filter((s) => /[^  ][;:!?»]|«[^  ]/.test(french(s)) || s.includes("'"))).toEqual([]);
+    expect(texts('es').filter((s) => badSpanish(french(s)))).toEqual([]);
     const banned = ['تحميل', 'الإيميل', 'يرجى', 'سيتم', 'الخاص بك', 'بدلًا من ذلك', 'بنجاح', '—'];
     expect(texts('ar').filter((s) => banned.some((w) => s.includes(w)))).toEqual([]);
   });
@@ -125,13 +127,13 @@ describe('comparison pages', () => {
     }
   });
 
-  it('are in the sitemap in every language, each URL with all three alternates', async () => {
+  it('are in the sitemap in every language, each URL with all four alternates', async () => {
     const entries = await sitemap();
     for (const path of [...COMPARISONS.map((c) => c.path), COMPARE_PATH]) {
-      for (const prefix of ['', '/fr', '/ar']) {
+      for (const prefix of ['', '/fr', '/ar', '/es']) {
         const entry = entries.find((e) => e.url === `https://blendpdf.com${prefix}${path}`);
         expect(entry, `${prefix}${path}`).toBeDefined();
-        expect(Object.keys(entry!.alternates!.languages!).sort(), `${prefix}${path}`).toEqual(['ar', 'en', 'fr']);
+        expect(Object.keys(entry!.alternates!.languages!).sort(), `${prefix}${path}`).toEqual(['ar', 'en', 'es', 'fr']);
       }
     }
   });

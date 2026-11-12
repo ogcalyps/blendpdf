@@ -8,10 +8,10 @@ import { SIZE_TARGETS } from '../lib/size-limits/targets';
 import { UPLOAD_LIMITS_PATH } from '../lib/upload-limits';
 
 /**
- * Guides, comparisons, compress-to-a-size pages and the ID copy page are
- * written in some locales only. Under any other (Spanish, at its launch) they
- * show the English text, so they must stay out of the index, the sitemap and
- * hreflang, the way the /<locale>/…/faq pages do.
+ * Guides, comparisons, compress-to-a-size pages, the ID copy page and the
+ * upload limits reference are written per locale. A locale launched without
+ * them shows the English text, so there they must stay out of the index, the
+ * sitemap and hreflang, the way the /<locale>/…/faq pages do.
  */
 const BASE = 'https://blendpdf.com';
 const unwritten = locales.filter((l) => !LONG_FORM_LOCALES.includes(l));
@@ -26,8 +26,8 @@ const longFormPaths = [
 ];
 
 describe('long-form pages in a locale they are not written in', () => {
-  it('Spanish is such a locale', () => {
-    expect(unwritten).toContain('es');
+  it('none, today: every site locale has its long-form pages (a new locale launching without them is added deliberately)', () => {
+    expect(unwritten).toEqual([]);
   });
 
   it('point at the English URL, unindexed, with hreflang only for the written locales', () => {

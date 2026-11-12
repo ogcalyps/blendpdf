@@ -4,6 +4,7 @@
  * shows, house style, and every page in the sitemap.
  */
 import { describe, expect, it } from 'vitest';
+import { badSpanish } from './helpers/spanish';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PORTALS, SIZE_TARGETS, portalTarget, portalText, sizeChrome, sizePageText, type PortalTarget, type SizeTarget } from '../lib/size-limits';
@@ -11,7 +12,7 @@ import { validLimitMb } from '../lib/workspace/summary';
 import sitemap from '../app/sitemap';
 
 const ROOT = join(__dirname, '..');
-const LOCALES = ['en', 'fr', 'ar'] as const;
+const LOCALES = ['en', 'fr', 'ar', 'es'] as const;
 
 /** Every text a size page shows. */
 function texts(locale: string, t: SizeTarget): string[] {
@@ -84,6 +85,7 @@ describe('size pages', () => {
     for (const locale of ['en', 'fr']) expect(all(locale).filter((s) => /[–—]/.test(s)), locale).toEqual([]);
     const badFrench = all('fr').filter((s) => /[^\u00a0\u202f][;:!?»]|«[^\u00a0\u202f]/.test(s) || s.includes("'"));
     expect(badFrench).toEqual([]);
+    expect(all('es').filter(badSpanish)).toEqual([]);
     const banned = ['تحميل', 'الإيميل', 'يرجى', 'سيتم', 'الخاص بك', 'بدلًا من ذلك', 'بنجاح', '—'];
     expect(all('ar').filter((s) => banned.some((w) => s.includes(w)))).toEqual([]);
   });
@@ -94,6 +96,7 @@ describe('size pages', () => {
       expect(urls.has(`https://blendpdf.com/compress-pdf/${t.slug}`), t.slug).toBe(true);
       expect(urls.has(`https://blendpdf.com/fr/compress-pdf/${t.slug}`), t.slug).toBe(true);
       expect(urls.has(`https://blendpdf.com/ar/compress-pdf/${t.slug}`), t.slug).toBe(true);
+      expect(urls.has(`https://blendpdf.com/es/compress-pdf/${t.slug}`), t.slug).toBe(true);
     }
   });
 

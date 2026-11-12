@@ -58,16 +58,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/forms" className="text-sm text-gray-600 hover:text-primary">
-                  {t('nav.formTemplates')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/fill-form" className="text-sm text-gray-600 hover:text-primary">
-                  {t('nav.tools.batchFill.title')}
-                </Link>
-              </li>
-              <li>
                 <Link href="/compare" className="text-sm text-gray-600 hover:text-primary">
                   {t('footer.compare')}
                 </Link>

@@ -1,0 +1,371 @@
+{
+  "tested": "2026-11-12",
+  "how": "Edit PDF on blendpdf.com (main at 665f0eb), in Chrome",
+  "tasks": [
+    {
+      "task": "1a",
+      "file": "saved-by-blendpdf/1a.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: يوسف, الإدريسي."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "removed",
+          "status": "pass",
+          "detail": "Taken out of the file: محمد, العلوي."
+        },
+        {
+          "id": "kept",
+          "status": "fail",
+          "detail": "4 of the 4 other lines read differently from the original, such as: شهادة عمل. Without ActualText they read as before, so the save dropped some of the original ActualText."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "1b",
+      "file": "saved-by-blendpdf/1b.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: يوسف, الإدريسي."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "kept",
+          "status": "pass",
+          "detail": "The 5 other lines read as they did in the original."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "2",
+      "file": "saved-by-blendpdf/2.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: كريم, التازي."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters."
+        },
+        {
+          "id": "removed",
+          "status": "pass",
+          "detail": "Taken out of the file: السيدة, سعاد, بنعلي."
+        },
+        {
+          "id": "kept",
+          "status": "pass",
+          "detail": "The 5 other lines read as they did in the original."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "3",
+      "file": "saved-by-blendpdf/3.pdf",
+      "emptyBox": true,
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: الثامنة."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters."
+        },
+        {
+          "id": "removed",
+          "status": "pass",
+          "detail": "Taken out of the file: التاسعة."
+        },
+        {
+          "id": "kept",
+          "status": "pass",
+          "detail": "The 5 other lines read as they did in the original."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "4a",
+      "file": "saved-by-blendpdf/4a.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: الأربعاء, ولا, تأجيل, بعده."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "removed",
+          "status": "pass",
+          "detail": "Taken out of the file: يوم, الاثنين."
+        },
+        {
+          "id": "kept",
+          "status": "fail",
+          "detail": "3 of the 3 other lines read differently from the original, such as: إعلان. Without ActualText they read as before, so the save dropped some of the original ActualText."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "4b",
+      "file": "saved-by-blendpdf/4b.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: تأجيل."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "kept",
+          "status": "pass",
+          "detail": "The 4 other lines read as they did in the original."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "5a",
+      "file": "saved-by-blendpdf/5a.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: صَبَرَ, ظَفِرَ."
+        },
+        {
+          "id": "copy",
+          "status": "fail",
+          "detail": "Copying does not give the new text whole and in order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "harakat",
+          "status": "fail",
+          "detail": "Copying gives this text in pieces, so its harakat do not come out in order."
+        },
+        {
+          "id": "removed",
+          "status": "pass",
+          "detail": "Taken out of the file: زَرَعَ, حَصَدَ."
+        },
+        {
+          "id": "kept",
+          "status": "fail",
+          "detail": "3 of the 3 other lines read differently from the original, such as: ورقة عمل: القراءة بالشكل التام."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "5b",
+      "file": "saved-by-blendpdf/5b.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: الصَّبْرُ, مِفْتَاحُ, الفَرَجِ."
+        },
+        {
+          "id": "copy",
+          "status": "fail",
+          "detail": "Copying does not give the new text whole and in order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "harakat",
+          "status": "fail",
+          "detail": "Copying gives this text in pieces, so its harakat do not come out in order."
+        },
+        {
+          "id": "kept",
+          "status": "pass",
+          "detail": "The 4 other lines read as they did in the original."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "6a",
+      "file": "saved-by-blendpdf/6a.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: متجر, Shopify, لمدة, شهرا."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "removed",
+          "status": "pass",
+          "detail": "Taken out of the file: تصميم, موقع, WordPress."
+        },
+        {
+          "id": "kept",
+          "status": "fail",
+          "detail": "4 of the 4 other lines read differently from the original, such as: فاتورة رقم INV-2026-0147. Without ActualText they read as before, so the save dropped some of the original ActualText."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "6b",
+      "file": "saved-by-blendpdf/6b.pdf",
+      "checks": [
+        {
+          "id": "search",
+          "status": "pass",
+          "detail": "Found as text: تم, الدفع, عبر, PayPal, يوم, نوفمبر."
+        },
+        {
+          "id": "copy",
+          "status": "pass",
+          "detail": "Copying gives the new text whole, in reading order."
+        },
+        {
+          "id": "order",
+          "status": "pass",
+          "detail": "Placed right to left: the first word is the rightmost."
+        },
+        {
+          "id": "letters",
+          "status": "pass",
+          "detail": "Arabic letters, with or without ActualText."
+        },
+        {
+          "id": "kept",
+          "status": "pass",
+          "detail": "The 5 other lines read as they did in the original."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "task": "7",
+      "refused": "Changing text on this page would also change how other parts of it look, such as shadows or see-through effects. Use Hide (white box) and Text instead."
+    }
+  ]
+}

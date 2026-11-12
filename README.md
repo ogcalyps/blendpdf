@@ -115,8 +115,8 @@ LibreOffice, ocrmypdf, Tesseract with Arabic and French data, a JRE, veraPDF,
 and the Python packages for PDF to Word and PDF to Excel. On macOS most of
 these are in Homebrew. A missing program only breaks the route that needs it.
 
-Optional settings (email delivery, analytics, Google Drive import) are listed
-in `.env.example`. None are needed to run the app.
+Optional settings (email delivery, analytics) are listed in `.env.example`.
+None are needed to run the app.
 
 ## Tests
 

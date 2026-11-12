@@ -6,7 +6,7 @@
 
 import type { PortalSlug } from '@/lib/size-limits/types';
 
-export type LimitLocale = 'en' | 'fr' | 'ar';
+export type LimitLocale = 'en' | 'fr' | 'ar' | 'es';
 
 export type LimitCategory = 'government' | 'immigration' | 'education' | 'employment' | 'housing' | 'tax' | 'health';
 

@@ -49,6 +49,7 @@ export const CHROME: Record<ComparisonLocale, ComparisonChrome> = {
         { href: '/guides/edit-pdf-text', label: 'Guide: add or change text in a PDF' },
         { href: '/pdf-to-word', label: 'PDF to Word' },
         { href: '/ocr-pdf', label: 'OCR PDF' },
+        { href: '/arabic-pdf-editor-test', label: 'Test any PDF editor with Arabic' },
         { href: '/compare', label: 'All comparisons' },
       ],
     },
@@ -207,6 +208,110 @@ export const CHROME: Record<ComparisonLocale, ComparisonChrome> = {
       intro:
         'Le 12 novembre 2026, nous avons essayé d’autres éditeurs PDF gratuits en ligne, sans compte, pour ajouter une ligne en arabe et en modifier une. Chaque page indique ce que montraient les fichiers enregistrés et cite les pages du service concerné. La page consacrée à Adobe s’appuie uniquement sur les pages d’Adobe, car le téléchargement depuis son éditeur exige un compte.',
       cta: 'Voir la comparaison',
+    },
+  },
+
+  es: {
+    home: 'Inicio',
+    howTo: {
+      edit: {
+        title: 'Cómo cambiar una línea en árabe en BlendPDF',
+        steps: [
+          'Abra su PDF en **Editar PDF**.',
+          'Elija **Editar el texto** y haga clic en la línea que quiere cambiar.',
+          'Escriba la línea como debe quedar. La verá en la página mientras escribe.',
+          'Haga clic en **Guardar PDF**. Las palabras antiguas se quitan de la página, no solo se tapan.',
+        ],
+      },
+      add: {
+        title: 'Cómo agregar texto en árabe en BlendPDF',
+        steps: [
+          'Abra su PDF en **Editar PDF**.',
+          'Elija **Texto** y haga clic donde deben ir las palabras.',
+          'Escriba en árabe o en español, incluso los dos en el mismo cuadro.',
+          'Haga clic en **Guardar PDF**. Las palabras se guardan como texto real, así que puede seleccionarlas y buscarlas.',
+        ],
+      },
+    },
+    limits: {
+      title: 'Los límites de BlendPDF',
+      intro: '**Editar el texto** todavía está en beta. Esto es lo que aún no puede hacer:',
+      items: [
+        {
+          title: 'Una línea a la vez',
+          text: 'Cambia una sola línea, y las palabras no pasan a la línea siguiente. Para reescribir un párrafo, convierta el PDF a Word, edítelo allí y vuelva a guardarlo como PDF.',
+        },
+        {
+          title: 'Páginas con sombras o efectos de transparencia',
+          text: 'El editor no cambia el texto en estas páginas, porque eso cambiaría el aspecto de otras partes de la página. Tape las palabras antiguas con **Ocultar (recuadro blanco)** y escriba encima con **Texto**.',
+        },
+        {
+          title: 'La fuente puede cambiar',
+          text: 'Si la fuente original no tiene todas las letras que usted escribe, escribimos la línea con la fuente más parecida que tenemos. Para el árabe es Noto Sans Arabic, más sencilla que la mayoría de las fuentes árabes que se usan en documentos, así que la línea puede verse distinta de las que la rodean. El editor le avisa cuando esto ocurre.',
+        },
+      ],
+    },
+    more: {
+      title: 'Páginas relacionadas',
+      links: [
+        { href: '/edit-pdf', label: 'Editar PDF' },
+        { href: '/guides/edit-pdf-text', label: 'Guía: agregar o cambiar texto en un PDF' },
+        { href: '/pdf-to-word', label: 'PDF a Word' },
+        { href: '/ocr-pdf', label: 'OCR PDF' },
+        { href: '/compare', label: 'Todas las comparaciones' },
+      ],
+    },
+    faq: {
+      freeEdit: {
+        question: '¿Puedo editar texto en árabe en un PDF gratis?',
+        answer: 'Sí. En “Editar PDF” de BlendPDF, elija “Editar el texto” (beta), haga clic en una línea y vuelva a escribirla. Es gratuito, sin cuenta y sin marca de agua. Cambia una línea a la vez.',
+      },
+      upload: {
+        question: '¿Se sube mi PDF mientras lo edito?',
+        answer: 'No. La edición se hace en su navegador, así que el archivo no se envía a nuestros servidores. Solo se sube si nos pide que le enviemos el resultado por correo electrónico.',
+      },
+      font: {
+        question: '¿Por qué mi línea en árabe se ve distinta después del cambio?',
+        answer: 'La fuente original no tenía todas las letras que usted escribió, así que la línea se escribió con Noto Sans Arabic, la fuente árabe más parecida que tenemos. Las palabras son correctas, pero el estilo puede ser distinto del de las líneas de alrededor.',
+      },
+      realText: {
+        question: '¿Puedo buscar el texto en árabe que agrego?',
+        answer: 'Sí. BlendPDF guarda las palabras que usted agrega como texto real, no como imagen, así que puede seleccionarlas, copiarlas y buscarlas.',
+      },
+      noAccount: {
+        question: '¿Necesito una cuenta para editar un PDF en BlendPDF?',
+        answer: 'No. No hay que crear ninguna cuenta ni se agrega marca de agua, y la edición se hace en su navegador, así que el archivo no se sube a menos que nos pida que le enviemos el resultado por correo electrónico.',
+      },
+    },
+    source: { before: 'Fuente: ', after: ', consultada el 12 de noviembre de 2026' },
+    method: {
+      title: 'Compruébelo por su cuenta',
+      intro: 'Juzgamos cada editor por el archivo que guardó, no por su vista previa. Así puede repetir la prueba:',
+      download: 'Descargar la página de prueba (PDF, 40 KB)',
+      steps: {
+        edit: [
+          'Descargue nuestra página de prueba, un certificado de trabajo en árabe de una página, con datos inventados.',
+          'Ábrala en el editor que quiere comprobar, sin cuenta, y en la primera frase cambie el nombre “محمد العلوي” por “يوسف الإدريسي”.',
+          'Guarde el archivo y ábralo en cualquier lector de PDF. Mire esa línea: dónde empieza, dónde termina y si están todas las palabras.',
+          'Busque “يوسف” en el archivo guardado. Si no se encuentra nada, las palabras nuevas no se guardaron como texto.',
+        ],
+        add: [
+          'Descargue nuestra página de prueba, un certificado de trabajo en árabe de una página, con datos inventados.',
+          'Ábrala en el editor que quiere comprobar, sin cuenta, y agregue “السيد يوسف الإدريسي” en cualquier parte de la página con su herramienta de texto.',
+          'Guarde el archivo y ábralo en cualquier lector de PDF. Compruebe que están las tres palabras, de derecha a izquierda y con las letras unidas.',
+          'Busque “يوسف” en el archivo guardado. Si no se encuentra nada, las palabras se guardaron como imagen.',
+        ],
+      },
+    },
+    correction: { before: '¿Hay algo desactualizado o incorrecto en esta página? Escriba a ', after: '. Lo revisaremos y corregiremos la página en un plazo de 7 días.' },
+    hub: {
+      metaTitle: 'BlendPDF frente a otros editores de PDF, probados en árabe | BlendPDF',
+      description:
+        'El 12 de noviembre de 2026 probamos otros editores de PDF gratuitos en línea con texto en árabe. Vea qué guardó cada uno y qué dicen sus propias páginas.',
+      title: 'BlendPDF frente a otros editores de PDF',
+      intro:
+        'El 12 de noviembre de 2026 probamos otros editores de PDF gratuitos en línea, sin crear una cuenta: agregamos una línea en árabe y cambiamos otra. Cada página dice lo que mostraron los archivos guardados y cita las propias páginas del otro servicio. La página de Adobe se basa solo en las páginas de Adobe, porque para descargar desde su editor se necesita una cuenta.',
+      cta: 'Ver la comparación',
     },
   },
 

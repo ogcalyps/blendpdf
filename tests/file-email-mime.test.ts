@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { sendFileByEmail } from '../lib/send-file-by-email';
-import { sendFileEmailViaSes } from '../lib/send-file-email-ses';
+import { AttachmentNotAllowedError, emailAttachment, sendFileEmailViaSes } from '../lib/send-file-email-ses';
 import { EMAIL_TOOL_SLUGS, emailToolInfo } from '../lib/email-tools';
 
 /**
@@ -27,9 +27,12 @@ vi.mock('@aws-sdk/client-ses', () => ({
 const ARABIC_NAME = 'تقرير المبيعات.pdf';
 const PDF_B64 = 'JVBERi0xLjQK';
 
-async function send(filename: string, locale?: 'en' | 'ar', fileType = 'application/pdf'): Promise<string> {
+const ZIP_B64 = Buffer.from('PK\x03\x04rest-of-a-zip', 'latin1').toString('base64');
+const b64 = (text: string) => Buffer.from(text, 'utf8').toString('base64');
+
+async function send(filename: string, locale?: 'en' | 'ar', fileType = 'application/pdf', data = PDF_B64): Promise<string> {
   sesSends.length = 0;
-  await sendFileEmailViaSes({ to: 'a@b.co', filename, fileType, fileDataBase64: PDF_B64, locale });
+  await sendFileEmailViaSes({ to: 'a@b.co', filename, fileType, fileDataBase64: data, locale });
   expect(sesSends).toHaveLength(1);
   return sesSends[0].toString('utf8');
 }
@@ -146,44 +149,33 @@ describe('file email MIME message', () => {
     expect(decodeURIComponent(raw)).toBe(name);
   });
 
-  it.each([
-    ['en', `Your BlendPDF file: ${ARABIC_NAME}`],
-    ['ar', `ملفك من BlendPDF: ${isolated(ARABIC_NAME)}`],
-  ] as const)('localizes and RFC 2047-encodes the subject (%s)', async (locale, expected) => {
-    const { headers } = split(await send(ARABIC_NAME, locale));
+  it('RFC 2047-encodes the Arabic subject', async () => {
+    const { headers } = split(await send(ARABIC_NAME, 'ar'));
     const subject = header(headers, 'Subject')!;
     expect(subject).not.toMatch(/[^\x20-\x7E]/);
     expectEncodedLinesWithin76(headers);
-    expect(decode2047(subject)).toBe(expected);
-    // Each word is within the 75-char limit and decodes on its own: no character was cut in half
-    const words = subject.match(ENCODED_WORD)!;
-    expect(words.length).toBeGreaterThan(1);
-    for (const w of words) {
+    expect(decode2047(subject)).toBe('ملفك من BlendPDF');
+    for (const w of subject.match(ENCODED_WORD)!) {
       expect(w.length).toBeLessThanOrEqual(75);
       expect(decode2047(w)).not.toContain('\uFFFD');
     }
   });
 
-  // The Arabic subjects above happen to put every 45-byte cut on a character
-  // boundary; 3- and 4-byte characters do not, so they prove the chunking
+  // Anyone can send a file to any address, so the subject, which a recipient
+  // sees before opening anything, never carries text the sender chose
   it.each([
-    ['CJK', `${'報告書'.repeat(10)}.pdf`],
-    ['emoji', `${'\u{1F600}'.repeat(20)}.pdf`],
-  ])('never cuts a multi-byte character across encoded-words (%s)', async (_label, name) => {
+    ['Account suspended, verify at evil.example.pdf'],
+    [ARABIC_NAME],
+    [`${'報告書'.repeat(10)}.pdf`],
+  ])('keeps the file name out of the subject (%s)', async (name) => {
     for (const locale of ['en', 'ar'] as const) {
-      const { headers } = split(await send(name, locale));
-      const subject = header(headers, 'Subject')!;
-      for (const w of subject.match(ENCODED_WORD)!) {
-        expect(w.length).toBeLessThanOrEqual(75);
-        expect(decode2047(w)).not.toContain('�');
-      }
-      expectEncodedLinesWithin76(headers);
-      expect(decode2047(subject).endsWith(locale === 'ar' ? isolated(name) : name)).toBe(true);
+      const subject = decode2047(header(split(await send(name, locale)).headers, 'Subject')!);
+      expect(subject).toBe(locale === 'ar' ? 'ملفك من BlendPDF' : 'Your BlendPDF file');
     }
   });
 
   it('leaves a plain ASCII subject unencoded', async () => {
-    expect(header(split(await send('report.pdf')).headers, 'Subject')).toBe('Your BlendPDF file: report.pdf');
+    expect(header(split(await send('report.pdf')).headers, 'Subject')).toBe('Your BlendPDF file');
   });
 
   it('writes the Arabic email right-to-left, in Arabic, in both parts', async () => {
@@ -200,13 +192,13 @@ describe('file email MIME message', () => {
   });
 
   // In RTL text "2024.pdf" would show as "pdf.2024" unless the name is isolated
-  it('isolates the file name from the Arabic sentence in the text, html and subject', async () => {
+  it('isolates the file name from the Arabic sentence in the text and html', async () => {
     const name = '2024-report.pdf';
     const raw = await send(name, 'ar');
     const { plain, html } = message(raw);
     expect(decodedBody(plain)).toContain(`«${isolated(name)}»`);
     expect(decodedBody(html)).toContain(`<strong>${isolated(name)}</strong>`);
-    expect(decode2047(header(split(raw).headers, 'Subject')!)).toBe(`ملفك من BlendPDF: ${isolated(name)}`);
+    expect(decode2047(header(split(raw).headers, 'Subject')!)).toBe('ملفك من BlendPDF');
     // The attachment name itself carries no bidi marks
     expect(param(header(split(message(raw).attachment).headers, 'Content-Disposition')!, 'filename', false)).toBe(name);
   });
@@ -257,8 +249,10 @@ describe('file email MIME message', () => {
   });
 
   it('strips path segments and bidi overrides that could disguise the extension', async () => {
-    const disposition = header(split(message(await send('C:\\Users\\me\\invoice\u202Efdp.exe')).attachment).headers, 'Content-Disposition')!;
-    expect(param(disposition, 'filename', false)).toBe('invoicefdp.exe');
+    const disposition = header(split(message(await send('C:\\Users\\me\\invoice\u202Efdp.pdf')).attachment).headers, 'Content-Disposition')!;
+    expect(param(disposition, 'filename', false)).toBe('invoicefdp.pdf');
+    // ...and what the cleaned name really is decides whether it goes out at all
+    await expect(send('C:\\Users\\me\\invoice\u202Efdp.exe')).rejects.toBeInstanceOf(AttachmentNotAllowedError);
   });
 
   // Browsers name a repeat download "report (1).pdf"; the old fallback trimmed it to "report (1.pdf"
@@ -282,11 +276,11 @@ describe('file email MIME message', () => {
     expect(param(disposition, 'filename', false)).toBe('my final (1).pdf');
   });
 
-  it('does not invent a .pdf extension for a non-ASCII name without one', async () => {
-    const { headers } = split(message(await send('صور', 'ar', 'application/zip')).attachment);
+  it('gives a non-ASCII zip name an ASCII fallback that keeps its extension', async () => {
+    const { headers } = split(message(await send('صور.zip', 'ar', 'application/zip', ZIP_B64)).attachment);
     const disposition = header(headers, 'Content-Disposition')!;
-    expect(param(disposition, 'filename', true)).toBe('صور');
-    expect(param(disposition, 'filename', false)).toBe('file');
+    expect(param(disposition, 'filename', true)).toBe('صور.zip');
+    expect(param(disposition, 'filename', false)).toBe('file.zip');
   });
 
   it('is multipart/mixed: alternative (plain, then html) plus exactly one attachment', async () => {
@@ -305,12 +299,36 @@ describe('file email MIME message', () => {
     expect(split(attachment).body.replace(/\r\n/g, '')).toBe(PDF_B64);
   });
 
-  it('refuses a client-supplied type that would inject header lines, keeps a simple charset param', async () => {
-    const injected = message(await send('x.pdf', 'en', 'application/pdf\r\nX-Injected: 1'));
-    expect(header(split(injected.attachment).headers, 'Content-Type')!.startsWith('application/octet-stream;')).toBe(true);
+  it('takes the attachment type from the file, never from the client', async () => {
+    const injected = message(await send('x.pdf', 'en', 'text/html\r\nX-Injected: 1'));
+    expect(header(split(injected.attachment).headers, 'Content-Type')!.startsWith('application/pdf;')).toBe(true);
     expect(injected.attachment).not.toContain('X-Injected');
-    const text = message(await send('x.txt', 'en', 'text/plain;charset=utf-8'));
-    expect(header(split(text.attachment).headers, 'Content-Type')!.startsWith('text/plain;charset=utf-8;')).toBe(true);
+    const text = message(await send('x.txt', 'en', 'text/html', b64('plain words, nothing else\n')));
+    expect(header(split(text.attachment).headers, 'Content-Type')!.startsWith('text/plain; charset=utf-8;')).toBe(true);
+  });
+
+  // The route is open to anyone, so it only carries what the tools make (security review, 2026-11-12)
+  it.each([
+    ['an HTML page', 'login.html', b64('<html><form action=https://evil.example>')],
+    ['HTML named .pdf', 'statement.pdf', b64('<html><form action=https://evil.example>')],
+    ['a program', 'setup.exe', Buffer.from('MZ\x90\x00', 'latin1').toString('base64')],
+    ['a zip that is not a zip', 'photos.zip', PDF_B64],
+    ['binary named .txt', 'notes.txt', Buffer.from([0x68, 0x00, 0x69]).toString('base64')],
+    ['invalid UTF-8 named .txt', 'notes.txt', Buffer.from([0xff, 0xfe, 0x41]).toString('base64')],
+    ['no extension', 'report', PDF_B64],
+  ])('refuses %s', async (_label, name, data) => {
+    expect(emailAttachment(name, data)).toBeNull();
+    await expect(send(name, 'en', 'application/pdf', data)).rejects.toBeInstanceOf(AttachmentNotAllowedError);
+  });
+
+  it.each([
+    ['report.pdf', PDF_B64, 'application/pdf'],
+    ['report.docx', ZIP_B64, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    ['report.xlsx', ZIP_B64, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+    ['pages.zip', ZIP_B64, 'application/zip'],
+    ['text.txt', b64('نص عربي and English\n'), 'text/plain; charset=utf-8'],
+  ])('carries what the tools make (%s)', (name, data, mime) => {
+    expect(emailAttachment(name, data)).toEqual({ name, mime });
   });
 });
 
@@ -357,7 +375,7 @@ describe('Arabic file name display', () => {
     ['تقرير المبيعات 2024.pdf', '\u2068تقرير المبيعات \u20662024.pdf\u2069\u2069'],
     ['تقرير.pdf', '\u2068تقرير\u2066.pdf\u2069\u2069'],
     ['Q3-report.pdf', '\u2068\u2066Q3-report.pdf\u2069\u2069'],
-    ['تقرير', '\u2068تقرير\u2069'],
+    // (A name without an extension is never sent: emailAttachment only carries the tools' file types.)
   ])('keeps the Latin tail of %s in one left-to-right piece', async (name, shown) => {
     sesSends.length = 0;
     await sendFileEmailViaSes({ to: 'a@b.co', filename: name, fileType: 'application/pdf', fileDataBase64: PDF_B64, locale: 'ar' });

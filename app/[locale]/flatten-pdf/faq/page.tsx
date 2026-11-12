@@ -17,7 +17,7 @@ export default function FlattenPdfFAQ() {
     },
     {
       question: 'When should I flatten a PDF form?',
-      answer: 'Flatten after you\'ve filled a form and before you submit, email, or print it. It locks your answers in place and ensures the form looks the same in every PDF viewer. Fill forms first with the BlendPDF Fill Form tool, then flatten the result.'
+      answer: 'Flatten after you\'ve filled a form and before you submit, email, or print it. It locks your answers in place and ensures the form looks the same in every PDF viewer. Fill the form first in your PDF reader or browser, then flatten the result.'
     },
     {
       question: 'Which form field types can be flattened?',
@@ -37,7 +37,7 @@ export default function FlattenPdfFAQ() {
     },
     {
       question: 'Can I fill a form before flattening it?',
-      answer: 'Yes — that\'s the intended workflow. Use the BlendPDF Fill Form tool to type your answers into the interactive fields, download the filled PDF, then flatten it here so the answers can\'t be changed.'
+      answer: 'Yes — that\'s the intended workflow. Type your answers into the interactive fields in your PDF reader or browser, save the filled PDF, then flatten it here so the answers can\'t be changed.'
     },
     {
       question: 'Can I flatten password-protected PDFs?',
@@ -177,7 +177,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>The Complete BlendPDF Workflow</strong><br />
-                  Fill the form first with the <a href="/fill-form" className="text-blue-600 hover:text-blue-800">Fill Form tool</a>, download the filled copy, then flatten it here. If the document also needs a password, protect it after flattening; if it shouldn't leak author metadata, clean it with the Remove PDF Metadata tool. Keep the original unflattened file on your device in case you ever need to revise your answers — flattening the copy costs you nothing.
+                  Fill the form first in your PDF reader or browser, save the filled copy, then flatten it here. If the document also needs a password, protect it after flattening; if it shouldn't leak author metadata, clean it with the Remove PDF Metadata tool. Keep the original unflattened file on your device in case you ever need to revise your answers — flattening the copy costs you nothing.
                 </p>
               </div>
             </section>
@@ -219,7 +219,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>Your Original Is Your Undo</strong><br />
-                  The safety net is built into the workflow: BlendPDF never modifies your source file. The flattened version is a separate download with a "flattened-" prefix, and the original — interactive fields, editable answers and all — stays on your device. If you need to change an answer later, edit the original (or re-fill it with the <a href="/fill-form" className="text-blue-600 hover:text-blue-800">Fill Form tool</a>) and flatten again. Keeping the unflattened original alongside the flattened copy is the recommended practice.
+                  The safety net is built into the workflow: BlendPDF never modifies your source file. The flattened version is a separate download with a "flattened-" prefix, and the original — interactive fields, editable answers and all — stays on your device. If you need to change an answer later, edit the original's fields and flatten again. Keeping the unflattened original alongside the flattened copy is the recommended practice.
                 </p>
                 <p>
                   <strong>A Note on What "Locked" Means</strong><br />
@@ -244,7 +244,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>What You Can Do Instead</strong><br />
-                  If you need to add answers to a static form, the text and annotations have to be placed on top of the page — and if you were looking to fill an interactive form first, that's exactly what the <a href="/fill-form" className="text-blue-600 hover:text-blue-800">Fill Form tool</a> is for: fill there, then flatten here. The no-fields notice includes this hint with a direct link.
+                  If you need to add answers to a static form, the text has to be placed on top of the page, which is what <a href="/edit-pdf" className="text-blue-600 hover:text-blue-800">Edit PDF</a> does. If your form does have interactive fields, fill them in your PDF reader or browser first, then flatten here.
                 </p>
                 <p>
                   <strong>The "Save Anyway" Option</strong><br />
@@ -282,7 +282,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>Step One: Fill</strong><br />
-                  Open the <a href="/fill-form" className="text-blue-600 hover:text-blue-800">Fill Form tool</a> and load your interactive PDF. Type into the text fields, tick the checkboxes, choose the dropdown options, and download the filled copy. Like flattening, filling runs in your browser, so your answers stay on your device throughout.
+                  Open your interactive PDF in a PDF reader (Adobe Acrobat Reader, Preview on a Mac) or in Chrome, Edge or Firefox. Type into the text fields, tick the checkboxes, choose the dropdown options, and save the filled copy.
                 </p>
                 <p>
                   <strong>Step Two: Flatten</strong><br />
@@ -294,7 +294,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>Forms Filled Elsewhere Work Too</strong><br />
-                  You don't have to use BlendPDF's Fill Form tool for the first step. Forms filled in Adobe Acrobat, macOS Preview, a browser's built-in viewer, or any other application flatten just the same — the tool reads the current value and appearance of each field, wherever those values were typed. Whatever the form shows when you upload it is what gets locked into the flattened copy.
+                  Forms filled in Adobe Acrobat, macOS Preview, a browser's built-in viewer, or any other application flatten just the same — the tool reads the current value and appearance of each field, wherever those values were typed. Whatever the form shows when you upload it is what gets locked into the flattened copy.
                 </p>
               </div>
             </section>
@@ -357,7 +357,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>The Original Is Your Editable Master</strong><br />
-                  Since flattening is permanent in the output, the untouched original is what preserves your ability to revise. Need to fix a typo, update a date, or submit a corrected version? Edit the original's fields (or re-fill with the <a href="/fill-form" className="text-blue-600 hover:text-blue-800">Fill Form tool</a>) and flatten again — a fresh flattened copy costs one click. This is why the tool never overwrites the source: the editable version is genuinely valuable.
+                  Since flattening is permanent in the output, the untouched original is what preserves your ability to revise. Need to fix a typo, update a date, or submit a corrected version? Edit the original's fields and flatten again — a fresh flattened copy costs one click. This is why the tool never overwrites the source: the editable version is genuinely valuable.
                 </p>
                 <p>
                   <strong>No Hidden Side Effects</strong><br />
@@ -428,7 +428,7 @@ export default function FlattenPdfFAQ() {
                 </p>
                 <p>
                   <strong>A Practical Tip for Arabic Forms</strong><br />
-                  Before flattening, check the filled form in your PDF viewer and confirm the Arabic answers display correctly in the fields themselves. Flattening faithfully locks in whatever the fields show — including any rendering quirks the filling application introduced. If a field looks right before flattening, it will look right after; if it doesn't, fix it at the filling stage (the <a href="/fill-form" className="text-blue-600 hover:text-blue-800">Fill Form tool</a> works with Arabic input), then flatten.
+                  Before flattening, check the filled form in your PDF viewer and confirm the Arabic answers display correctly in the fields themselves. Flattening faithfully locks in whatever the fields show — including any rendering quirks the filling application introduced. If a field looks right before flattening, it will look right after; if it doesn't, fix it at the filling stage, then flatten.
                 </p>
                 <p>
                   <strong>Arabic-First, Locally Processed</strong><br />

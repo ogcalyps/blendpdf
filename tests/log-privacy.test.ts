@@ -139,8 +139,10 @@ function violations(src: string): string[] {
 describe('server logs carry no filenames or email addresses', () => {
   it('is looking at real log calls (not vacuous)', () => {
     const total = files.reduce((n, f) => n + logCalls(codeOnly(readFileSync(f, 'utf8'))).length, 0);
-    expect(files.length).toBeGreaterThan(30);
-    expect(total).toBeGreaterThan(200);
+    // Floors, not counts: the public mirror (ogcalyps/blendpdf) leaves out the back
+    // office, so it has 27 files and 207 calls where this repo has 35 and 217.
+    expect(files.length).toBeGreaterThan(20);
+    expect(total).toBeGreaterThan(150);
   });
 
   for (const file of files) {

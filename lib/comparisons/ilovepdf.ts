@@ -165,6 +165,81 @@ export const ilovepdf: Comparison = {
       card: 'Sa page indique que son éditeur de contenu, qui modifie le texte existant, ne prend pas encore en charge l’écriture de droite à gauche.',
     },
 
+    es: {
+      metaTitle: 'Alternativa a iLovePDF para editar PDF en árabe | BlendPDF',
+      description:
+        'La propia página de iLovePDF dice que su editor de contenido todavía no admite idiomas que se escriben de derecha a izquierda. BlendPDF cambia una línea en árabe de derecha a izquierda, una línea a la vez (beta).',
+      title: 'Una alternativa a iLovePDF para editar PDF en árabe',
+      tested: 'Comprobado el 12 de noviembre de 2026',
+      summary:
+        'iLovePDF dice que su editor de contenido (Content Editor), el modo que cambia el texto existente, todavía no admite idiomas que se escriben de derecha a izquierda. En BlendPDF, abra su archivo en **Editar PDF**, elija **Editar el texto** (beta), haga clic en la línea y vuelva a escribirla. Es gratuito, sin cuenta, y la edición se hace en su navegador.',
+      cta: 'Editar un PDF en árabe',
+      evidence: {
+        title: 'Cambiar una línea en árabe en BlendPDF',
+        intro:
+          'Con BlendPDF cambiamos el nombre de la primera frase de un certificado de trabajo en árabe de una página. Abajo se ve la parte superior del archivo antes y después. El marco gris es el borde de la página.',
+        shots: {
+          original: { label: 'Original', caption: 'La línea antes del cambio.', alt: 'La línea original en árabe, alineada a la derecha dentro de los márgenes de la página.' },
+          blendpdf: {
+            label: 'BlendPDF',
+            caption: 'El nombre nuevo está en su lugar, la línea sigue empezando en el margen derecho y las letras están unidas. Quedó en Noto Sans Arabic, una fuente más sencilla que la original.',
+            alt: 'La línea guardada por BlendPDF: el nombre nuevo, de derecha a izquierda dentro de los márgenes, con las letras unidas.',
+          },
+        },
+      },
+      quotes: {
+        title: 'Lo que dice iLovePDF sobre el árabe',
+        intro: 'Su página Edit PDF dice esto sobre el Content Editor, el modo que cambia el texto existente:',
+        glosses: ['Traducción: “Por el momento, el editor de contenido no admite idiomas que se escriben de derecha a izquierda (RTL)”.'],
+        after: 'En BlendPDF, **Editar el texto** (beta) sí cambia líneas en árabe, de derecha a izquierda, una línea a la vez.',
+      },
+      table: {
+        title: 'Comparación directa',
+        head: ['Lo que comprobamos', 'BlendPDF', 'iLovePDF'],
+        rows: [
+          {
+            label: 'Cambiar una línea en árabe',
+            blendpdf: 'Escrita de derecha a izquierda, dentro de los márgenes y con las letras unidas.',
+            them: 'Según su propia página, su editor de contenido todavía no admite idiomas que se escriben de derecha a izquierda.',
+          },
+          {
+            label: 'Adónde va su archivo',
+            blendpdf: 'La edición se hace en su navegador.',
+            them: 'Se procesa en sus servidores y se elimina en las dos horas siguientes, según sus condiciones.',
+          },
+          { label: 'Uso gratuito', blendpdf: 'Sin límite diario.', them: 'Un número limitado de documentos, según iLovePDF.' },
+        ],
+        note: 'BlendPDF se probó el 12 de noviembre de 2026, y las páginas de iLovePDF se consultaron el mismo día. iLovePDF puede haber cambiado desde entonces, así que consulte sus condiciones actuales en ilovepdf.com.',
+      },
+      strengths: {
+        title: 'Lo que iLovePDF hace bien',
+        items: [
+          'Su sitio también está en árabe.',
+          'Su plan gratuito acepta archivos más grandes en algunas herramientas: 100 MB para unir, dividir o editar y 200 MB para comprimir, frente a 50 MB por archivo en BlendPDF.',
+          'Su editor de contenido permite seleccionar el texto existente para editarlo, moverlo o eliminarlo, en idiomas que se escriben de izquierda a derecha.',
+        ],
+      },
+      faq: [
+        {
+          question: '¿iLovePDF admite el árabe?',
+          answer:
+            'Su sitio sí, pero su editor para cambiar el texto existente no, según sus propias palabras. El 12 de noviembre de 2026, su página Edit PDF decía: “The Content Editor does not currently support Right-to-Left (RTL) languages.” (Por el momento, el editor de contenido no admite idiomas que se escriben de derecha a izquierda.)',
+        },
+        CHROME.es.faq.freeEdit,
+        CHROME.es.faq.upload,
+        {
+          question: '¿Cuánto tiempo conserva iLovePDF mis archivos?',
+          answer:
+            'Sus condiciones dicen que los archivos se eliminan en un plazo de dos horas después de procesarlos en sus servidores (consultadas el 12 de noviembre de 2026). El editor de BlendPDF no sube su archivo a menos que nos pida que le enviemos el resultado por correo electrónico, y los archivos enviados a nuestras otras herramientas se eliminan en el plazo de una hora.',
+        },
+        CHROME.es.faq.font,
+      ],
+      disclaimer:
+        'iLovePDF es una marca comercial de su propietario. BlendPDF no tiene ninguna relación con iLovePDF. Todo lo que esta página dice sobre iLovePDF viene de sus propias páginas, consultadas el 12 de noviembre de 2026. iLovePDF puede haber cambiado desde entonces, así que consulte en ilovepdf.com sus funciones y límites actuales.',
+      breadcrumb: 'BlendPDF frente a iLovePDF',
+      card: 'Su propia página dice que su editor de contenido, que cambia el texto existente, todavía no admite idiomas que se escriben de derecha a izquierda.',
+    },
+
     ar: {
       metaTitle: 'بديل iLovePDF لتعديل ملفات PDF العربية | BlendPDF',
       description:

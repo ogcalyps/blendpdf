@@ -2736,7 +2736,7 @@
       },
       "whenToFlatten": {
         "question": "¿Cuándo conviene aplanar un formulario PDF?",
-        "answer": "Aplánelo después de completarlo y antes de presentarlo, enviarlo por correo electrónico o imprimirlo. Así sus respuestas quedan fijas y el formulario se ve igual en cualquier visor de PDF. Puede completar primero el formulario con nuestra herramienta Completar formulario y luego aplanar el resultado aquí."
+        "answer": "Aplánelo después de completarlo y antes de presentarlo, enviarlo por correo electrónico o imprimirlo. Así sus respuestas quedan fijas y el formulario se ve igual en cualquier visor de PDF. Puede completar primero el formulario en su lector de PDF o su navegador y luego aplanar el resultado aquí."
       },
       "reversible": {
         "question": "¿Se puede deshacer el aplanado?",
@@ -2756,7 +2756,7 @@
       },
       "fillFormFlattening": {
         "question": "¿Puedo completar un formulario antes de aplanarlo?",
-        "answer": "Sí, es el uso previsto. Escriba sus respuestas en los campos interactivos con la herramienta Completar formulario de BlendPDF, descargue el PDF completado y luego aplánelo aquí para que las respuestas no se puedan cambiar."
+        "answer": "Sí, es el uso previsto. Escriba sus respuestas en los campos interactivos con su lector de PDF o su navegador, guarde el PDF completado y luego aplánelo aquí para que las respuestas no se puedan cambiar."
       },
       "flattenPasswordProtected": {
         "question": "¿Puedo aplanar un PDF protegido con contraseña?",

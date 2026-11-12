@@ -164,6 +164,85 @@ export const smallpdf: Comparison = {
       card: 'Son ajout de texte gratuit a enregistré deux de nos trois mots arabes, lettres détachées, et la modification du texte existant est réservée à l’offre Pro.',
     },
 
+    es: {
+      metaTitle: 'Alternativa a Smallpdf para PDF en árabe: nuestra prueba | BlendPDF',
+      description:
+        'Agregamos la misma línea en árabe en Smallpdf y en BlendPDF. Smallpdf perdió una palabra y dibujó las letras sin unir. BlendPDF conservó las tres palabras, con las letras unidas.',
+      title: 'Una alternativa a Smallpdf para PDF en árabe',
+      tested: 'Probado el 12 de noviembre de 2026',
+      summary:
+        'En nuestra prueba, la herramienta gratuita para agregar texto de Smallpdf omitió la última palabra de un nombre en árabe y dibujó las letras sin unir, y para cambiar el texto existente hace falta Smallpdf Pro. En BlendPDF, las dos cosas son gratis y sin crear una cuenta: **Texto** agrega palabras y **Editar el texto** (beta) cambia una línea.',
+      cta: 'Editar un PDF en árabe',
+      evidence: {
+        title: 'La misma página, las mismas palabras',
+        intro:
+          'Agregamos “السيد يوسف الإدريسي” (tres palabras: un tratamiento de cortesía y un nombre) a un certificado de trabajo de una página en árabe, una vez con la herramienta gratuita para agregar texto de Smallpdf y otra con la herramienta Texto de BlendPDF, sin usar una cuenta. Abajo se ve la parte de cada página guardada donde quedaron las palabras.',
+        shots: {
+          blendpdf: {
+            label: 'BlendPDF',
+            caption: 'Las tres palabras, de derecha a izquierda, con las letras unidas. Es texto real.',
+            alt: 'La línea guardada por BlendPDF: “السيد يوسف الإدريسي”, tres palabras con las letras unidas.',
+          },
+          them: {
+            label: 'Smallpdf',
+            caption: 'Solo se guardaron dos palabras, “السيد يوسف”. Falta la tercera, “الإدريسي”, y las letras están dibujadas por separado en lugar de unidas.',
+            alt: 'La línea guardada por Smallpdf: dos palabras con las letras sin unir; falta la tercera palabra.',
+          },
+        },
+      },
+      quotes: {
+        title: 'Lo que dice Smallpdf sobre la edición de texto',
+        intro: 'Su página Edit PDF dice esto sobre cambiar el texto que ya tiene un PDF:',
+        glosses: ['Traducción: “La edición directa del texto de un PDF requiere una suscripción Pro”.'],
+        after: 'En BlendPDF, **Editar el texto** (beta) es gratis y cambia una línea a la vez.',
+      },
+      table: {
+        title: 'Comparación directa',
+        head: ['Lo que comprobamos', 'BlendPDF', 'Smallpdf'],
+        rows: [
+          {
+            label: 'Agregar una línea en árabe (gratis)',
+            blendpdf: 'Las tres palabras, de derecha a izquierda, con las letras unidas.',
+            them: 'Se guardaron dos de las tres palabras, con las letras sin unir.',
+          },
+          { label: 'Cambiar el texto existente', blendpdf: 'Gratis, una línea a la vez (beta).', them: 'Solo con Pro, según su página Edit PDF.' },
+          {
+            label: 'Uso gratuito',
+            blendpdf: 'Sin límite diario.',
+            them: 'Su página de precios indica un límite diario de descargas (“Daily download limit”) en el plan gratuito.',
+          },
+        ],
+        note: 'Probado el 12 de noviembre de 2026, con las páginas de Smallpdf consultadas el mismo día. Smallpdf puede haber cambiado desde entonces: consulte sus planes actuales en smallpdf.com.',
+      },
+      strengths: {
+        title: 'Lo que Smallpdf hace bien',
+        items: [
+          'Su sitio también está en árabe.',
+          'Con Pro, su editor cambia el texto que ya tiene un PDF.',
+          'Su plan gratuito admite archivos de hasta 100 MB para conversiones, frente a 50 MB en BlendPDF.',
+        ],
+      },
+      faq: [
+        {
+          question: '¿Smallpdf es gratis para PDF en árabe?',
+          answer:
+            'En parte. Su herramienta para agregar texto es gratuita, pero en nuestra prueba del 12 de noviembre de 2026 solo guardó dos de tres palabras en árabe, con las letras sin unir. Para cambiar el texto que ya tiene un PDF hace falta Pro: su página Edit PDF dice “Direct PDF text editing requires a Pro subscription”.',
+        },
+        CHROME.es.faq.freeEdit,
+        CHROME.es.faq.noAccount,
+        {
+          question: '¿El plan gratuito tiene un límite diario?',
+          answer:
+            'BlendPDF no tiene límite diario. Cuando lo comprobamos, el 12 de noviembre de 2026, la página de precios de Smallpdf indicaba un límite diario de descargas (“Daily download limit”) en su plan gratuito, y su blog decía que el plan gratuito convierte “up to two documents per day” (hasta dos documentos al día).',
+        },
+        CHROME.es.faq.realText,
+      ],
+      disclaimer:
+        'Smallpdf es una marca comercial de su propietario. BlendPDF no tiene ninguna relación con Smallpdf. Hicimos esta prueba nosotros mismos el 12 de noviembre de 2026 en smallpdf.com, sin usar una cuenta, y citamos sus páginas tal como estaban ese día. Smallpdf puede haber cambiado desde entonces: consulte smallpdf.com para conocer sus funciones y límites actuales.',
+      breadcrumb: 'BlendPDF frente a Smallpdf',
+      card: 'Su herramienta gratuita para agregar texto guardó dos de nuestras tres palabras en árabe, sin unir, y para cambiar el texto existente hace falta Pro.',
+    },
+
     ar: {
       metaTitle: 'بديل Smallpdf لملفات PDF العربية: جرّبنا الأداتين | BlendPDF',
       description:

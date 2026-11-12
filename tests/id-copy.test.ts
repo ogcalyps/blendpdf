@@ -3,6 +3,7 @@
  * every **label** a real UI label, house style, and the page in the sitemap.
  */
 import { describe, expect, it } from 'vitest';
+import { badSpanish } from './helpers/spanish';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { idCopyContent, idCopyText } from '../lib/id-copy';
@@ -32,10 +33,12 @@ describe('ID copy watermark', () => {
     expect(idCopyText('fr', 'l’agence', 'dossier de location', DAY)).toBe('Copie destinée à l’agence, pour dossier de location, le 07/11/2026');
     expect(idCopyText('ar', 'وكالة الكراء', '', DAY)).toBe('نسخة خاصة بـوكالة الكراء، بتاريخ 07/11/2026');
     expect(idCopyText('en', '', '', DAY)).toBe('Copy, 07/11/2026');
+    expect(idCopyText('es', 'la inmobiliaria', 'el contrato de alquiler', DAY)).toBe('Copia exclusiva para la inmobiliaria, para el contrato de alquiler, 07/11/2026');
+    expect(idCopyText('es', '', '', DAY)).toBe('Copia, 07/11/2026');
   });
 
   it('every **label** is one the site shows in that language', () => {
-    for (const locale of ['en', 'fr', 'ar']) {
+    for (const locale of ['en', 'fr', 'ar', 'es']) {
       const ui = uiStrings(locale);
       const labels = texts(locale).flatMap((s) => [...s.matchAll(/\*\*(.+?)\*\*/g)].map((m) => m[1]));
       expect(labels.length, locale).toBeGreaterThan(0);
@@ -46,12 +49,13 @@ describe('ID copy watermark', () => {
   it('house style', () => {
     for (const locale of ['en', 'fr']) expect(texts(locale).filter((s) => /[–—]/.test(s)), locale).toEqual([]);
     expect(texts('fr').filter((s) => /[^  ][;:!?»]|«[^  ]/.test(s) || s.includes("'"))).toEqual([]);
+    expect(texts('es').filter(badSpanish)).toEqual([]);
     const banned = ['تحميل', 'الإيميل', 'يرجى', 'سيتم', 'الخاص بك', 'بدلًا من ذلك', 'بنجاح', '—'];
     expect(texts('ar').filter((s) => banned.some((w) => s.includes(w)))).toEqual([]);
   });
 
   it('is in the sitemap in every language', async () => {
     const urls = new Set((await sitemap()).map((e) => e.url));
-    for (const prefix of ['', '/fr', '/ar']) expect(urls.has(`https://blendpdf.com${prefix}/watermark-pdf/id-copy`), prefix).toBe(true);
+    for (const prefix of ['', '/fr', '/ar', '/es']) expect(urls.has(`https://blendpdf.com${prefix}/watermark-pdf/id-copy`), prefix).toBe(true);
   });
 });

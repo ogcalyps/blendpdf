@@ -189,6 +189,92 @@ export const sejda: Comparison = {
       breadcrumb: 'BlendPDF face à Sejda',
       card: 'Son éditeur prévient lui-même que l’arabe n’est pas entièrement pris en charge, et notre ligne arabe modifiée a débordé de la page.',
     },
+    es: {
+      metaTitle: 'Alternativa a Sejda para editar PDF en árabe: nuestra prueba | BlendPDF',
+      description: 'Cambiamos la misma línea en árabe en el editor en línea de Sejda y en BlendPDF. En Sejda, la línea se salió de la página y su primera palabra quedó cortada. En BlendPDF, se quedó dentro de los márgenes.',
+      title: 'Una alternativa a Sejda para editar PDF en árabe',
+      tested: 'Probado el 12 de noviembre de 2026',
+      summary: 'El editor en línea de Sejda advierte que no admite por completo el árabe, y en nuestra prueba la línea en árabe modificada se salió de la página. En BlendPDF, abra su archivo en **Editar PDF**, elija **Editar el texto** (beta), haga clic en la línea y vuelva a escribirla. Es gratis, sin límite por hora, y la edición se hace en su navegador.',
+      cta: 'Editar un PDF en árabe',
+      evidence: {
+        title: 'La misma página, el mismo cambio',
+        intro: 'Para la prueba redactamos un certificado de trabajo de una página en árabe y cambiamos el nombre de su primera frase: una vez en el editor en línea de Sejda (sejda.com/pdf-editor) y otra en BlendPDF. Abajo se ve la parte superior de cada archivo guardado. El marco gris es el borde de la página.',
+        shots: {
+          original: {
+            label: 'Original',
+            caption: 'La línea antes del cambio.',
+            alt: 'La línea original en árabe, alineada a la derecha dentro de los márgenes de la página.',
+          },
+          blendpdf: {
+            label: 'BlendPDF',
+            caption: 'El nombre nuevo está en su lugar, la línea sigue empezando en el margen derecho y las letras están unidas. Quedó escrita en Noto Sans Arabic, una fuente más sencilla que la original.',
+            alt: 'La línea guardada por BlendPDF: el nombre nuevo, de derecha a izquierda dentro de los márgenes, con las letras unidas.',
+          },
+          them: {
+            label: 'Sejda',
+            caption: 'La línea queda anclada a la izquierda y se sale por el borde derecho de la página. Su primera palabra queda cortada.',
+            alt: 'La línea guardada por Sejda: anclada a la izquierda, se sale por el borde derecho de la página y su primera palabra queda cortada.',
+          },
+        },
+      },
+      quotes: {
+        title: 'Lo que dice Sejda sobre el árabe',
+        intro: 'Al abrir la página en árabe, el editor de Sejda mostró estos dos avisos, en inglés:',
+        after: 'Es decir, las escrituras de derecha a izquierda, como el árabe o el hebreo, no son totalmente compatibles, y los alfabetos de escritura compleja, como el árabe o el devanagari, no son compatibles. Cuando hicimos clic en la línea en árabe, el editor mostró sus letras al revés y sin unir. Así que Sejda sí avisa, y el archivo guardado coincidió con el aviso.',
+      },
+      table: {
+        title: 'Comparación directa',
+        head: ['Lo que comprobamos', 'BlendPDF', 'Sejda (editor en línea)'],
+        rows: [
+          {
+            label: 'Cambiar una línea en árabe',
+            blendpdf: 'Escrita de derecha a izquierda, dentro de los márgenes, con las letras unidas.',
+            them: 'Anclada a la izquierda, se salió por el borde derecho y la primera palabra quedó cortada.',
+          },
+          {
+            label: 'Lo que dice sobre el árabe',
+            blendpdf: 'El sitio y el editor también están en árabe, y las líneas en árabe se escriben de derecha a izquierda.',
+            them: 'Dos avisos: la escritura de derecha a izquierda no es totalmente compatible, y los alfabetos de escritura compleja, como el árabe, no son compatibles.',
+          },
+          {
+            label: 'Adónde va su archivo',
+            blendpdf: 'La edición se hace en su navegador.',
+            them: 'Los archivos se envían a los servidores de Sejda.',
+          },
+          {
+            label: 'Uso gratuito',
+            blendpdf: 'Sin límite por hora.',
+            them: '3 tareas por hora en el plan gratuito.',
+          },
+        ],
+        note: 'Probado el 12 de noviembre de 2026. Sejda puede haber cambiado desde entonces: consulte sus límites actuales en sejda.com.',
+      },
+      faq: [
+        {
+          question: '¿Sejda admite el árabe?',
+          answer: 'No por completo, según el propio Sejda. El 12 de noviembre de 2026, su editor en línea mostró dos avisos en nuestra página en árabe: “Right to left scripts are not fully supported (eg: Arabic, Hebrew)” y “Complex script alphabets are not supported (eg: Arabic, Devanagari)”. Cuando cambiamos una línea y guardamos, la línea se salió por el borde derecho de la página.',
+        },
+        {
+          question: '¿Puedo editar texto en árabe en un PDF gratis?',
+          answer: 'Sí. En “Editar PDF” de BlendPDF, elija “Editar el texto” (beta), haga clic en una línea y vuelva a escribirla. Es gratuito, sin cuenta y sin marca de agua. Cambia una línea a la vez.',
+        },
+        {
+          question: '¿Se sube mi PDF mientras lo edito?',
+          answer: 'No. La edición se hace en su navegador, así que el archivo no se envía a nuestros servidores. Solo se sube si nos pide que le enviemos el resultado por correo electrónico.',
+        },
+        {
+          question: '¿Cuántos PDF puedo editar?',
+          answer: 'BlendPDF no tiene límite por hora. El plan gratuito de Sejda permitía 3 tareas por hora cuando lo comprobamos, el 12 de noviembre de 2026.',
+        },
+        {
+          question: '¿Por qué mi línea en árabe se ve distinta después del cambio?',
+          answer: 'La fuente original no tenía todas las letras que usted escribió, así que la línea se escribió con Noto Sans Arabic, la fuente árabe más parecida que tenemos. Las palabras son correctas, pero el estilo puede ser distinto del de las líneas de alrededor.',
+        },
+      ],
+      disclaimer: 'Sejda es una marca comercial de su propietario. BlendPDF no tiene ninguna relación con Sejda. Hicimos esta prueba nosotros mismos el 12 de noviembre de 2026 con el editor gratuito en línea de sejda.com/pdf-editor. Sejda puede haber cambiado desde entonces: consulte sejda.com para conocer sus funciones y límites actuales.',
+      breadcrumb: 'BlendPDF frente a Sejda',
+      card: 'Su propio editor advierte que el árabe no es totalmente compatible, y nuestra línea en árabe modificada se salió de la página.',
+    },
     ar: {
       metaTitle: 'بديل Sejda لتعديل ملفات PDF العربية: جرّبنا الأداتين | BlendPDF',
       description: 'عدّلنا السطر العربي نفسه في Sejda وفي BlendPDF: في Sejda تجاوز حافة الصفحة وقُصّت أول كلمة، وفي BlendPDF بقي داخل الهوامش مكتوبًا من اليمين إلى اليسار بحروف متصلة.',

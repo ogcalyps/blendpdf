@@ -143,6 +143,78 @@
     "width": 1024,
     "height": 1220
   },
+  "es/add-letterhead-to-pdf-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/add-letterhead-to-pdf-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/add-letterhead-to-pdf-3": {
+    "width": 576,
+    "height": 838
+  },
+  "es/compress-pdf-under-size-limit-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/compress-pdf-under-size-limit-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/edit-pdf-text-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/edit-pdf-text-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/how-blendpdf-works-1": {
+    "width": 1344,
+    "height": 520
+  },
+  "es/how-blendpdf-works-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/how-blendpdf-works-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/how-blendpdf-works-4": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/merge-split-reorder-pages-1": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/merge-split-reorder-pages-2": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/merge-split-reorder-pages-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/sign-and-stamp-pdf-1": {
+    "width": 1024,
+    "height": 1308
+  },
+  "es/sign-and-stamp-pdf-2": {
+    "width": 1024,
+    "height": 960
+  },
+  "es/sign-and-stamp-pdf-3": {
+    "width": 1600,
+    "height": 1000
+  },
+  "es/sign-and-stamp-pdf-4": {
+    "width": 1024,
+    "height": 1220
+  },
   "fr/add-letterhead-to-pdf-1": {
     "width": 1600,
     "height": 1000

@@ -132,13 +132,12 @@ describe('leak-guard exemptions stay rare', () => {
     });
     // Each of these returns a message THIS codebase wrote, on a typed error:
     // ocr-pdf ALREADY_HAS_TEXT, extract-pdf-fields PdfRejection,
-    // send-file-email FileTooLargeForEmailError, split parsePageRanges,
-    // unlock-pdf UnlockRequestError. Adding a sixth should be deliberate.
+    // send-file-email FileTooLargeForEmailError, unlock-pdf UnlockRequestError.
+    // (split's parsePageRanges went with the route.) Adding a fifth should be deliberate.
     expect(exempt.sort()).toEqual([
       'app/api/extract-pdf-fields/route.ts',
       'app/api/ocr-pdf/route.ts',
       'app/api/send-file-email/route.ts',
-      'app/api/split/route.ts',
       'app/api/unlock-pdf/route.ts',
     ]);
   });

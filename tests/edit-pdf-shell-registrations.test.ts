@@ -5,6 +5,7 @@ import { getEditTools } from '../lib/navigation';
 import { EMAIL_TOOL_SLUGS, emailToolInfo } from '../lib/email-tools';
 import { RUN_TOOLS } from '../lib/run-tools';
 import sitemap from '../app/sitemap';
+import { locales } from '../i18n';
 import { generateMetadata } from '../app/[locale]/edit-pdf/layout';
 
 /**
@@ -140,8 +141,8 @@ describe('comparison pages', () => {
 
   it('every comparison links to Edit PDF and OCR PDF', () => {
     const src = read('lib/comparisons/chrome.ts');
-    expect(src.split("href: '/edit-pdf'").length - 1, 'once per language').toBe(3);
-    expect(src.split("href: '/ocr-pdf'").length - 1, 'once per language').toBe(3);
+    expect(src.split("href: '/edit-pdf'").length - 1, 'once per language').toBe(locales.length);
+    expect(src.split("href: '/ocr-pdf'").length - 1, 'once per language').toBe(locales.length);
     expect(read('components/compare/ComparisonPage.tsx')).toContain('chrome.more.links.map');
   });
 });

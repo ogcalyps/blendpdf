@@ -1,4 +1,4 @@
-import { mkdir, readFile } from 'fs/promises';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import { join, parse } from 'path';
 import { pathToFileURL } from 'url';
 import { runProcess, withScratchDir, type ProcessResult } from './run-process';
@@ -16,6 +16,20 @@ export interface LibreOfficeResult extends ProcessResult {
   /** The converted file, or null when LibreOffice wrote none (or an empty one). */
   output: Buffer | null;
 }
+
+/**
+ * Settings every conversion's fresh profile starts with. BlockUntrustedRefererLinks
+ * stops a document from loading anything by link: an uploaded file with a
+ * linked image made the server fetch any http:// URL (a blind SSRF, the EC2
+ * metadata service included) or embed an image from its own disk. Checked
+ * locally on LibreOffice 25.8 (security review, 2026-11-12): with it, no
+ * request and no linked image; embedded images still render.
+ */
+export const LOCKED_DOWN_PROFILE = `<?xml version="1.0" encoding="UTF-8"?>
+<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<item oor:path="/org.openoffice.Office.Common/Security/Scripting"><prop oor:name="BlockUntrustedRefererLinks" oor:op="fuse"><value>true</value></prop></item>
+</oor:items>
+`;
 
 /**
  * Convert one file with LibreOffice, as its own process tree, leaving nothing
@@ -44,6 +58,9 @@ export function convertWithLibreOffice(
   return withScratchDir('lo-', async (scratch) => {
     const outDir = join(scratch, 'out');
     await mkdir(outDir);
+    const userDir = join(scratch, 'profile', 'user');
+    await mkdir(userDir, { recursive: true });
+    await writeFile(join(userDir, 'registrymodifications.xcu'), LOCKED_DOWN_PROFILE);
 
     const officeArgs = [
       `-env:UserInstallation=${pathToFileURL(join(scratch, 'profile')).href}`,
