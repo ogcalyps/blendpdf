@@ -1,6 +1,6 @@
 {
   "tested": "2026-11-12",
-  "how": "Edit PDF on blendpdf.com (main at 665f0eb), in Chrome",
+  "how": "Edit PDF on blendpdf.com (main at 665f0eb), in Chrome; 1a, 4a, 5a and 6a again on a production build with the ActualText fix",
   "tasks": [
     {
       "task": "1a",
@@ -33,8 +33,8 @@
         },
         {
           "id": "kept",
-          "status": "fail",
-          "detail": "4 of the 4 other lines read differently from the original, such as: شهادة عمل. Without ActualText they read as before, so the save dropped some of the original ActualText."
+          "status": "pass",
+          "detail": "The 4 other lines read as they did in the original."
         }
       ],
       "notes": []
@@ -177,8 +177,8 @@
         },
         {
           "id": "kept",
-          "status": "fail",
-          "detail": "3 of the 3 other lines read differently from the original, such as: إعلان. Without ActualText they read as before, so the save dropped some of the original ActualText."
+          "status": "pass",
+          "detail": "The 3 other lines read as they did in the original."
         }
       ],
       "notes": []
@@ -251,8 +251,8 @@
         },
         {
           "id": "kept",
-          "status": "fail",
-          "detail": "3 of the 3 other lines read differently from the original, such as: ورقة عمل: القراءة بالشكل التام."
+          "status": "pass",
+          "detail": "The 3 other lines read as they did in the original."
         }
       ],
       "notes": []
@@ -325,8 +325,8 @@
         },
         {
           "id": "kept",
-          "status": "fail",
-          "detail": "4 of the 4 other lines read differently from the original, such as: فاتورة رقم INV-2026-0147. Without ActualText they read as before, so the save dropped some of the original ActualText."
+          "status": "pass",
+          "detail": "The 4 other lines read as they did in the original."
         }
       ],
       "notes": []

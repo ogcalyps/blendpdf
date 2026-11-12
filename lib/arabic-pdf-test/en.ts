@@ -17,7 +17,7 @@ export const text: TestSetText = {
     tested: 'Tested on 12 November 2026 with Edit PDF on blendpdf.com, in Chrome.',
     items: [
       'Adding Arabic: every check passed on all four files, except that lines with harakat look right but copy out in pieces.',
-      'Changing a line: the new line passed on every file we could change, harakat aside. But on files made by Chrome, the other lines then read in pieces in pdftotext. That’s a bug in BlendPDF.',
+      'Changing a line: the new line passed on every file we could change, harakat aside, and the rest of the page read as before. Our first run found a bug in BlendPDF here: on files made by Chrome, the other lines then read in pieces in pdftotext. We fixed it and ran those tasks again.',
       'The page with a shadow: BlendPDF won’t change its text, and says what to do instead.',
     ],
   },
@@ -76,12 +76,9 @@ export const text: TestSetText = {
     refused: 'Refused',
     status: { pass: 'passed', fail: 'failed' },
     notes: {
-      '1a': 'The new line passed. But the save drops some of Chrome’s ActualText, so pdftotext then reads the other lines in pieces. macOS Preview still reads them right.',
       '3': 'The line’s box opened empty, because the file doesn’t say which letters it shows. You type the whole line, and the saved file then passes.',
-      '4a': 'As in 1a: the new line passed, and the other lines then read in pieces in pdftotext.',
-      '5a': 'The marks sit right on the page but are saved as separate pieces, so copying breaks the words up, in macOS Preview too. As in 1a, the other lines then read in pieces in pdftotext.',
+      '5a': 'The marks sit right on the page but are saved as separate pieces, so copying breaks the words up, in macOS Preview too.',
       '5b': 'It looks right and search finds the words, but the marks are saved as separate pieces, so copying breaks the words up, in macOS Preview too.',
-      '6a': 'As in 1a: the new line passed, and the other lines then read in pieces in pdftotext.',
       '7': 'BlendPDF won’t change text on this page, because rewriting it would change the shadow. It says to cover the old words with Hide (white box) and type the new ones with Text.',
     },
   },

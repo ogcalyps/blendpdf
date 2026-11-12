@@ -24,7 +24,7 @@ const FOLDER = 'blendpdf-arabic-pdf-test-v1';
 /** The run on blendpdf.com, with what the saved files can't show. */
 const RUN = {
   tested: '2026-11-12',
-  how: 'Edit PDF on blendpdf.com (main at 665f0eb), in Chrome',
+  how: 'Edit PDF on blendpdf.com (main at 665f0eb), in Chrome; 1a, 4a, 5a and 6a again on a production build with the ActualText fix',
   tasks: {
     // The line's box opened empty: the file's letter map doesn't say which letters are there
     3: { emptyBox: true },

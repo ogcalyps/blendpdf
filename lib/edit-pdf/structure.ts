@@ -66,7 +66,7 @@ function setKids(context: PDFContext, holder: PDFDict, kids: PDFObject[]): void 
 }
 
 /** One char per byte of a content stream, or null when pdf-lib can't decode it faithfully. */
-function contentText(stream: PDFObject | undefined): string | null {
+export function contentText(stream: PDFObject | undefined): string | null {
   if (!(stream instanceof PDFRawStream)) return null;
   if (stream.dict.has(N('DecodeParms')) || stream.dict.has(N('DP')) || stream.dict.has(N('F'))) return null;
   try {

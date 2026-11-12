@@ -17,7 +17,9 @@
  *      source user space), checks the rewrite and verifies the removal
  *      (./replace.ts, loaded with import()), and everything below runs on
  *      its output. Any failure rejects the whole export: nothing is saved
- *      with an old line still in it.
+ *      with an old line still in it. Then the glyphs of ActualText spans
+ *      are drawn under the CTM their EMC sees again, so poppler reads them
+ *      where they are (./spans.ts)
  *   2. capture the page list ONCE. pdf-lib 1.17.1's removePage does not
  *      invalidate its page cache (PDFDocument.js:524), so getPages() is never
  *      called again; `current` mirrors the page tree from here on
@@ -98,6 +100,7 @@ import { isolateResources, pageRefsInTree, tidyPageTree } from './page-tree';
 import { pruneUnreachable } from './prune';
 import { StampPainter } from './stamps';
 import { moveContent } from './room';
+import { fixActualText } from './spans';
 import { pruneStructure } from './structure';
 import {
   COVER_COLOR,
@@ -610,6 +613,8 @@ export async function exportEditedPdf(source: Uint8Array, request: ExportRequest
     if (doc.isEncrypted) throw failed("PDFium's output is encrypted");
     if (original.length !== sourcePageCount) throw failed(`PDFium's output has ${original.length} pages, not ${sourcePageCount}`);
     removedLines = removal.removedLines;
+    // poppler would read the untouched lines of these pages in fragments otherwise (./spans.ts).
+    for (const index of rewrittenIndexes) fixActualText(original[index]);
   }
 
   const keptPages = request.pages.flatMap((entry) => (entry.source.kind === 'source' ? [original[entry.source.index]] : []));
