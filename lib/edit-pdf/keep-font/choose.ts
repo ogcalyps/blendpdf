@@ -20,7 +20,7 @@ import { createLayoutFont, firstStrongDirection, layoutText } from '@/lib/pdf-te
 import { CAIRO_FONT_URL } from '@/lib/pdf-text/constants';
 import { REPLACE_FIT_MAX, REPLACE_FIT_MIN, REPLACE_FIT_UNSURE, REPLACE_MAX_SIZE, REPLACE_MIN_SIZE } from '../types';
 import type { HexColor, ReplaceFontChoice, ReplaceObject } from '../types';
-import { ARABIC_MARK } from './arabic';
+import { ARABIC_MARK, hasArabic } from './arabic';
 import { LOOKALIKE_FONTS, lookalikeFile } from './lookalike';
 import { FONT_PROBLEM, planLine } from './plan';
 import type { LineFontData, LookalikeFamily, PdfFontInfo, PlacedGlyph, ReplacementPlan } from './types';
@@ -51,12 +51,28 @@ export async function stackFonts(urls: readonly string[], deps: PlanDeps): Promi
 const roundSize = (size: number) => Math.round(size * 10) / 10;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-/** The look-alike families for this text, primary first (keep-font-spec.md section 3). */
+/** Hebrew letters and points (and the Hebrew presentation forms). */
+export const HEBREW = /[֑-״יִ-ﭏ]/;
+
+/** Hebrew points and cantillation, treated like harakat: a changed word with one is drawn in a look-alike, which places them with its own GPOS. */
+const HEBREW_POINT = /[֑-ׇ]/;
+
+/** Only the Liberation families have Hebrew: the closest one for a Latin family that doesn't. */
+const HEBREW_FAMILY: Partial<Record<LookalikeFamily, LookalikeFamily>> = { Carlito: 'Liberation Sans', Caladea: 'Liberation Serif' };
+
+/**
+ * The look-alike families for this text, primary first (keep-font-spec.md
+ * section 3). A right-to-left line is Arabic first, unless its letters are
+ * Hebrew: then the Latin family leads, swapped for the Liberation family
+ * closest to it when it has no Hebrew, so the whole line comes from one font.
+ */
 export function lookalikeStack(data: LineFontData, text: string, lineDirection: 'ltr' | 'rtl'): LookalikeFamily[] {
   const pick = data.lookalike;
-  const arabicFirst = (firstStrongDirection(text) ?? lineDirection) === 'rtl';
-  const first = arabicFirst ? pick.arabic : pick.latin;
-  const second = arabicFirst ? pick.latin : pick.arabic;
+  const hebrew = HEBREW.test(text);
+  const latin = hebrew ? (HEBREW_FAMILY[pick.latin] ?? pick.latin) : pick.latin;
+  const arabicFirst = (firstStrongDirection(text) ?? lineDirection) === 'rtl' && !(hebrew && !hasArabic(text));
+  const first = arabicFirst ? pick.arabic : latin;
+  const second = arabicFirst ? latin : pick.arabic;
   return LOOKALIKE_FONTS[first].covers === 'both' || first === second ? [first] : [first, second];
 }
 
@@ -128,7 +144,7 @@ export async function planReplacement(object: ReplaceObject, text: string, deps:
   if (font) {
     const data = font.data;
     reason = data.blocked ? 'font' : 'letters';
-    const marked = changedWords(line.text, text).some((w) => ARABIC_MARK.test(w));
+    const marked = changedWords(line.text, text).some((w) => ARABIC_MARK.test(w) || HEBREW_POINT.test(w));
     if (!data.blocked && !marked) {
       const size = object.autoSize ? font.size : object.size;
       const plan = planLine(data, line.text, text, line.direction, size);
@@ -170,12 +186,24 @@ export async function planReplacement(object: ReplaceObject, text: string, deps:
     }
   }
 
-  // Cairo, as in Phase C; a picture when even Cairo lacks a character.
+  // Cairo, as in Phase C; then Liberation Sans, alone or after Cairo, for the letters Cairo lacks
+  // (Hebrew, Cyrillic, Greek); a picture when even that can't draw a character.
   const cairo = await stackFonts([CAIRO_FONT_URL], deps);
   const size = fittedSize(object, cairo, REPLACE_FIT_UNSURE);
   const transient = unavailable ? ({ transient: true } as const) : {};
   if (layoutText(cairo, text, { size, direction: 'auto', fallbackDirection: line.direction }).missing.length === 0) {
     return { kind: 'vector', choice: { mode: 'cairo', font: 'Cairo', reason, sameFamily: false }, size, fonts: [CAIRO_FONT_URL], oblique: false, ...transient };
+  }
+  const liberation = lookalikeFile('Liberation Sans', false);
+  for (const urls of [[liberation], [CAIRO_FONT_URL, liberation]]) {
+    const stack = await stackFonts(urls, deps).catch(() => null);
+    if (!stack) {
+      return { kind: 'image', choice: { mode: 'image', font: null, reason, sameFamily: false }, size, transient: true };
+    }
+    const fitted = fittedSize(object, stack, REPLACE_FIT_UNSURE);
+    if (layoutText(stack, text, { size: fitted, direction: 'auto', fallbackDirection: line.direction }).missing.length === 0) {
+      return { kind: 'vector', choice: { mode: 'lookalike', font: 'Liberation Sans', reason, sameFamily: false }, size: fitted, fonts: urls, oblique: false, ...transient };
+    }
   }
   return { kind: 'image', choice: { mode: 'image', font: null, reason, sameFamily: false }, size, ...transient };
 }

@@ -56,6 +56,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { formatGregorianDate, todayHijri } from '@/lib/hijri';
 import { DEFAULT_LINE_HEIGHT } from '@/lib/pdf-text/constants';
 import {
+  EDITOR_FALLBACK_FAMILY,
   EDITOR_FONT_FAMILY,
   MAX_IMAGE_BYTES,
   MAX_MERGE_FILES,
@@ -188,21 +189,69 @@ function registerEditorFont(engine: TextEngine): Promise<boolean> {
   return editorFontPromise;
 }
 
-function useTextEngine(): { engine: TextEngine | null; fontReady: boolean } {
+let fallbackFontPromise: Promise<boolean> | null = null;
+
+/** Register the engine's Liberation Sans as EDITOR_FALLBACK_FAMILY once per session, with Cairo's metrics so line boxes don't move. */
+function registerFallbackFont(engine: TextEngine): Promise<boolean> {
+  if (!engine.fallbackBytes) return Promise.resolve(false);
+  if (!fallbackFontPromise) {
+    const bytes = engine.fallbackBytes;
+    fallbackFontPromise = (async () => {
+      try {
+        const face = new FontFace(EDITOR_FALLBACK_FAMILY, new Uint8Array(bytes), {
+          ascentOverride: `${engine.ascent * 100}%`,
+          descentOverride: `${engine.descent * 100}%`,
+          lineGapOverride: '0%',
+        });
+        await face.load();
+        document.fonts.add(face);
+        return true;
+      } catch (error) {
+        console.warn('edit-pdf: could not register the fallback font', error);
+        fallbackFontPromise = null;
+        return false;
+      }
+    })();
+  }
+  return fallbackFontPromise;
+}
+
+/**
+ * The text engine, Cairo only at first. `needFallback` (a box has letters Cairo lacks: Hebrew,
+ * Cyrillic, Greek) fetches Liberation Sans once and swaps in the engine that lays out with it.
+ * It may be called while rendering: state changes only when the fetch settles.
+ */
+function useTextEngine(): { engine: TextEngine | null; fontReady: boolean; needFallback: () => void; fallbackFailed: boolean } {
   const [state, setState] = useState<{ engine: TextEngine | null; fontReady: boolean }>({ engine: null, fontReady: false });
+  const [fallbackFailed, setFallbackFailed] = useState(false);
+  const fallbackStarted = useRef(false);
   useEffect(() => {
     let live = true;
     loadTextEngine()
       .then(async (engine) => {
         const fontReady = await registerEditorFont(engine);
-        if (live) setState({ engine, fontReady });
+        if (live) setState((current) => (current.engine?.fallbackBytes ? current : { engine, fontReady }));
       })
       .catch((error) => console.warn('edit-pdf: text engine unavailable', error));
     return () => {
       live = false;
     };
   }, []);
-  return state;
+  const needFallback = useCallback(() => {
+    if (fallbackStarted.current) return;
+    fallbackStarted.current = true;
+    loadTextEngine({ fallback: true })
+      .then(async (engine) => {
+        const fontReady = await registerEditorFont(engine);
+        await registerFallbackFont(engine); // without it the preview draws those letters in a system font; layout and save are unaffected
+        setState({ engine, fontReady });
+      })
+      .catch((error) => {
+        console.warn('edit-pdf: fallback font unavailable', error);
+        setFallbackFailed(true);
+      });
+  }, []);
+  return { ...state, needFallback, fallbackFailed };
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -405,12 +454,12 @@ function Editor({ source, scanned, fixedBy, files, mode, planPreset, watermarkPr
   );
 
   // ── Text layout ──
-  const { engine, fontReady } = useTextEngine();
+  const { engine, fontReady, needFallback, fallbackFailed } = useTextEngine();
   const layoutCache = useRef(new Map<string, TextBoxLayout>());
   const layoutText = useCallback(
     (text: string, size: number, width: number, fallback: Direction = fallbackDirection): TextBoxLayout | null => {
       if (!engine) return null;
-      const key = `${size}|${Math.round(width * 100)}|${fallback}|${text}`;
+      const key = `${engine.fallbackBytes ? 'f' : 'c'}|${size}|${Math.round(width * 100)}|${fallback}|${text}`;
       let layout = layoutCache.current.get(key);
       if (!layout) {
         try {
@@ -422,9 +471,14 @@ function Editor({ source, scanned, fixedBy, files, mode, planPreset, watermarkPr
         if (layoutCache.current.size > 400) layoutCache.current.clear();
         layoutCache.current.set(key, layout);
       }
+      // Letters Cairo lacks: fetch the fallback (the next engine lays them out); no picture note unless that fails.
+      if (layout.missing.length > 0 && !engine.fallbackBytes && !fallbackFailed) {
+        needFallback();
+        return { ...layout, missing: [] };
+      }
       return layout;
     },
-    [engine, fallbackDirection],
+    [engine, fallbackDirection, needFallback, fallbackFailed],
   );
 
   /** box.hPct of a text object on a page of this size (points). */

@@ -20,9 +20,11 @@
 import { useLayoutEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react';
 import { useTranslations } from 'next-intl';
 import { DEFAULT_LINE_HEIGHT } from '@/lib/pdf-text/constants';
-import { EDITOR_FONT_FAMILY, type TextBoxLayout, type TextObject } from '@/lib/edit-pdf';
+import { EDITOR_FALLBACK_FAMILY, EDITOR_FONT_FAMILY, type TextBoxLayout, type TextObject } from '@/lib/edit-pdf';
 
-export const EDITOR_FONT_STACK = `"${EDITOR_FONT_FAMILY}", var(--font-cairo), Cairo, sans-serif`;
+export const EDITOR_FONT_STACK = `"${EDITOR_FONT_FAMILY}", "${EDITOR_FALLBACK_FAMILY}", var(--font-cairo), Cairo, sans-serif`;
+/** A box laid out in Liberation Sans alone (layout.fonts 'fallback'): its spaces, digits and Latin come from it too. */
+const FALLBACK_FIRST_STACK = `"${EDITOR_FALLBACK_FAMILY}", "${EDITOR_FONT_FAMILY}", var(--font-cairo), Cairo, sans-serif`;
 
 interface TextEditing {
   value: string;
@@ -94,7 +96,7 @@ export function TextBox({ object, pxPerPt, layout, editing, hitProps, interactiv
   const fontSize = object.size * pxPerPt;
   const lineHeight = (layout?.lineHeight ?? object.size * DEFAULT_LINE_HEIGHT) * pxPerPt;
   const font: CSSProperties = {
-    fontFamily: EDITOR_FONT_STACK,
+    fontFamily: layout?.fonts === 'fallback' ? FALLBACK_FIRST_STACK : EDITOR_FONT_STACK,
     fontSize,
     lineHeight: `${lineHeight}px`,
     color: object.color,

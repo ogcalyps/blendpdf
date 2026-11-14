@@ -128,11 +128,18 @@ function needsGlyph(cp: number): boolean {
   return cp !== 0x0a && !isBidiControl(cp) && !isDefaultIgnorable(cp);
 }
 
+/** A letter or a mark: a cluster with one belongs to its script's font. */
+const SCRIPT_CHAR = /[\p{L}\p{M}]/u;
+
 /**
  * The font of every code unit: per grapheme cluster, the first font of the
  * stack that has all of its code points; none has them all: the primary
  * font (the character is reported missing). A cluster that needs no glyph
  * (a lone ZWJ) keeps the font before it, so it stays in its letter's run.
+ * So does a space, digit or punctuation mark the font before it can draw:
+ * a Hebrew line drawn by the second font of the stack would otherwise take
+ * its spaces from the first, and pdf.js, which starts a new text item at
+ * every font change, would read the words back in visual order.
  */
 function assignFonts(fonts: readonly Font[], text: string): Uint8Array {
   const fontAt = new Uint8Array(text.length);
@@ -140,13 +147,15 @@ function assignFonts(fonts: readonly Font[], text: string): Uint8Array {
   let previous = 0;
   let start = 0;
   for (const end of graphemeBoundaries(text, 0, text.length)) {
+    const cluster = text.slice(start, end);
     const cps: number[] = [];
-    for (const ch of text.slice(start, end)) {
+    for (const ch of cluster) {
       const cp = ch.codePointAt(0)!;
       if (needsGlyph(cp)) cps.push(cp);
     }
     let font = previous;
-    if (cps.length > 0) {
+    const neutral = start > 0 && !SCRIPT_CHAR.test(cluster);
+    if (cps.length > 0 && !(neutral && cps.every((cp) => fonts[previous].hasGlyphForCodePoint(cp)))) {
       const found = fonts.findIndex((f) => cps.every((cp) => f.hasGlyphForCodePoint(cp)));
       font = found < 0 ? 0 : found;
     }

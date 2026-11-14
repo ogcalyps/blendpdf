@@ -143,12 +143,13 @@ export async function hasTextLayer(pdf: Pick<PDFDocumentProxy, 'numPages' | 'get
 
 /**
  * The text layout the PDF writer uses, for the preview. Fetches CAIRO_FONT_URL
- * once and caches the engine for the session. Implementation:
+ * once and caches the engine for the session; with `fallback`, Liberation
+ * Sans too, for boxes with letters Cairo lacks. Implementation:
  * ./text-engine.ts (loaded with import()).
  */
-export async function loadTextEngine(): Promise<TextEngine> {
+export async function loadTextEngine(options: { fallback?: boolean } = {}): Promise<TextEngine> {
   const { loadTextEngine: load } = await import('./text-engine');
-  return load();
+  return load(options);
 }
 
 /**

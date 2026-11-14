@@ -103,9 +103,10 @@ describe('pdf-text: a font stack', () => {
     const saved = await PDFDocument.load(bytes);
     const fonts = saved.getPage(0).node.Resources()!.lookup(PDFName.of('Font'), PDFDict);
     expect(fonts.keys()).toHaveLength(2);
-    // One Tf per switch: (USD) Liberation, space Noto, $ Liberation, 25 and the word Noto (25 is an Arabic number here, $ a neutral: UAX #9 W2, N2).
+    // One Tf per switch: "$25 (USD)" Liberation, then the space and the word Noto. Noto has no $, so $ goes to
+    // Liberation; 25, the spaces and the brackets then stay in the font before them, which has them.
     const content = new TextDecoder().decode(await inflatedContent(saved));
-    expect(content.match(/ Tf\b/g)).toHaveLength(4);
+    expect(content.match(/ Tf\b/g)).toHaveLength(2);
     const [read] = await readPdf(bytes);
     expect(visualLines(read.glyphs, 14)).toEqual(['(USD) $25 رعسلا']);
   });

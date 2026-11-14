@@ -101,6 +101,7 @@ import { pruneUnreachable } from './prune';
 import { StampPainter } from './stamps';
 import { moveContent } from './room';
 import { fixActualText } from './spans';
+import { layoutNewText, TEXT_FALLBACK_FONT_URL, TEXT_FONT_URLS } from './text-fonts';
 import { pruneStructure } from './structure';
 import {
   COVER_COLOR,
@@ -525,10 +526,18 @@ class Painter {
     if (object.text.trim() === '' || !fontBytes) return;
     const width = object.box.wPct * g.width;
     const { fallbackDirection } = this.request;
-    const layout = layoutText(layoutFontFor(fontBytes), object.text, { size: object.size, maxWidth: width, direction: 'auto', fallbackDirection });
+    const options = { size: object.size, maxWidth: width, direction: 'auto' as const, fallbackDirection };
+    const cairo = layoutFontFor(fontBytes);
+    let { fonts, layout } = layoutNewText(cairo, null, object.text, options);
+    if (layout.missing.length > 0) {
+      // The preview fetched Liberation Sans for this box too (text-fonts.ts); a fetch that fails leaves the picture.
+      const fallback = await this.loadFont(TEXT_FALLBACK_FONT_URL).then(layoutFontFor, () => null);
+      if (fallback) ({ fonts, layout } = layoutNewText(cairo, fallback, object.text, options));
+    }
     if (layout.missing.length === 0) {
       const topLeft = visualPointToPdf(g, { x: object.box.xPct, y: object.box.yPct });
-      drawLayout(page, await embeddedFont({ doc: this.doc, embedded: this.embedded, loadFont: this.loadFont }, CAIRO_FONT_URL), layout, {
+      const ctx = { doc: this.doc, embedded: this.embedded, loadFont: this.loadFont };
+      drawLayout(page, await Promise.all(TEXT_FONT_URLS[fonts].map((url) => embeddedFont(ctx, url))), layout, {
         size: object.size,
         width,
         align: 'start',

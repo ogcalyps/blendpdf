@@ -75,6 +75,8 @@ export const MAX_CANVAS_PIXELS = 16_000_000;
 export const MIN_TOUCH_TARGET = 44;
 /** FontFace family the UI registers from the engine's Cairo bytes (TextEngine.fontBytes). */
 export const EDITOR_FONT_FAMILY = 'BlendPDF Editor Cairo';
+/** FontFace family for TextEngine.fallbackBytes (Liberation Sans), with Cairo's metrics. */
+export const EDITOR_FALLBACK_FAMILY = 'BlendPDF Editor Fallback';
 
 // ── Pages ───────────────────────────────────────────────────────────────────
 
@@ -696,9 +698,14 @@ export interface TextBoxLayout {
   lineHeight: number;
   /** Total height in points (lines.length * lineHeight); hPct = height / visual page height. */
   height: number;
-  /** Characters Cairo cannot draw. Not empty: show the editPdf.textAsImage note; export saves the box as a picture. */
+  /** Characters no font of the box can draw. Not empty: show the editPdf.textAsImage note; export saves the box as a picture. */
   missing: string[];
+  /** The fonts it is laid out in (text-fonts.ts): the preview puts the same one first in its CSS stack. */
+  fonts: TextFonts;
 }
+
+/** Cairo; Liberation Sans alone (it has Hebrew, Cyrillic and Greek, which Cairo lacks); or Cairo with Liberation Sans after it. */
+export type TextFonts = 'cairo' | 'fallback' | 'both';
 
 export interface TextLayoutRequest {
   /** Points. */
@@ -715,6 +722,12 @@ export interface TextLayoutRequest {
 export interface TextEngine {
   /** The Cairo TTF the PDF embeds. Register it: new FontFace(EDITOR_FONT_FAMILY, fontBytes, overrides). */
   fontBytes: Uint8Array;
+  /**
+   * Liberation Sans, once a box needed a letter Cairo lacks (loadTextEngine({ fallback: true })).
+   * Register it as EDITOR_FALLBACK_FAMILY with the same overrides. Null: not loaded, and
+   * layout() reports such letters missing.
+   */
+  fallbackBytes: Uint8Array | null;
   /**
    * Font metrics as fractions of the em, for the FontFace descriptors
    * ascentOverride / descentOverride (with lineGapOverride '0%'), so the
